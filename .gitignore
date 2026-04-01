@@ -1,1 +1,4 @@
-node_modules\n.svelte-kit\n.vercel\nbuild
+node_modules
+.svelte-kit
+.vercel
+build
