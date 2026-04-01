@@ -70,9 +70,15 @@
 	};
 
 	const MUSCLE_COLORS: Record<string, string> = {
-		'Pecho': '#f87171', 'Triceps': '#fb923c', 'Hombros': '#fbbf24',
-		'Espalda': '#60a5fa', 'Biceps': '#818cf8',
-		'Cuadriceps': '#4ade80', 'Isquiotibiales': '#34d399', 'Gluteos': '#2dd4bf', 'Pantorrillas': '#6ee7b7',
+		'Pecho': '#f87171',
+		'Tríceps': '#fb923c',
+		'Hombros': '#fbbf24',
+		'Espalda': '#60a5fa',
+		'Bíceps': '#818cf8',
+		'Cuádriceps': '#4ade80',
+		'Isquiotibiales': '#34d399',
+		'Glúteos': '#2dd4bf',
+		'Pantorrillas': '#6ee7b7',
 		'Core': '#f59e0b',
 		'Cardio': '#38bdf8',
 	};
