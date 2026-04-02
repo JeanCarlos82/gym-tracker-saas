@@ -27,22 +27,19 @@
 </head>
 <body>
 	<script>
-		// Force unregister stale service workers and clear old caches
-		if ('serviceWorker' in navigator) {
-			var SW_VERSION = '2';
-			if (localStorage.getItem('sw_v') !== SW_VERSION) {
-				navigator.serviceWorker.getRegistrations().then(function(regs) {
+		// One-time cleanup of stale service workers
+		if ('serviceWorker' in navigator && !sessionStorage.getItem('sw_ok')) {
+			sessionStorage.setItem('sw_ok', '1');
+			navigator.serviceWorker.getRegistrations().then(function(regs) {
+				if (regs.length) {
 					regs.forEach(function(r) { r.unregister(); });
-				});
-				caches.keys().then(function(keys) {
-					keys.forEach(function(k) { caches.delete(k); });
-				});
-				localStorage.setItem('sw_v', SW_VERSION);
-				if (localStorage.getItem('sw_cleared') !== '1') {
-					localStorage.setItem('sw_cleared', '1');
-					location.reload();
+					caches.keys().then(function(keys) {
+						Promise.all(keys.map(function(k) { return caches.delete(k); })).then(function() {
+							location.reload();
+						});
+					});
 				}
-			}
+			});
 		}
 	</script>
 	<div>%sveltekit.body%</div>
