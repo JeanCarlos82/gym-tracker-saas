@@ -39,6 +39,7 @@
 	function relaunchWizard() { wizardVisible = true; }
 	function openGuide() { guideVisible = true; }
 	function startFromLanding() { showLanding = false; showAuth = true; }
+	function skipToWizard() { showLanding = false; wizardVisible = true; }
 
 	async function onAuthComplete() {
 		showAuth = false;
@@ -244,7 +245,7 @@
 				<div class="landing-section-title">Empieza gratis hoy</div>
 				<div style="color:var(--muted);font-family:'DM Mono',monospace;font-size:11px;margin-bottom:24px">Sin anuncios. Sin limites. Para siempre.</div>
 				<button class="landing-cta" onclick={startFromLanding}>COMENZAR</button>
-				<button class="landing-skip" onclick={() => { showLanding = false; onAuthComplete(); }}>Continuar sin cuenta</button>
+				<button class="landing-skip" onclick={skipToWizard}>Continuar sin cuenta</button>
 			</div>
 		</div>
 	{/if}
