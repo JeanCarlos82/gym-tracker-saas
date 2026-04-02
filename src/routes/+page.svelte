@@ -53,11 +53,11 @@
 
 	async function onAuthComplete() {
 		showAuth = false;
+		// Re-check auth state
+		await initAuth();
 		if ($user) {
-			// User logged in — load data from Supabase
 			await db.init();
 			if (!db.isOnboarded()) {
-				// First time with account — migrate local data if any
 				await db.migrateToCloud();
 			}
 		}
@@ -69,16 +69,20 @@
 
 	onMount(async () => {
 		await initAuth();
+		isOnboarded = db.isOnboarded();
+
+		if (!isOnboarded) {
+			// Not onboarded — show auth screen
+			showAuth = true;
+			mounted = true;
+			return;
+		}
+
+		// Onboarded — load data
 		if ($user) {
 			await db.init();
 		}
-		isOnboarded = db.isOnboarded();
 		mounted = true;
-		if (!$user && !isOnboarded) {
-			showAuth = true;
-		} else if (!isOnboarded) {
-			wizardVisible = true;
-		}
 	});
 </script>
 
