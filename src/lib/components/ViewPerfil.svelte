@@ -446,13 +446,21 @@ Mi rutina es:
 	}
 
 	// ── Export / Import ──
-	function deleteAllData() {
+	async function deleteAllData() {
+		// Only clear gym data, not auth tokens
 		if (typeof localStorage !== 'undefined') {
-			localStorage.clear();
+			localStorage.removeItem('gym_sessions');
+			localStorage.removeItem('gym_routine');
+			localStorage.removeItem('gym_profile');
+			localStorage.removeItem('gym_objective');
+			localStorage.removeItem('gym_bw');
+			localStorage.removeItem('gym_onboarded');
 		}
+		// Sign out if logged in
+		try { await signOut(); } catch (_) {}
 		ontoast('Datos borrados');
 		setTimeout(() => {
-			window.location.reload();
+			window.location.href = '/';
 		}, 500);
 	}
 
