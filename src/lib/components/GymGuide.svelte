@@ -52,7 +52,7 @@
 </script>
 
 <div class="overlay" class:open={visible} id="guide-overlay" onclick={close}>
-	<div class="modal" style="max-height:90dvh;overflow-y:scroll;-webkit-overflow-scrolling:touch;overscroll-behavior:contain" onclick={(e) => e.stopPropagation()}>
+	<div class="modal modal-scroll" onclick={(e) => e.stopPropagation()}>
 		<div class="mhandle"></div>
 		<div class="mtitle">GUÍA DEL GYM</div>
 		<div class="msub">Todo lo que necesitas saber para empezar</div>

@@ -63,33 +63,32 @@
 		}
 
 		const result: MonthGroup[] = [];
-		let isFirstMonth = true;
+		let firstMonthKey = '';
+		let firstWeekKey = '';
 
 		for (const [key, mo] of monthMap) {
 			const weeks: WeekGroup[] = [];
-			let isFirstWeek = true;
-
 			for (const [wKey, wk] of mo.weeks) {
-				// Auto-open first week of first month
-				if (isFirstMonth && isFirstWeek && !(wKey in openWeeks)) {
-					openWeeks[wKey] = true;
-				}
+				if (!firstWeekKey) firstWeekKey = wKey;
 				weeks.push({ key: wKey, label: wk.label, sessions: wk.sessions });
-				isFirstWeek = false;
 			}
-
 			const totalSessions = weeks.reduce((a, w) => a + w.sessions.length, 0);
-
-			// Auto-open first month
-			if (isFirstMonth && !(key in openMonths)) {
-				openMonths[key] = true;
-			}
-
+			if (!firstMonthKey) firstMonthKey = key;
 			result.push({ key, label: mo.label, weeks, totalSessions });
-			isFirstMonth = false;
 		}
 
-		return result;
+		return { groups: result, firstMonthKey, firstWeekKey };
+	});
+
+	// Auto-open first month/week on mount
+	import { onMount } from 'svelte';
+	onMount(() => {
+		if (months.firstMonthKey && !(months.firstMonthKey in openMonths)) {
+			openMonths = { ...openMonths, [months.firstMonthKey]: true };
+		}
+		if (months.firstWeekKey && !(months.firstWeekKey in openWeeks)) {
+			openWeeks = { ...openWeeks, [months.firstWeekKey]: true };
+		}
 	});
 
 	// ── Toggle helpers ──
@@ -141,7 +140,7 @@
 
 </script>
 
-{#if months.length === 0}
+{#if months.groups.length === 0}
 	<!-- Empty state -->
 	<div class="empty">
 		<div class="empty-ico">
@@ -158,7 +157,7 @@
 	</div>
 {:else}
 	<div id="sess-list">
-		{#each months as month (month.key)}
+		{#each months.groups as month (month.key)}
 			<div class="hist-month-block">
 				<!-- Month header -->
 				<div
