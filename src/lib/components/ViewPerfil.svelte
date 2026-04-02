@@ -861,29 +861,29 @@ Mi rutina es:
 			</div>
 			<div class="p2">
 				<div class="pfield">
-					<div class="plbl">ALTURA ({pHeightUnit === 'ft' ? 'ft/in' : 'cm'})</div>
-					<div style="display:flex;gap:4px;align-items:center">
+					<div class="plbl">ALTURA</div>
+					<div class="unit-row">
 						{#if pHeightUnit === 'ft'}
-							<input class="pinput pnum" type="number" bind:value={pFeet} placeholder="5" min="3" max="7" oninput={handleProfileInput} style="flex:1">
-							<span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2)">ft</span>
-							<input class="pinput pnum" type="number" bind:value={pInches} placeholder="10" min="0" max="11" oninput={handleProfileInput} style="flex:1">
-							<span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2)">in</span>
+							<input class="pinput pnum" type="number" bind:value={pFeet} placeholder="5" min="3" max="7" oninput={handleProfileInput}>
+							<span class="unit-label">ft</span>
+							<input class="pinput pnum" type="number" bind:value={pInches} placeholder="10" min="0" max="11" oninput={handleProfileInput}>
+							<span class="unit-label">in</span>
 						{:else}
-							<input class="pinput pnum" type="number" bind:value={pHeight} placeholder="175" min="100" max="230" oninput={handleProfileInput} style="flex:1">
+							<input class="pinput pnum" type="number" bind:value={pHeight} placeholder="175" min="100" max="230" oninput={handleProfileInput}>
 						{/if}
-						<div class="sex-row" style="min-width:64px">
-							<div class="sex-btn" class:active={pHeightUnit === 'cm'} onclick={() => { pHeightUnit = 'cm'; saveProfileData(); }} style="font-size:11px;padding:8px">cm</div>
-							<div class="sex-btn" class:active={pHeightUnit === 'ft'} onclick={() => { pHeightUnit = 'ft'; saveProfileData(); }} style="font-size:11px;padding:8px">ft</div>
+						<div class="unit-group">
+							<button class="unit-toggle" class:active={pHeightUnit === 'cm'} onclick={() => { pHeightUnit = 'cm'; saveProfileData(); }}>cm</button>
+							<button class="unit-toggle" class:active={pHeightUnit === 'ft'} onclick={() => { pHeightUnit = 'ft'; saveProfileData(); }}>ft</button>
 						</div>
 					</div>
 				</div>
 				<div class="pfield">
-					<div class="plbl">PESO ({pWeightUnit})</div>
-					<div style="display:flex;gap:6px;align-items:center">
-						<input class="pinput pnum" type="number" bind:value={pWeight} placeholder={pWeightUnit === 'lb' ? '165' : '75'} min="30" max={pWeightUnit === 'lb' ? '660' : '300'} step="0.1" oninput={handleProfileInput} style="flex:1">
-						<div class="sex-row" style="min-width:80px">
-							<div class="sex-btn" class:active={pWeightUnit === 'kg'} onclick={() => { pWeightUnit = 'kg'; saveProfileData(); }}>kg</div>
-							<div class="sex-btn" class:active={pWeightUnit === 'lb'} onclick={() => { pWeightUnit = 'lb'; saveProfileData(); }}>lb</div>
+					<div class="plbl">PESO</div>
+					<div class="unit-row">
+						<input class="pinput pnum" type="number" bind:value={pWeight} placeholder={pWeightUnit === 'lb' ? '165' : '75'} min="30" max={pWeightUnit === 'lb' ? '660' : '300'} step="0.1" oninput={handleProfileInput}>
+						<div class="unit-group">
+							<button class="unit-toggle" class:active={pWeightUnit === 'kg'} onclick={() => { pWeightUnit = 'kg'; saveProfileData(); }}>kg</button>
+							<button class="unit-toggle" class:active={pWeightUnit === 'lb'} onclick={() => { pWeightUnit = 'lb'; saveProfileData(); }}>lb</button>
 						</div>
 					</div>
 				</div>

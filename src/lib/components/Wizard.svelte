@@ -595,29 +595,29 @@ Mi rutina es:
 					</div>
 					<div class="wiz-row">
 						<div class="wiz-field">
-							<label class="wiz-label">ALTURA ({wizHeightUnit === 'ft' ? 'ft/in' : 'cm'})</label>
-							<div style="display:flex;gap:4px;align-items:center">
+							<label class="wiz-label">ALTURA</label>
+							<div class="unit-row">
 								{#if wizHeightUnit === 'ft'}
-									<input class="wiz-input wiz-num" type="number" bind:value={wizFeet} placeholder="5" min="3" max="7" style="flex:1">
-									<span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted2)">ft</span>
-									<input class="wiz-input wiz-num" type="number" bind:value={wizInches} placeholder="10" min="0" max="11" style="flex:1">
-									<span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted2)">in</span>
+									<input class="wiz-input wiz-num" type="number" bind:value={wizFeet} placeholder="5" min="3" max="7">
+									<span class="unit-label">ft</span>
+									<input class="wiz-input wiz-num" type="number" bind:value={wizInches} placeholder="10" min="0" max="11">
+									<span class="unit-label">in</span>
 								{:else}
-									<input class="wiz-input wiz-num" type="number" bind:value={wizHeight} placeholder="175" min="100" max="230" style="flex:1">
+									<input class="wiz-input wiz-num" type="number" bind:value={wizHeight} placeholder="175" min="100" max="230">
 								{/if}
-								<div class="wiz-sex-row" style="min-width:64px">
-									<div class="wiz-sex" class:active={wizHeightUnit === 'cm'} onclick={() => { wizHeightUnit = 'cm'; }} style="font-size:12px;padding:8px">cm</div>
-									<div class="wiz-sex" class:active={wizHeightUnit === 'ft'} onclick={() => { wizHeightUnit = 'ft'; }} style="font-size:12px;padding:8px">ft</div>
+								<div class="unit-group">
+									<button class="unit-toggle" class:active={wizHeightUnit === 'cm'} onclick={() => { wizHeightUnit = 'cm'; }}>cm</button>
+									<button class="unit-toggle" class:active={wizHeightUnit === 'ft'} onclick={() => { wizHeightUnit = 'ft'; }}>ft</button>
 								</div>
 							</div>
 						</div>
 						<div class="wiz-field">
-							<label class="wiz-label">PESO ({wizUnit})</label>
-							<div style="display:flex;gap:6px;align-items:center">
-								<input class="wiz-input wiz-num" type="number" bind:value={wizWeight} placeholder={wizUnit === 'lb' ? '165' : '75'} min="30" max={wizUnit === 'lb' ? '660' : '300'} step="0.1" style="flex:1">
-								<div class="wiz-sex-row" style="min-width:70px">
-									<div class="wiz-sex" class:active={wizUnit === 'kg'} onclick={() => { wizUnit = 'kg'; }}>kg</div>
-									<div class="wiz-sex" class:active={wizUnit === 'lb'} onclick={() => { wizUnit = 'lb'; }}>lb</div>
+							<label class="wiz-label">PESO</label>
+							<div class="unit-row">
+								<input class="wiz-input wiz-num" type="number" bind:value={wizWeight} placeholder={wizUnit === 'lb' ? '165' : '75'} min="30" max={wizUnit === 'lb' ? '660' : '300'} step="0.1">
+								<div class="unit-group">
+									<button class="unit-toggle" class:active={wizUnit === 'kg'} onclick={() => { wizUnit = 'kg'; }}>kg</button>
+									<button class="unit-toggle" class:active={wizUnit === 'lb'} onclick={() => { wizUnit = 'lb'; }}>lb</button>
 								</div>
 							</div>
 						</div>

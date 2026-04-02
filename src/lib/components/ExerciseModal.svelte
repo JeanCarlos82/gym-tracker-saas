@@ -585,9 +585,9 @@
 			<!-- Sets header with unit toggle -->
 			<div class="sets-header">
 				<div class="sets-title">SERIES DE HOY</div>
-				<div class="unit-row">
-					<button class="ubtn" class:active={curUnit === 'kg'} onclick={() => setUnit('kg')}>kg</button>
-					<button class="ubtn" class:active={curUnit === 'lb'} onclick={() => setUnit('lb')}>lb</button>
+				<div class="unit-group">
+					<button class="unit-toggle" class:active={curUnit === 'kg'} onclick={() => setUnit('kg')}>kg</button>
+					<button class="unit-toggle" class:active={curUnit === 'lb'} onclick={() => setUnit('lb')}>lb</button>
 				</div>
 			</div>
 
