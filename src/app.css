@@ -26,12 +26,11 @@ input,textarea{-webkit-user-select:text;user-select:text;}
 /* ── HEADER ── */
 .hdr{
   flex-shrink:0;
-  padding:8px var(--margin) 8px;
+  padding:6px var(--margin) 6px;
   padding-left:calc(var(--margin) + var(--safe-left));
   padding-right:calc(var(--margin) + var(--safe-right));
   display:flex;align-items:center;justify-content:space-between;
   border-bottom:1px solid var(--border);
-  min-height:48px;
 }
 .hdr-eyebrow{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:2px;}
 .hdr-day{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;color:var(--text);line-height:1;display:flex;align-items:baseline;gap:8px;}
@@ -883,7 +882,6 @@ input,textarea{-webkit-user-select:text;user-select:text;}
 /* ── PWA standalone mode: status bar overlaps content ── */
 @media(display-mode:standalone){
   #app{padding-top:env(safe-area-inset-top,0px);}
-  .hdr{padding-top:max(8px, env(safe-area-inset-top,8px));}
   .overlay,.wizard-overlay,.auth-overlay,.landing{padding-top:env(safe-area-inset-top,0px);}
 }
 
