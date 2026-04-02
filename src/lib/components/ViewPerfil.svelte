@@ -77,9 +77,10 @@ Mi rutina es:
 `;
 
 	// ── Props ──
-	let { ontoast = (msg: string) => {}, onopenguide = () => {} }: {
+	let { ontoast = (msg: string) => {}, onopenguide = () => {}, onrelaunch = () => {} }: {
 		ontoast?: (msg: string) => void;
 		onopenguide?: () => void;
+		onrelaunch?: () => void;
 	} = $props();
 
 	// ── Reactive DB state ──
@@ -408,6 +409,19 @@ Mi rutina es:
 		ontoast(`Copiado de ${DL[fromDk]}`);
 	}
 
+	let addExInputs: Record<string, string> = $state({});
+
+	function addExercise(dk: string) {
+		const name = (addExInputs[dk] || '').trim();
+		if (!name) return;
+		const newRoutine = { ...dbData.routine };
+		const exs = [...(newRoutine[dk].exercises || [])];
+		exs.push({ name, type: 'pesas' as const });
+		newRoutine[dk] = { ...newRoutine[dk], exercises: exs };
+		db.saveRoutine(newRoutine);
+		addExInputs[dk] = '';
+	}
+
 	function moveEx(dk: string, from: number, to: number) {
 		if (to < 0) return;
 		const newRoutine = { ...dbData.routine };
@@ -724,17 +738,25 @@ Mi rutina es:
 										</div>
 									{/each}
 
-									<!-- Actions -->
-									<div class="routine-actions">
-										{#if otherDaysWithExercises(dk).length}
-											<!-- Copy from other day -->
+									<!-- Add exercise -->
+									<div class="addex-row" style="display:flex;gap:6px;margin-top:8px">
+										<input class="addex-input" type="text" placeholder="Nombre del ejercicio"
+											bind:value={addExInputs[dk]}
+											onkeydown={(e) => { if (e.key === 'Enter') addExercise(dk); }}>
+										<button class="bw-addbtn" onclick={() => addExercise(dk)}>+</button>
+									</div>
+
+									<!-- Copy from other day -->
+									{#if otherDaysWithExercises(dk).length}
+										<div class="routine-actions" style="margin-top:6px">
+											<span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted)">Copiar de:</span>
 											{#each otherDaysWithExercises(dk) as fromDk}
 												<button class="copy-day-btn" onclick={() => copyDayTo(fromDk, dk)} style="font-size:10px;margin:2px">
 													{DL[fromDk]}
 												</button>
 											{/each}
-										{/if}
-									</div>
+										</div>
+									{/if}
 								</div>
 							{/if}
 						</div>
