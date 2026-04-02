@@ -61,35 +61,36 @@
 		// Cancel HTML fallback timer
 		if (typeof window !== 'undefined' && (window as any).__cancelFallback) (window as any).__cancelFallback();
 
-		// Safety net: NEVER hang on loading screen
-		const safetyTimeout = setTimeout(() => {
-			if (!ready) {
-				isOnboarded = db.isOnboarded();
-				if (!isOnboarded) showLanding = true;
-				ready = true;
-			}
-		}, 5000);
+		// If user was onboarded before, show app immediately (data loads in bg)
+		const wasOnboarded = db.isOnboarded();
+		if (wasOnboarded) {
+			isOnboarded = true;
+			ready = true;
+		}
 
 		try {
 			await initAuth();
 			const u = get(user);
-			isOnboarded = db.isOnboarded();
 
 			if (u) {
-				await db.init();
-				db.setOnboarded();
-				isOnboarded = true;
-			} else if (!isOnboarded) {
+				db.init().then(() => {
+					db.setOnboarded();
+					isOnboarded = true;
+				}).catch(() => {});
+				if (!wasOnboarded) {
+					isOnboarded = true;
+					db.setOnboarded();
+				}
+			} else if (!wasOnboarded) {
 				showLanding = true;
 			}
 		} catch (e: unknown) {
 			console.error('Init failed:', e);
-			initError = e instanceof Error ? e.message : 'Error al cargar la app';
-			isOnboarded = db.isOnboarded();
-			if (!isOnboarded) showLanding = true;
+			if (!wasOnboarded) {
+				showLanding = true;
+			}
 		}
 
-		clearTimeout(safetyTimeout);
 		ready = true;
 
 		// Handle OAuth callback: user appears after redirect

@@ -10,17 +10,17 @@ export async function initAuth(): Promise<void> {
 		user.set(session?.user ?? null);
 	});
 
-	// Try to get existing session (with hard timeout for mobile)
+	// Try to get existing session with REAL timeout
 	try {
-		const controller = new AbortController();
-		const timeout = setTimeout(() => controller.abort(), 3000);
-		const { data } = await supabase.auth.getSession();
-		clearTimeout(timeout);
-		if (data.session?.user) {
-			user.set(data.session.user);
+		const result = await Promise.race([
+			supabase.auth.getSession(),
+			new Promise<null>(r => setTimeout(() => r(null), 3000))
+		]);
+		if (result && 'data' in result && result.data.session?.user) {
+			user.set(result.data.session.user);
 		}
 	} catch (_) {
-		// Timeout or error — continue without session
+		// Error — continue without session
 	}
 }
 
