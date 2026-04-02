@@ -144,14 +144,15 @@
 			if (u && (showAuth || showLanding)) {
 				showAuth = false;
 				showLanding = false;
+				db.setOnboarded();
+				isOnboarded = true;
+				// Load cloud data in background
 				db.init().then(() => {
-					db.setOnboarded();
-					isOnboarded = true;
 					const data = get(db);
 					if (!Object.values(data.routine).some(d => d.exercises?.length > 0)) {
 						wizardVisible = true;
 					}
-				});
+				}).catch(() => {});
 			}
 		});
 	});
