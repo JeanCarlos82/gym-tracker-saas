@@ -47,10 +47,35 @@
 	function close(e: MouseEvent) {
 		if ((e.target as HTMLElement).id === 'picker-overlay') visible = false;
 	}
+
+	let swipeStartY = 0;
+	let swipeY = $state(0);
+	let swiping = $state(false);
+
+	function onTouchStart(e: TouchEvent) {
+		const modal = (e.target as HTMLElement).closest('.modal');
+		if (modal && modal.scrollTop > 0) return;
+		swipeStartY = e.touches[0].clientY;
+		swiping = true;
+	}
+	function onTouchMove(e: TouchEvent) {
+		if (!swiping) return;
+		swipeY = Math.max(0, e.touches[0].clientY - swipeStartY);
+	}
+	function onTouchEnd() {
+		if (swipeY > 100) visible = false;
+		swipeY = 0; swiping = false;
+	}
 </script>
 
-<div class="overlay" class:open={visible} id="picker-overlay" onclick={close}>
-	<div class="modal modal-scroll" onclick={(e) => e.stopPropagation()}>
+<div class="overlay" class:open={visible} id="picker-overlay" onclick={close}
+	style:opacity={swiping && swipeY > 0 ? Math.max(0.3, 1 - swipeY / 300) : undefined}
+>
+	<div class="modal modal-scroll" onclick={(e) => e.stopPropagation()}
+		ontouchstart={onTouchStart} ontouchmove={onTouchMove} ontouchend={onTouchEnd}
+		style:transform={swipeY > 0 ? `translateY(${swipeY}px)` : undefined}
+		style:transition={swiping ? 'none' : 'transform 0.35s cubic-bezier(0.32,0.72,0,1)'}
+	>
 		<div class="mhandle"></div>
 		<div class="mtitle">AGREGAR EJERCICIOS</div>
 		<div class="msub">Toca para seleccionar o quitar</div>
