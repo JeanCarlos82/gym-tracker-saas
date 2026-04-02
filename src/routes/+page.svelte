@@ -77,23 +77,6 @@
 		}
 
 		ready = true;
-
-		// Watch for OAuth callback — user store updates after redirect
-		const unsub = user.subscribe(u => {
-			if (u && showAuth) {
-				showAuth = false;
-				db.init().then(() => {
-					db.setOnboarded();
-					isOnboarded = true;
-					const data = get(db);
-					if (!Object.values(data.routine).some(d => d.exercises?.length > 0)) {
-						wizardVisible = true;
-					}
-				});
-			}
-		});
-
-		return () => unsub();
 	});
 </script>
 

@@ -5,19 +5,46 @@ import type { User } from '@supabase/supabase-js';
 export const user = writable<User | null>(null);
 
 export async function initAuth(): Promise<void> {
-	// Listen for auth changes (OAuth callbacks, logout, etc)
-	supabase.auth.onAuthStateChange((_event, session) => {
-		user.set(session?.user ?? null);
+	// Detect OAuth callback (tokens in URL hash or code in query)
+	const hasAuthCallback = typeof window !== 'undefined' &&
+		(window.location.hash.includes('access_token') ||
+		 window.location.search.includes('code='));
+
+	// Use a promise to wait for the first auth state event
+	const firstEvent = new Promise<void>((resolve) => {
+		const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+			user.set(session?.user ?? null);
+			resolve();
+		});
+		// Store subscription for potential cleanup
+		void subscription;
 	});
 
-	// Get cached session
-	try {
-		const { data } = await supabase.auth.getSession();
-		if (data.session?.user) {
-			user.set(data.session.user);
+	if (hasAuthCallback) {
+		// OAuth redirect: wait for Supabase to process tokens (max 4s)
+		await Promise.race([
+			firstEvent,
+			new Promise<void>(r => setTimeout(r, 4000))
+		]);
+		// Clean URL after OAuth processing
+		if (typeof window !== 'undefined') {
+			window.history.replaceState({}, '', window.location.pathname);
 		}
-	} catch (e) {
-		console.error('initAuth error:', e);
+	} else {
+		// Normal visit: get cached session immediately
+		try {
+			const { data } = await supabase.auth.getSession();
+			if (data.session?.user) {
+				user.set(data.session.user);
+			}
+		} catch (e) {
+			console.error('initAuth error:', e);
+		}
+		// Also wait for the listener to fire (it provides the definitive state)
+		await Promise.race([
+			firstEvent,
+			new Promise<void>(r => setTimeout(r, 1000))
+		]);
 	}
 }
 
