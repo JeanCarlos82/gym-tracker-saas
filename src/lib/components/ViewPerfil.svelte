@@ -201,13 +201,17 @@ Mi rutina es:
 	}
 
 	function calcStreak(): number {
+		const hasTrainingDays = Object.values(dbData.routine).some(d => d && !d.rest);
+		if (!hasTrainingDays || !dbData.sessions.length) return 0;
+
 		const dates = new Set(
 			dbData.sessions.filter(s => s.entries?.length > 0).map(s => s.date)
 		);
 		let n = 0;
 		const d = new Date();
 		if (!dates.has(today())) d.setDate(d.getDate() - 1);
-		while (true) {
+		let maxIter = 400;
+		while (maxIter-- > 0) {
 			const k = d.toISOString().split('T')[0];
 			const dk = DK_MAP[d.getDay()];
 			const isRest = dbData.routine[dk]?.rest;
