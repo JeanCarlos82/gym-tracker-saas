@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { db } from '$lib/stores/db';
+	import { user, authLoading, initAuth, signOut } from '$lib/stores/auth';
 	import Nav from '$lib/components/Nav.svelte';
 	import Header from '$lib/components/Header.svelte';
 	import Toast from '$lib/components/Toast.svelte';
@@ -10,10 +11,12 @@
 	import ViewPerfil from '$lib/components/ViewPerfil.svelte';
 	import ExerciseModal from '$lib/components/ExerciseModal.svelte';
 	import Wizard from '$lib/components/Wizard.svelte';
+	import Auth from '$lib/components/Auth.svelte';
 
 	let activeView = $state('hoy');
 	let isOnboarded = $state(false);
 	let mounted = $state(false);
+	let showAuth = $state(false);
 
 	// Modal state
 	let modalVisible = $state(false);
@@ -48,24 +51,57 @@
 		wizardVisible = true;
 	}
 
-	onMount(() => {
+	async function onAuthComplete() {
+		showAuth = false;
+		if ($user) {
+			// User logged in — load data from Supabase
+			await db.init();
+			if (!db.isOnboarded()) {
+				// First time with account — migrate local data if any
+				await db.migrateToCloud();
+			}
+		}
+		isOnboarded = db.isOnboarded();
+		if (!isOnboarded) {
+			wizardVisible = true;
+		}
+	}
+
+	onMount(async () => {
+		await initAuth();
+		if ($user) {
+			await db.init();
+		}
 		isOnboarded = db.isOnboarded();
 		mounted = true;
-		if (!isOnboarded) {
+		if (!$user && !isOnboarded) {
+			showAuth = true;
+		} else if (!isOnboarded) {
 			wizardVisible = true;
 		}
 	});
 </script>
 
-{#if mounted}
-	{#if !isOnboarded || wizardVisible}
+{#if !mounted || $authLoading}
+	<div style="position:fixed;inset:0;background:#0a0a0a;display:flex;align-items:center;justify-content:center;">
+		<div style="text-align:center;">
+			<div style="font-family:'Bebas Neue',sans-serif;font-size:48px;color:#E8FF3A;letter-spacing:2px;">GYM</div>
+			<div style="font-family:'DM Mono',monospace;font-size:11px;color:#555;">Cargando...</div>
+		</div>
+	</div>
+{:else}
+	{#if showAuth}
+		<Auth oncomplete={onAuthComplete} />
+	{/if}
+
+	{#if !showAuth && (!isOnboarded || wizardVisible)}
 		<Wizard
 			bind:visible={wizardVisible}
 			oncomplete={onWizardComplete}
 		/>
 	{/if}
 
-	{#if isOnboarded}
+	{#if !showAuth && isOnboarded}
 		<div id="app">
 			<Header />
 
