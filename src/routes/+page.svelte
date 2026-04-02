@@ -38,7 +38,17 @@
 	function onWizardComplete() { isOnboarded = true; wizardVisible = false; }
 	function relaunchWizard() { wizardVisible = true; }
 	function openGuide() { guideVisible = true; }
-	function startFromLanding() { showLanding = false; showAuth = true; }
+	function startFromLanding() {
+		showLanding = false;
+		const u = get(user);
+		if (u || db.isOnboarded()) {
+			// Already has account or was onboarded — go to app
+			isOnboarded = true;
+			if (u) db.init();
+		} else {
+			showAuth = true;
+		}
+	}
 	function skipToWizard() { showLanding = false; wizardVisible = true; }
 
 	async function onAuthComplete() {
@@ -66,32 +76,19 @@
 		// Safety: never hang more than 5s
 		const safety = setTimeout(() => {
 			if (!ready) {
-				if (wasOnboarded) isOnboarded = true;
-				else showLanding = true;
+				showLanding = true;
 				ready = true;
 			}
 		}, 5000);
 
 		try {
 			await initAuth();
-			const u = get(user);
 
-			if (u) {
-				// User logged in: load cloud data BEFORE showing app
-				await db.init();
-				db.setOnboarded();
-				isOnboarded = true;
-			} else if (wasOnboarded) {
-				// Guest user who was onboarded: show app with local data
-				isOnboarded = true;
-			} else {
-				// New user: show landing
-				showLanding = true;
-			}
+			// Always show landing first
+			showLanding = true;
 		} catch (e: unknown) {
 			console.error('Init failed:', e);
-			if (wasOnboarded) isOnboarded = true;
-			else showLanding = true;
+			showLanding = true;
 		}
 
 		clearTimeout(safety);
