@@ -103,13 +103,28 @@
 					}
 				}
 			} else if (authPending) {
-				// Came from OAuth but no user yet — wait max 3s then show landing
-				setTimeout(() => {
-					if (!isOnboarded && !showLanding) {
+				// Came from OAuth — poll for user every 500ms, max 4s
+				let attempts = 0;
+				const poll = setInterval(() => {
+					attempts++;
+					const u = get(user);
+					if (u) {
+						clearInterval(poll);
+						db.setOnboarded();
+						isOnboarded = true;
+						ready = true;
+						db.init().then(() => {
+							const data = get(db);
+							if (!Object.values(data.routine).some(d => d.exercises?.length > 0)) {
+								wizardVisible = true;
+							}
+						}).catch(() => {});
+					} else if (attempts >= 8) {
+						clearInterval(poll);
 						showLanding = true;
 						ready = true;
 					}
-				}, 3000);
+				}, 500);
 			} else {
 				// No user, normal visit — show landing
 				showLanding = true;
