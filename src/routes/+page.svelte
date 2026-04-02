@@ -58,6 +58,9 @@
 	let initError = $state('');
 
 	onMount(async () => {
+		// Cancel HTML fallback timer
+		if (typeof window !== 'undefined' && (window as any).__cancelFallback) (window as any).__cancelFallback();
+
 		// Safety net: NEVER hang on loading screen
 		const safetyTimeout = setTimeout(() => {
 			if (!ready) {

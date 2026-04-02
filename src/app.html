@@ -26,9 +26,27 @@
 	%sveltekit.head%
 </head>
 <body>
-	<div>%sveltekit.body%</div>
+	<div id="app-root">%sveltekit.body%</div>
+	<noscript>
+		<div style="position:fixed;inset:0;background:#0a0a0a;display:flex;align-items:center;justify-content:center;color:#f2f2f2;font-family:sans-serif;text-align:center;padding:20px;">
+			<div><h1 style="color:#E8FF3A;font-size:48px;margin-bottom:16px;">GYM</h1><p>Necesitas JavaScript activado para usar esta app.</p></div>
+		</div>
+	</noscript>
+	<div id="js-fallback" style="display:none;position:fixed;inset:0;background:#0a0a0a;z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:16px;padding:20px;text-align:center;">
+		<div style="color:#E8FF3A;font-family:sans-serif;font-size:48px;font-weight:bold;letter-spacing:6px;">GYM</div>
+		<div style="color:#777;font-family:sans-serif;font-size:13px;">La app tarda en cargar.</div>
+		<button onclick="location.reload()" style="background:#E8FF3A;color:#000;border:none;border-radius:10px;padding:14px 28px;font-size:16px;font-weight:bold;cursor:pointer;margin-top:8px;">REINTENTAR</button>
+		<div style="color:#555;font-family:sans-serif;font-size:11px;margin-top:12px;">Si el problema persiste, prueba con otro navegador.</div>
+	</div>
 	<script>
-		// Clean up old service workers silently
+		// Show fallback if app doesn't load in 10s
+		var _ft = setTimeout(function() {
+			var f = document.getElementById('js-fallback');
+			if (f) f.style.display = 'flex';
+		}, 10000);
+		// Cancel fallback when Svelte mounts
+		window.__cancelFallback = function() { clearTimeout(_ft); var f = document.getElementById('js-fallback'); if (f) f.style.display = 'none'; };
+		// Clean up old service workers
 		try {
 			if (navigator.serviceWorker) {
 				navigator.serviceWorker.getRegistrations().then(function(r) {
