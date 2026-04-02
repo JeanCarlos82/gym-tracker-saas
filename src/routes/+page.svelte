@@ -13,6 +13,7 @@
 	import ExerciseModal from '$lib/components/ExerciseModal.svelte';
 	import Wizard from '$lib/components/Wizard.svelte';
 	import Auth from '$lib/components/Auth.svelte';
+	import GymGuide from '$lib/components/GymGuide.svelte';
 
 	let activeView = $state('hoy');
 	let isOnboarded = $state(false);
@@ -22,6 +23,7 @@
 	let modalExercise = $state('');
 	let modalType = $state<'pesas' | 'cardio'>('pesas');
 	let wizardVisible = $state(false);
+	let guideVisible = $state(false);
 	let toast: Toast;
 
 	function switchView(view: string) { activeView = view; }
@@ -29,6 +31,7 @@
 	function showToast(msg: string) { toast?.show(msg); }
 	function onWizardComplete() { isOnboarded = true; wizardVisible = false; }
 	function relaunchWizard() { wizardVisible = true; }
+	function openGuide() { guideVisible = true; }
 
 	async function onAuthComplete() {
 		showAuth = false;
@@ -149,7 +152,7 @@
 				{:else if activeView === 'hist'}
 					<div class="view active"><ViewHistorial /></div>
 				{:else if activeView === 'perfil'}
-					<div class="view active"><ViewPerfil ontoast={showToast} onrelaunch={relaunchWizard} /></div>
+					<div class="view active"><ViewPerfil ontoast={showToast} onrelaunch={relaunchWizard} onopenguide={openGuide} /></div>
 				{/if}
 			</div>
 			<Nav active={activeView} onswitch={switchView} />
@@ -157,6 +160,7 @@
 	{/if}
 
 	<ExerciseModal bind:visible={modalVisible} exerciseName={modalExercise} exerciseType={modalType} ontoast={showToast} />
+	<GymGuide bind:visible={guideVisible} />
 {/if}
 
 <Toast bind:this={toast} />
