@@ -58,9 +58,6 @@
 	let initError = $state('');
 
 	onMount(async () => {
-		// Cancel HTML fallback timer
-		if (typeof window !== 'undefined' && (window as any).__cancelFallback) (window as any).__cancelFallback();
-
 		const wasOnboarded = db.isOnboarded();
 
 		// Safety: never hang more than 5s
