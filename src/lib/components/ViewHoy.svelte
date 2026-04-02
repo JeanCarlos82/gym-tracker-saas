@@ -87,22 +87,44 @@
 		reorderSelected = null;
 	}
 
-	function selectReorderEx(idx: number) {
-		if (reorderSelected === null) {
-			reorderSelected = idx;
-		} else if (reorderSelected === idx) {
-			reorderSelected = null;
-		} else {
-			// Perform the swap
+	let reorderAnimating = $state<number | null>(null);
+
+	function moveUp(idx: number) {
+		if (idx <= 0) return;
+		reorderAnimating = idx;
+		setTimeout(() => {
 			const routine = { ...$db.routine };
-			const dayExercises = [...routine[dayKey].exercises];
-			const [moved] = dayExercises.splice(reorderSelected, 1);
-			dayExercises.splice(idx, 0, moved);
-			routine[dayKey] = { ...routine[dayKey], exercises: dayExercises };
+			const exs = [...routine[dayKey].exercises];
+			[exs[idx - 1], exs[idx]] = [exs[idx], exs[idx - 1]];
+			routine[dayKey] = { ...routine[dayKey], exercises: exs };
 			db.saveRoutine(routine);
-			reorderSelected = null;
-			onToast?.('Movido');
-		}
+			reorderAnimating = null;
+		}, 150);
+		if (navigator.vibrate) navigator.vibrate(20);
+	}
+
+	function moveDown(idx: number) {
+		if (idx >= exercises.length - 1) return;
+		reorderAnimating = idx;
+		setTimeout(() => {
+			const routine = { ...$db.routine };
+			const exs = [...routine[dayKey].exercises];
+			[exs[idx], exs[idx + 1]] = [exs[idx + 1], exs[idx]];
+			routine[dayKey] = { ...routine[dayKey], exercises: exs };
+			db.saveRoutine(routine);
+			reorderAnimating = null;
+		}, 150);
+		if (navigator.vibrate) navigator.vibrate(20);
+	}
+
+	function removeExercise(idx: number) {
+		const routine = { ...$db.routine };
+		const exs = [...routine[dayKey].exercises];
+		exs.splice(idx, 1);
+		routine[dayKey] = { ...routine[dayKey], exercises: exs };
+		db.saveRoutine(routine);
+		onToast?.('Eliminado');
+		if (navigator.vibrate) navigator.vibrate(30);
 	}
 
 	function handleCardClick(exerciseName: string, type: 'pesas' | 'cardio') {
@@ -154,26 +176,26 @@
 		{#each exercises as ex, exIdx (ex.name)}
 			{#if reorderMode}
 				<!-- Reorder mode card -->
-				{@const isSel = reorderSelected === exIdx}
-				{@const isTarget = reorderSelected !== null && !isSel}
 				<div
-					class="ex-card reorder {isSel ? 'reorder-sel' : ''}{isTarget ? ' reorder-target' : ''}"
-										role="button"
-					tabindex="0"
-					onclick={(e) => { e.stopPropagation(); selectReorderEx(exIdx); }}
-					onkeydown={(e) => { if (e.key === 'Enter') { e.stopPropagation(); selectReorderEx(exIdx); } }}
+					class="ex-card reorder"
+					class:reorder-moving={reorderAnimating === exIdx}
 				>
+					<div class="reorder-arrows">
+						<button class="reorder-arrow" disabled={exIdx === 0} onclick={() => moveUp(exIdx)} aria-label="Subir">
+							<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+						</button>
+						<button class="reorder-arrow" disabled={exIdx === exercises.length - 1} onclick={() => moveDown(exIdx)} aria-label="Bajar">
+							<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+						</button>
+					</div>
 					<span class="reorder-num">{exIdx + 1}</span>
 					<div class="reorder-info">
 						<div class="reorder-name">{ex.name}</div>
-						<div class="reorder-hint">
-							{#if isSel}
-								Toca la posicion destino
-							{:else if isTarget}
-								Posicion {exIdx + 1}
-							{/if}
-						</div>
+						<div class="reorder-hint">{ex.type === 'cardio' ? 'Cardio' : 'Pesas'}</div>
 					</div>
+					<button class="reorder-del" onclick={() => removeExercise(exIdx)} aria-label="Eliminar">
+						<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+					</button>
 				</div>
 			{:else if ex.type === 'cardio'}
 				<!-- Cardio card -->
