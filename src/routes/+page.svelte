@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { get } from 'svelte/store';
 	import { db } from '$lib/stores/db';
-	import { user, authLoading, initAuth, signOut } from '$lib/stores/auth';
+	import { user, authLoading, initAuth } from '$lib/stores/auth';
 	import Nav from '$lib/components/Nav.svelte';
 	import Header from '$lib/components/Header.svelte';
 	import Toast from '$lib/components/Toast.svelte';
@@ -19,19 +19,14 @@
 	let mounted = $state(false);
 	let showAuth = $state(false);
 
-	// Modal state
 	let modalVisible = $state(false);
 	let modalExercise = $state('');
 	let modalType = $state<'pesas' | 'cardio'>('pesas');
-
-	// Wizard state
 	let wizardVisible = $state(false);
 
 	let toast: Toast;
 
-	function switchView(view: string) {
-		activeView = view;
-	}
+	function switchView(view: string) { activeView = view; }
 
 	function openModal(name: string, type: 'pesas' | 'cardio') {
 		modalExercise = name;
@@ -39,34 +34,31 @@
 		modalVisible = true;
 	}
 
-	function showToast(msg: string) {
-		toast?.show(msg);
-	}
+	function showToast(msg: string) { toast?.show(msg); }
 
 	function onWizardComplete() {
 		isOnboarded = true;
 		wizardVisible = false;
 	}
 
-	function relaunchWizard() {
-		wizardVisible = true;
-	}
+	function relaunchWizard() { wizardVisible = true; }
 
 	async function onAuthComplete() {
 		showAuth = false;
-		await initAuth();
-		if ($user) {
+		// Re-check auth
+		const currentUser = get(user);
+		if (currentUser) {
 			await db.init();
 			db.setOnboarded();
 			isOnboarded = true;
-			// Check if user has a routine in cloud
+			// Check if user has a routine
 			const data = get(db);
 			const hasRoutine = Object.values(data.routine).some(d => d.exercises?.length > 0);
 			if (!hasRoutine) {
 				wizardVisible = true;
 			}
 		} else {
-			// Continued without account
+			// Guest mode
 			isOnboarded = db.isOnboarded();
 			if (!isOnboarded) {
 				wizardVisible = true;
@@ -77,21 +69,14 @@
 	onMount(async () => {
 		await initAuth();
 
-		// After initAuth, check if OAuth set onboarded
+		const currentUser = get(user);
 		isOnboarded = db.isOnboarded();
 
-		if ($user) {
-			// User is logged in — load cloud data
+		if (currentUser) {
+			// User logged in — load cloud data
 			await db.init();
-			isOnboarded = db.isOnboarded();
-
-			if (!isOnboarded) {
-				// First login — try migrate, then wizard
-				await db.migrateToCloud();
-				db.setOnboarded();
-				isOnboarded = true;
-				wizardVisible = true;
-			}
+			isOnboarded = true;
+			db.setOnboarded();
 			mounted = true;
 			return;
 		}
@@ -130,10 +115,7 @@
 			<div class="scroll" id="scroll">
 				{#if activeView === 'hoy'}
 					<div class="view active">
-						<ViewHoy
-							onopenmodal={openModal}
-							ontoast={showToast}
-						/>
+						<ViewHoy onopenmodal={openModal} ontoast={showToast} />
 					</div>
 				{:else if activeView === 'prog'}
 					<div class="view active">
@@ -145,10 +127,7 @@
 					</div>
 				{:else if activeView === 'perfil'}
 					<div class="view active">
-						<ViewPerfil
-							ontoast={showToast}
-							onrelaunch={relaunchWizard}
-						/>
+						<ViewPerfil ontoast={showToast} onrelaunch={relaunchWizard} />
 					</div>
 				{/if}
 			</div>
