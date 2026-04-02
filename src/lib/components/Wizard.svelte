@@ -201,7 +201,7 @@
 		wizHeight = dbData?.profile?.height || '';
 		wizWeight = dbData?.profile?.weight || '';
 		wizActivityLevel = dbData?.profile?.activityLevel ?? -1;
-		wizGoal = objToGoal[dbData?.objective] || null;
+		wizGoal = null;
 		wizExperience = null;
 		wizSelectedDays = [];
 		wizMode = null;
