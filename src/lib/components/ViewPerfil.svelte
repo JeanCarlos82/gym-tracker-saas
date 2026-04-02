@@ -4,6 +4,7 @@
 	import { signOut } from '$lib/stores/auth';
 	import { supabase } from '$lib/supabase';
 	import { getExerciseInfo, getExerciseMuscleGroup } from '$lib/data/exercises';
+	import ExercisePicker from '$lib/components/ExercisePicker.svelte';
 
 	let userEmail = $state<string | null>(null);
 	let emailLoading = $state(true);
@@ -381,7 +382,7 @@ Mi rutina es:
 
 	// ── Routine management ──
 	function toggleDay(dk: string) {
-		openDays[dk] = !openDays[dk];
+		openDays = { ...openDays, [dk]: !openDays[dk] };
 	}
 
 	function toggleRest(dk: string) {
@@ -409,17 +410,23 @@ Mi rutina es:
 		ontoast(`Copiado de ${DL[fromDk]}`);
 	}
 
-	let addExInputs: Record<string, string> = $state({});
+	let pickerDayKey = $state('');
+	let pickerVisible = $state(false);
 
-	function addExercise(dk: string) {
-		const name = (addExInputs[dk] || '').trim();
-		if (!name) return;
+	function openExercisePicker(dk: string) {
+		pickerDayKey = dk;
+		pickerVisible = true;
+	}
+
+	function onPickerSelect(names: string[]) {
+		if (!pickerDayKey) return;
 		const newRoutine = { ...dbData.routine };
-		const exs = [...(newRoutine[dk].exercises || [])];
-		exs.push({ name, type: 'pesas' as const });
-		newRoutine[dk] = { ...newRoutine[dk], exercises: exs };
+		const exs = names.map(name => {
+			const info = getExerciseInfo(name);
+			return { name, type: (info?.zone === 'cardio' ? 'cardio' : 'pesas') as 'pesas' | 'cardio' };
+		});
+		newRoutine[pickerDayKey] = { ...newRoutine[pickerDayKey], exercises: exs, rest: false };
 		db.saveRoutine(newRoutine);
-		addExInputs[dk] = '';
 	}
 
 	function moveEx(dk: string, from: number, to: number) {
@@ -567,7 +574,7 @@ Mi rutina es:
 			<div class="bw-hrow">
 				<span class="bw-hdate">{fmtDF(bw.date)}</span>
 				<span class="bw-hval">{bw.v} kg</span>
-				<button class="bw-hdel" onclick={() => delBW(bwExpanded ? bwRecords.length - 1 - i : bwRecords.length - 1 - i)}>x</button>
+				<button class="bw-hdel" onclick={() => { const idx = bwRecords.indexOf(bw); if (idx >= 0) delBW(idx); }}>x</button>
 			</div>
 		{/each}
 		{#if bwHasMore}
@@ -739,12 +746,9 @@ Mi rutina es:
 									{/each}
 
 									<!-- Add exercise -->
-									<div class="addex-row" style="display:flex;gap:6px;margin-top:8px">
-										<input class="addex-input" type="text" placeholder="Nombre del ejercicio"
-											bind:value={addExInputs[dk]}
-											onkeydown={(e) => { if (e.key === 'Enter') addExercise(dk); }}>
-										<button class="bw-addbtn" onclick={() => addExercise(dk)}>+</button>
-									</div>
+									<button class="copy-day-btn" style="margin-top:8px;width:100%;padding:10px;font-size:11px" onclick={() => openExercisePicker(dk)}>
+										+ AGREGAR EJERCICIOS
+									</button>
 
 									<!-- Copy from other day -->
 									{#if otherDaysWithExercises(dk).length}
@@ -938,3 +942,5 @@ Mi rutina es:
 		</a>
 	</div>
 </div>
+
+<ExercisePicker bind:visible={pickerVisible} selected={pickerDayKey ? (dbData.routine[pickerDayKey]?.exercises || []).map(e => e.name) : []} onselect={onPickerSelect} />
