@@ -86,20 +86,24 @@
 		}, 5000);
 
 		try {
-			// Detect OAuth callback — skip landing
-			const isOAuthCallback = typeof window !== 'undefined' &&
-				(window.location.hash.includes('access_token') || window.location.search.includes('code='));
-
 			await initAuth();
 			const u = get(user);
 
-			if (isOAuthCallback && u) {
-				// OAuth just completed — go straight to app
+			if (u && wasOnboarded) {
+				// Returning logged-in user — skip landing, go to app
+				await db.init();
+				isOnboarded = true;
+			} else if (u && !wasOnboarded) {
+				// Just logged in (OAuth callback) — load data, then app or wizard
 				await db.init();
 				db.setOnboarded();
 				isOnboarded = true;
+				const data = get(db);
+				if (!Object.values(data.routine).some(d => d.exercises?.length > 0)) {
+					wizardVisible = true;
+				}
 			} else {
-				// Show landing for everyone else
+				// No user — show landing
 				showLanding = true;
 			}
 		} catch (e: unknown) {
