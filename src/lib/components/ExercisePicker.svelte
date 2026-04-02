@@ -49,32 +49,48 @@
 	}
 
 	let swipeStartY = 0;
-	let swipeY = $state(0);
-	let swiping = $state(false);
+	let swipeCurrentY = 0;
+	let isSwiping = $state(false);
+	let isClosing = $state(false);
+	let modalTransform = $state('');
+	let overlayOpacity = $state('');
 
 	function onTouchStart(e: TouchEvent) {
-		const modal = (e.target as HTMLElement).closest('.modal');
-		if (modal && modal.scrollTop > 0) return;
+		const modal = (e.currentTarget as HTMLElement);
+		if (modal.scrollTop > 0) return;
 		swipeStartY = e.touches[0].clientY;
-		swiping = true;
+		isSwiping = true;
+		swipeCurrentY = 0;
 	}
 	function onTouchMove(e: TouchEvent) {
-		if (!swiping) return;
-		swipeY = Math.max(0, e.touches[0].clientY - swipeStartY);
+		if (!isSwiping) return;
+		swipeCurrentY = e.touches[0].clientY - swipeStartY;
+		if (swipeCurrentY > 0) {
+			const dampened = swipeCurrentY * 0.6;
+			modalTransform = `translateY(${dampened}px)`;
+			overlayOpacity = String(Math.max(0.3, 1 - dampened / 400));
+		} else { swipeCurrentY = 0; }
 	}
 	function onTouchEnd() {
-		if (swipeY > 100) visible = false;
-		swipeY = 0; swiping = false;
+		if (!isSwiping) return;
+		isSwiping = false;
+		if (swipeCurrentY > 80) {
+			isClosing = true;
+			modalTransform = 'translateY(100%)';
+			overlayOpacity = '0';
+			setTimeout(() => { visible = false; isClosing = false; modalTransform = ''; overlayOpacity = ''; }, 350);
+		} else { modalTransform = ''; overlayOpacity = ''; }
 	}
 </script>
 
 <div class="overlay" class:open={visible} id="picker-overlay" onclick={close}
-	style:opacity={swiping && swipeY > 0 ? Math.max(0.3, 1 - swipeY / 300) : undefined}
+	style:opacity={overlayOpacity || undefined}
+	style:transition={isClosing ? 'opacity 0.35s ease' : isSwiping ? 'none' : undefined}
 >
 	<div class="modal modal-scroll" onclick={(e) => e.stopPropagation()}
 		ontouchstart={onTouchStart} ontouchmove={onTouchMove} ontouchend={onTouchEnd}
-		style:transform={swipeY > 0 ? `translateY(${swipeY}px)` : undefined}
-		style:transition={swiping ? 'none' : 'transform 0.35s cubic-bezier(0.32,0.72,0,1)'}
+		style:transform={modalTransform || undefined}
+		style:transition={isClosing ? 'transform 0.35s cubic-bezier(0.32,0.72,0,1)' : isSwiping ? 'none' : undefined}
 	>
 		<div class="mhandle"></div>
 		<div class="mtitle">AGREGAR EJERCICIOS</div>
