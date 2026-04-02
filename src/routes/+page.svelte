@@ -103,8 +103,8 @@
 					}
 				}
 			} else if (authPending) {
-				// Came from OAuth but no user yet — wait for subscriber
-				showLanding = false;
+				// Came from OAuth but no user yet — keep loading screen visible
+				// Don't set ready=true yet, subscriber will handle it
 			} else {
 				// No user, normal visit — show landing
 				showLanding = true;
@@ -115,7 +115,7 @@
 		}
 
 		clearTimeout(safety);
-		ready = true;
+		if (!authPending || isOnboarded) ready = true;
 
 		// Start notification reminder check
 		startReminderCheck(() => {
@@ -144,11 +144,12 @@
 
 		// Handle OAuth callback: user appears after redirect
 		return user.subscribe(u => {
-			if (u && (showAuth || showLanding)) {
+			if (u && (showAuth || showLanding || !ready)) {
 				showAuth = false;
 				showLanding = false;
 				db.setOnboarded();
 				isOnboarded = true;
+				ready = true;
 				// Load cloud data in background
 				db.init().then(() => {
 					const data = get(db);
