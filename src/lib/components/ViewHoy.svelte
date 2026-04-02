@@ -135,10 +135,9 @@
 		routine[dayKey] = { ...routine[dayKey], exercises: exs };
 		db.saveRoutine(routine);
 
-		// Show land animation on the dropped card
 		landedIdx = toIdx;
 		if (navigator.vibrate) navigator.vibrate(25);
-		setTimeout(() => { landedIdx = null; }, 400);
+		setTimeout(() => { landedIdx = null; }, 250);
 	}
 
 	function removeExercise(idx: number) {
