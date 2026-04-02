@@ -27,6 +27,9 @@
 	let wizHeight = $state('');
 	let wizWeight = $state('');
 	let wizUnit = $state<'kg' | 'lb'>('kg');
+	let wizHeightUnit = $state<'cm' | 'ft'>('cm');
+	let wizFeet = $state('');
+	let wizInches = $state('');
 	let wizActivityLevel = $state(-1);
 	let wizGoal = $state<Goal | null>(null);
 	let wizExperience = $state<Experience | null>(null);
@@ -202,6 +205,12 @@
 		wizHeight = dbData?.profile?.height || '';
 		wizWeight = dbData?.profile?.weight || '';
 		wizUnit = dbData?.profile?.weightUnit || 'kg';
+		wizHeightUnit = dbData?.profile?.heightUnit || 'cm';
+		if (wizHeightUnit === 'ft' && wizHeight) {
+			const totalIn = Math.round(parseFloat(wizHeight) / 2.54);
+			wizFeet = String(Math.floor(totalIn / 12));
+			wizInches = String(totalIn % 12);
+		}
 		wizActivityLevel = dbData?.profile?.activityLevel ?? -1;
 		wizGoal = null;
 		wizExperience = null;
@@ -211,6 +220,15 @@
 		resultRoutine = null;
 		expandedDays = new Set();
 		showCopyPopupFor = null;
+	}
+
+	function getHeightCm(): string {
+		if (wizHeightUnit === 'ft') {
+			const ft = parseInt(wizFeet) || 0;
+			const inc = parseInt(wizInches) || 0;
+			return String(Math.round((ft * 12 + inc) * 2.54));
+		}
+		return wizHeight;
 	}
 
 	// ── Navigation helpers ──
@@ -245,7 +263,7 @@
 			name: wizName || dbData.profile.name,
 			age: wizAge || dbData.profile.age,
 			sex: wizSex || dbData.profile.sex,
-			height: wizHeight || dbData.profile.height,
+			height: getHeightCm() || dbData.profile.height, heightUnit: wizHeightUnit,
 			weight: wizWeight || dbData.profile.weight,
 			weightUnit: wizUnit || 'kg',
 			activityLevel: wizActivityLevel ?? 2,
@@ -310,7 +328,7 @@
 		const { key: templateKey, templates } = selectTemplate(wizExperience, numDays, wizGoal, wizSex);
 		const rawRoutine = buildRoutineFromWizard(templateKey, wizSelectedDays, templates);
 		resultRoutine = adaptExercises(rawRoutine, {
-			age: wizAge, weight: wizWeight, height: wizHeight,
+			age: wizAge, weight: wizWeight, height: getHeightCm(), heightUnit: wizHeightUnit,
 			experience: wizExperience, sex: wizSex, goal: wizGoal,
 			activityLevel: wizActivityLevel
 		});
@@ -332,7 +350,7 @@
 			name: wizName || 'Usuario',
 			age: wizAge || '25',
 			sex: wizSex || 'H',
-			height: wizHeight || '175',
+			height: getHeightCm() || '175', heightUnit: wizHeightUnit,
 			weight: wizWeight || '75',
 			weightUnit: wizUnit || 'kg',
 			restTimerSeconds: 90,
@@ -421,7 +439,7 @@
 			name: wizName || 'Usuario',
 			age: wizAge || '25',
 			sex: wizSex || 'H',
-			height: wizHeight || '175',
+			height: getHeightCm() || '175', heightUnit: wizHeightUnit,
 			weight: wizWeight || '75',
 			weightUnit: wizUnit || 'kg',
 			restTimerSeconds: 90,
@@ -577,8 +595,21 @@ Mi rutina es:
 					</div>
 					<div class="wiz-row">
 						<div class="wiz-field">
-							<label class="wiz-label">ALTURA (cm)</label>
-							<input class="wiz-input wiz-num" type="number" bind:value={wizHeight} placeholder="175" min="100" max="230">
+							<label class="wiz-label">ALTURA ({wizHeightUnit === 'ft' ? 'ft/in' : 'cm'})</label>
+							<div style="display:flex;gap:4px;align-items:center">
+								{#if wizHeightUnit === 'ft'}
+									<input class="wiz-input wiz-num" type="number" bind:value={wizFeet} placeholder="5" min="3" max="7" style="flex:1">
+									<span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted2)">ft</span>
+									<input class="wiz-input wiz-num" type="number" bind:value={wizInches} placeholder="10" min="0" max="11" style="flex:1">
+									<span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted2)">in</span>
+								{:else}
+									<input class="wiz-input wiz-num" type="number" bind:value={wizHeight} placeholder="175" min="100" max="230" style="flex:1">
+								{/if}
+								<div class="wiz-sex-row" style="min-width:64px">
+									<div class="wiz-sex" class:active={wizHeightUnit === 'cm'} onclick={() => { wizHeightUnit = 'cm'; }} style="font-size:12px;padding:8px">cm</div>
+									<div class="wiz-sex" class:active={wizHeightUnit === 'ft'} onclick={() => { wizHeightUnit = 'ft'; }} style="font-size:12px;padding:8px">ft</div>
+								</div>
+							</div>
 						</div>
 						<div class="wiz-field">
 							<label class="wiz-label">PESO ({wizUnit})</label>

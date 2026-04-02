@@ -11,7 +11,7 @@ const DEFAULT_ROUTINE: Routine = {
 	viernes: { label: '', rest: true, exercises: [] }, sabado: { label: '', rest: true, exercises: [] },
 	domingo: { label: '', rest: true, exercises: [] },
 };
-const DEFAULT_PROFILE: Profile = { name: '', age: '', sex: 'H', height: '', weight: '', weightUnit: 'kg', restTimerSeconds: 90, activityLevel: 2 };
+const DEFAULT_PROFILE: Profile = { name: '', age: '', sex: 'H', height: '', weight: '', weightUnit: 'kg', heightUnit: 'cm', restTimerSeconds: 90, activityLevel: 2 };
 const DEFAULT_DB: Database = { routine: DEFAULT_ROUTINE, sessions: [], profile: DEFAULT_PROFILE, objective: 'hipertrofia', bw: [] };
 
 // ── Local storage helpers ──
@@ -60,6 +60,7 @@ async function loadFromSupabase(userId: string): Promise<Database> {
 			name: p.name || '', age: p.age || '', sex: (p.sex as 'H' | 'M') || 'H',
 			height: p.height || '', weight: p.weight || '',
 			weightUnit: (p.weight_unit as 'kg' | 'lb') || 'kg',
+			heightUnit: (p.height_unit as 'cm' | 'ft') || 'cm',
 			restTimerSeconds: p.rest_timer_seconds || 90, activityLevel: p.activity_level ?? 2,
 		} : DEFAULT_PROFILE;
 
@@ -127,6 +128,7 @@ function createDB() {
 						name: profile.name, age: profile.age, sex: profile.sex,
 						height: profile.height, weight: profile.weight,
 						weight_unit: profile.weightUnit || 'kg',
+						height_unit: profile.heightUnit || 'cm',
 						rest_timer_seconds: profile.restTimerSeconds,
 						activity_level: profile.activityLevel,
 						updated_at: new Date().toISOString()

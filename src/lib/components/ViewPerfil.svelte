@@ -113,6 +113,9 @@ Mi rutina es:
 	let pWeight = $state('');
 	let pSex = $state<'H' | 'M'>('H');
 	let pWeightUnit = $state<'kg' | 'lb'>('kg');
+	let pHeightUnit = $state<'cm' | 'ft'>('cm');
+	let pFeet = $state('');
+	let pInches = $state('');
 	let pActivityLevel = $state(2);
 
 	// File input ref
@@ -163,6 +166,12 @@ Mi rutina es:
 		pWeight = p.weight || '';
 		pSex = p.sex || 'H';
 		pWeightUnit = p.weightUnit || 'kg';
+		pHeightUnit = p.heightUnit || 'cm';
+		if (pHeightUnit === 'ft' && pHeight) {
+			const totalIn = Math.round(parseFloat(pHeight) / 2.54);
+			pFeet = String(Math.floor(totalIn / 12));
+			pInches = String(totalIn % 12);
+		}
 		pActivityLevel = p.activityLevel ?? 2;
 
 		// Render BW chart
@@ -304,14 +313,24 @@ Mi rutina es:
 	}
 
 	// ── Profile save ──
+	function getHeightCm(): string {
+		if (pHeightUnit === 'ft') {
+			const ft = parseInt(pFeet) || 0;
+			const inc = parseInt(pInches) || 0;
+			return String(Math.round((ft * 12 + inc) * 2.54));
+		}
+		return pHeight;
+	}
+
 	function saveProfileData() {
 		db.saveProfile({
 			...dbData.profile,
 			name: pName,
 			age: pAge,
-			height: pHeight,
+			height: getHeightCm(),
 			weight: pWeight,
 			weightUnit: pWeightUnit,
+			heightUnit: pHeightUnit,
 			sex: pSex,
 			activityLevel: pActivityLevel
 		});
@@ -842,8 +861,21 @@ Mi rutina es:
 			</div>
 			<div class="p2">
 				<div class="pfield">
-					<div class="plbl">ALTURA (cm)</div>
-					<input class="pinput pnum" type="number" bind:value={pHeight} placeholder="175" min="100" max="230" oninput={handleProfileInput}>
+					<div class="plbl">ALTURA ({pHeightUnit === 'ft' ? 'ft/in' : 'cm'})</div>
+					<div style="display:flex;gap:4px;align-items:center">
+						{#if pHeightUnit === 'ft'}
+							<input class="pinput pnum" type="number" bind:value={pFeet} placeholder="5" min="3" max="7" oninput={handleProfileInput} style="flex:1">
+							<span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2)">ft</span>
+							<input class="pinput pnum" type="number" bind:value={pInches} placeholder="10" min="0" max="11" oninput={handleProfileInput} style="flex:1">
+							<span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2)">in</span>
+						{:else}
+							<input class="pinput pnum" type="number" bind:value={pHeight} placeholder="175" min="100" max="230" oninput={handleProfileInput} style="flex:1">
+						{/if}
+						<div class="sex-row" style="min-width:64px">
+							<div class="sex-btn" class:active={pHeightUnit === 'cm'} onclick={() => { pHeightUnit = 'cm'; saveProfileData(); }} style="font-size:11px;padding:8px">cm</div>
+							<div class="sex-btn" class:active={pHeightUnit === 'ft'} onclick={() => { pHeightUnit = 'ft'; saveProfileData(); }} style="font-size:11px;padding:8px">ft</div>
+						</div>
+					</div>
 				</div>
 				<div class="pfield">
 					<div class="plbl">PESO ({pWeightUnit})</div>

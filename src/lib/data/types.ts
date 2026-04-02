@@ -66,6 +66,7 @@ export interface Profile {
   height: string;
   weight: string;
   weightUnit: 'kg' | 'lb';
+  heightUnit: 'cm' | 'ft';
   restTimerSeconds: number;
   activityLevel: number;
 }
