@@ -91,14 +91,17 @@
 	let dragIdx = $state<number | null>(null);
 	let dragOverIdx = $state<number | null>(null);
 	let dragY = $state(0);
+	let landedIdx = $state<number | null>(null);
 	let dragStartY = 0;
 	let cardHeight = 0;
 
 	function onDragStart(idx: number, e: TouchEvent) {
 		e.preventDefault();
 		dragIdx = idx;
+		dragOverIdx = idx;
 		dragStartY = e.touches[0].clientY;
 		dragY = 0;
+		landedIdx = null;
 		const card = (e.target as HTMLElement).closest('.ex-card');
 		cardHeight = card?.getBoundingClientRect().height ?? 56;
 		if (navigator.vibrate) navigator.vibrate(15);
@@ -107,8 +110,7 @@
 	function onDragMove(e: TouchEvent) {
 		if (dragIdx === null) return;
 		e.preventDefault();
-		const y = e.touches[0].clientY;
-		dragY = y - dragStartY;
+		dragY = e.touches[0].clientY - dragStartY;
 		const offset = Math.round(dragY / (cardHeight + 6));
 		const newIdx = Math.max(0, Math.min(exercises.length - 1, dragIdx + offset));
 		if (newIdx !== dragOverIdx) {
@@ -118,17 +120,25 @@
 	}
 
 	function onDragEnd() {
-		if (dragIdx === null || dragOverIdx === null || dragIdx === dragOverIdx) {
-			dragIdx = null; dragOverIdx = null; dragY = 0;
-			return;
-		}
+		const fromIdx = dragIdx;
+		const toIdx = dragOverIdx;
+		dragY = 0;
+		dragIdx = null;
+		dragOverIdx = null;
+
+		if (fromIdx === null || toIdx === null || fromIdx === toIdx) return;
+
 		const routine = { ...$db.routine };
 		const exs = [...routine[dayKey].exercises];
-		const [moved] = exs.splice(dragIdx, 1);
-		exs.splice(dragOverIdx, 0, moved);
+		const [moved] = exs.splice(fromIdx, 1);
+		exs.splice(toIdx, 0, moved);
 		routine[dayKey] = { ...routine[dayKey], exercises: exs };
 		db.saveRoutine(routine);
-		dragIdx = null; dragOverIdx = null; dragY = 0;
+
+		// Show land animation on the dropped card
+		landedIdx = toIdx;
+		if (navigator.vibrate) navigator.vibrate(25);
+		setTimeout(() => { landedIdx = null; }, 400);
 	}
 
 	function removeExercise(idx: number) {
@@ -192,10 +202,12 @@
 				<!-- Reorder mode card with touch drag -->
 				{@const isDragging = dragIdx === exIdx}
 				{@const isOver = dragOverIdx === exIdx && dragIdx !== null && dragIdx !== exIdx}
+				{@const isLanded = landedIdx === exIdx}
 				<div
 					class="ex-card reorder"
 					class:reorder-dragging={isDragging}
 					class:reorder-over={isOver}
+					class:reorder-landed={isLanded}
 					style={isDragging ? `transform:translateY(${dragY}px) scale(1.03);z-index:10;` : ''}
 					ontouchmove={onDragMove}
 					ontouchend={onDragEnd}
