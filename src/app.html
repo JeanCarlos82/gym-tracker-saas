@@ -26,6 +26,25 @@
 	%sveltekit.head%
 </head>
 <body>
+	<script>
+		// Force unregister stale service workers and clear old caches
+		if ('serviceWorker' in navigator) {
+			var SW_VERSION = '2';
+			if (localStorage.getItem('sw_v') !== SW_VERSION) {
+				navigator.serviceWorker.getRegistrations().then(function(regs) {
+					regs.forEach(function(r) { r.unregister(); });
+				});
+				caches.keys().then(function(keys) {
+					keys.forEach(function(k) { caches.delete(k); });
+				});
+				localStorage.setItem('sw_v', SW_VERSION);
+				if (localStorage.getItem('sw_cleared') !== '1') {
+					localStorage.setItem('sw_cleared', '1');
+					location.reload();
+				}
+			}
+		}
+	</script>
 	<div>%sveltekit.body%</div>
 </body>
 </html>
