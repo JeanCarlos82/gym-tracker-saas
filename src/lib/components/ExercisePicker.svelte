@@ -24,7 +24,7 @@
 		{ key: 'cardio', label: 'CARDIO' },
 	];
 
-	let filtered = $derived(() => {
+	let filtered = $derived.by(() => {
 		const q = search.trim().toLowerCase();
 		if (!q) return EXERCISE_DB;
 		return EXERCISE_DB.filter(e =>
@@ -63,7 +63,7 @@
 		/>
 		<div style="max-height:50dvh;overflow-y:auto;margin:8px 0 12px;scrollbar-width:none">
 			{#each zones as zone}
-				{@const exs = filtered().filter(e => e.zone === zone.key)}
+				{@const exs = filtered.filter(e => e.zone === zone.key)}
 				{#if exs.length > 0}
 					<div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--accent);letter-spacing:1.5px;padding:8px 0 4px">
 						{zone.label}

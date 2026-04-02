@@ -24,10 +24,10 @@
 	<div>
 		<div class="hdr-eyebrow">ENTRENAMIENTO HOY</div>
 		<div class="hdr-day">{dayName}</div>
-		<div class="hdr-date">{dateStr()}</div>
+		<div class="hdr-date">{dateStr}</div>
 	</div>
 	<div class="hdr-right">
-		<div class="hdr-badge">{badge()}</div>
+		<div class="hdr-badge">{badge}</div>
 		<div class="hdr-timer" id="hdr-timer" style="display:none"></div>
 	</div>
 </div>
