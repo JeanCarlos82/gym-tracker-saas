@@ -158,8 +158,7 @@
 				{@const isTarget = reorderSelected !== null && !isSel}
 				<div
 					class="ex-card reorder {isSel ? 'reorder-sel' : ''}{isTarget ? ' reorder-target' : ''}"
-					style="animation-delay:{exIdx * 50}ms"
-					role="button"
+										role="button"
 					tabindex="0"
 					onclick={(e) => { e.stopPropagation(); selectReorderEx(exIdx); }}
 					onkeydown={(e) => { if (e.key === 'Enter') { e.stopPropagation(); selectReorderEx(exIdx); } }}
@@ -182,8 +181,7 @@
 				{@const logged = !!entry}
 				<div
 					class="ex-card {logged ? 'logged' : ''}"
-					style="animation-delay:{exIdx * 50}ms"
-					role="button"
+										role="button"
 					tabindex="0"
 					onclick={() => handleCardClick(ex.name, 'cardio')}
 					onkeydown={(e) => { if (e.key === 'Enter') handleCardClick(ex.name, 'cardio'); }}
@@ -238,8 +236,7 @@
 				{@const suggestion = !logged ? getSuggestion(ex.name) : null}
 				<div
 					class="ex-card {logged ? 'logged' : ''}"
-					style="animation-delay:{exIdx * 50}ms"
-					role="button"
+										role="button"
 					tabindex="0"
 					onclick={() => handleCardClick(ex.name, 'pesas')}
 					onkeydown={(e) => { if (e.key === 'Enter') handleCardClick(ex.name, 'pesas'); }}
