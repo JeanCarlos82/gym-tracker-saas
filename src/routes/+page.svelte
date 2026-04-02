@@ -103,8 +103,13 @@
 					}
 				}
 			} else if (authPending) {
-				// Came from OAuth but no user yet — keep loading screen visible
-				// Don't set ready=true yet, subscriber will handle it
+				// Came from OAuth but no user yet — wait max 3s then show landing
+				setTimeout(() => {
+					if (!isOnboarded && !showLanding) {
+						showLanding = true;
+						ready = true;
+					}
+				}, 3000);
 			} else {
 				// No user, normal visit — show landing
 				showLanding = true;
