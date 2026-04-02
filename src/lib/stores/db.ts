@@ -104,7 +104,7 @@ function createDB() {
 		},
 
 		async saveRoutine(routine: Routine) {
-			update(db => { db.routine = routine; return db; });
+			update(db => ({ ...db, routine }));
 			persistLocal('gym_routine', routine);
 			const userId = getUserId();
 			if (userId) {
@@ -117,7 +117,7 @@ function createDB() {
 		},
 
 		async saveProfile(profile: Profile) {
-			update(db => { db.profile = profile; return db; });
+			update(db => ({ ...db, profile }));
 			persistLocal('gym_profile', profile);
 			const userId = getUserId();
 			if (userId) {
@@ -134,7 +134,7 @@ function createDB() {
 		},
 
 		async saveObjective(objective: string) {
-			update(db => { db.objective = objective; return db; });
+			update(db => ({ ...db, objective }));
 			persistLocal('gym_objective', objective);
 			const userId = getUserId();
 			if (userId) {
@@ -146,10 +146,11 @@ function createDB() {
 
 		async addSession(sess: Session) {
 			update(db => {
-				const idx = db.sessions.findIndex(s => s.date === sess.date);
-				if (idx >= 0) db.sessions[idx] = sess;
-				else db.sessions.push(sess);
-				return db;
+				const sessions = [...db.sessions];
+				const idx = sessions.findIndex(s => s.date === sess.date);
+				if (idx >= 0) sessions[idx] = sess;
+				else sessions.push(sess);
+				return { ...db, sessions };
 			});
 			const currentData = get({ subscribe });
 			persistLocal('gym_sessions', currentData.sessions);
@@ -167,7 +168,7 @@ function createDB() {
 		},
 
 		async saveSessions(sessions: Session[]) {
-			update(db => { db.sessions = sessions; return db; });
+			update(db => ({ ...db, sessions }));
 			persistLocal('gym_sessions', sessions);
 			// Sync changed sessions to cloud
 			const userId = getUserId();
@@ -188,7 +189,7 @@ function createDB() {
 		},
 
 		async saveBW(bw: BodyWeightRecord[]) {
-			update(db => { db.bw = bw; return db; });
+			update(db => ({ ...db, bw }));
 			persistLocal('gym_bw', bw);
 			const userId = getUserId();
 			if (userId) {
