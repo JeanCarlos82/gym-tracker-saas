@@ -1,18 +1,20 @@
 // ── Data model types for the gym app ──
 
 /** A single set within a weight exercise entry */
-export interface WorkingSet {
+export interface GymSet {
   w: number;
   r: number;
-  warmup: boolean;
+  warmup?: boolean;
 }
+/** @deprecated Use GymSet instead */
+export type WorkingSet = GymSet;
 
 /** A weight-training entry logged for one exercise */
 export interface WeightEntry {
   exercise: string;
   type: 'pesas';
-  sets: WorkingSet[];
-  unit: 'kg' | 'lb';
+  sets: GymSet[];
+  unit: string;
   notes?: string;
 }
 
@@ -24,7 +26,7 @@ export interface CardioEntry {
   intensity: 'baja' | 'media' | 'alta';
   km: number;
   cal: number;
-  calEstimated: boolean;
+  calEstimated?: boolean;
   notes?: string;
 }
 
@@ -64,14 +66,16 @@ export interface Profile {
   height: string;
   weight: string;
   restTimerSeconds: number;
-  activityLevel?: number;
+  activityLevel: number;
 }
 
 /** A body-weight measurement */
-export interface BodyWeight {
+export interface BodyWeightRecord {
   date: string;   // ISO date YYYY-MM-DD
   v: number;      // weight in kg
 }
+/** @deprecated Use BodyWeightRecord instead */
+export type BodyWeight = BodyWeightRecord;
 
 /** Training objective */
 export type Objective = 'fuerza' | 'hipertrofia' | 'resistencia';
@@ -94,8 +98,8 @@ export interface Database {
   routine: Routine;
   sessions: Session[];
   profile: Profile;
-  objective: Objective;
-  bw: BodyWeight[];
+  objective: string;
+  bw: BodyWeightRecord[];
 }
 
 /** Set count breakdown returned by entrySetCount */

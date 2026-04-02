@@ -1,19 +1,8 @@
 import { writable, derived, get } from 'svelte/store';
 import { supabase } from '$lib/supabase';
 import { user } from './auth';
-
-// ── Types ──
-export interface GymSet { w: number; r: number; warmup?: boolean; }
-export interface WeightEntry { exercise: string; type: 'pesas'; sets: GymSet[]; unit: string; notes?: string; }
-export interface CardioEntry { exercise: string; type: 'cardio'; min: number; intensity: 'baja' | 'media' | 'alta'; km: number; cal: number; calEstimated?: boolean; notes?: string; }
-export type Entry = WeightEntry | CardioEntry;
-export interface Session { date: string; dayKey: string; startTime?: string; endTime?: string; entries: Entry[]; }
-export interface ExerciseRef { name: string; type: 'pesas' | 'cardio'; }
-export interface DayRoutine { label: string; rest: boolean; exercises: ExerciseRef[]; }
-export interface Routine { [key: string]: DayRoutine; }
-export interface Profile { name: string; age: string; sex: 'H' | 'M'; height: string; weight: string; restTimerSeconds: number; activityLevel: number; }
-export interface BodyWeightRecord { date: string; v: number; }
-export interface Database { routine: Routine; sessions: Session[]; profile: Profile; objective: string; bw: BodyWeightRecord[]; }
+import type { GymSet, WeightEntry, CardioEntry, Entry, Session, ExerciseRef, DayRoutine, Routine, Profile, BodyWeightRecord, Database } from '$lib/data/types';
+export type { GymSet, WeightEntry, CardioEntry, Entry, Session, ExerciseRef, DayRoutine, Routine, Profile, BodyWeightRecord, Database };
 
 // ── Defaults ──
 const DEFAULT_ROUTINE: Routine = {
