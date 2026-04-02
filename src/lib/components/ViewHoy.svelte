@@ -156,28 +156,6 @@
 	}
 </script>
 
-<!-- Streaks display -->
-{#if constancia >= 1 || progreso >= 1}
-	<div class="hdr-streaks">
-		{#if constancia >= 1}
-			<div class="hdr-streak fire">
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12">
-					<path d="M12 12c2-2.96 0-7-1-8 0 3.038-1.773 4.741-3 6-1.226 1.26-2 3.24-2 5a6 6 0 1 0 12 0c0-1.532-1.056-3.94-2-5-1.786 3-2.791 3-4 2z"/>
-				</svg>
-				<span>{constancia}</span>
-			</div>
-		{/if}
-		{#if progreso >= 1}
-			<div class="hdr-streak bolt">
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12">
-					<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-				</svg>
-				<span>{progreso}</span>
-			</div>
-		{/if}
-	</div>
-{/if}
-
 <!-- Main content -->
 {#if isRestDay}
 	<!-- Rest day display -->
@@ -332,17 +310,39 @@
 		{/each}
 
 		<!-- Reorder instruction note -->
-		{#if reorderMode && exCount > 1}
+		{#if reorderMode}
 			<div class="reorder-note">
 				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
 					<circle cx="12" cy="12" r="10"/>
 					<line x1="12" y1="16" x2="12" y2="12"/>
 					<line x1="12" y1="8" x2="12.01" y2="8"/>
 				</svg>
-				<p><b>1.</b> Toca el ejercicio que quieras mover &middot; <b>2.</b> Toca la posicion donde colocarlo</p>
+				<p>Arrastra <b>≡</b> para mover &middot; Toca <b>✕</b> para eliminar</p>
 			</div>
 		{/if}
 	</div>
+
+	<!-- Streaks -->
+	{#if !reorderMode && (constancia >= 1 || progreso >= 1)}
+		<div class="streaks-bar">
+			{#if constancia >= 1}
+				<div class="streak-chip fire">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
+						<path d="M12 12c2-2.96 0-7-1-8 0 3.038-1.773 4.741-3 6-1.226 1.26-2 3.24-2 5a6 6 0 1 0 12 0c0-1.532-1.056-3.94-2-5-1.786 3-2.791 3-4 2z"/>
+					</svg>
+					<span>{constancia} constancia</span>
+				</div>
+			{/if}
+			{#if progreso >= 1}
+				<div class="streak-chip bolt">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
+						<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+					</svg>
+					<span>{progreso} progreso</span>
+				</div>
+			{/if}
+		</div>
+	{/if}
 
 	<!-- FAB reorder button -->
 	{#if exCount > 1}
