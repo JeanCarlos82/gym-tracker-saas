@@ -47,29 +47,51 @@
 		}
 	}
 
-	onMount(async () => {
-		await initAuth();
-		const u = get(user);
-		isOnboarded = db.isOnboarded();
+	let initError = $state('');
 
-		if (u) {
-			// If user has local data but just logged in, migrate first
-			const hadLocalData = db.isOnboarded();
-			await db.init();
-			if (hadLocalData) {
-				await db.migrateToCloud();
+	onMount(async () => {
+		try {
+			await initAuth();
+		} catch (e) {
+			console.error('Auth init failed:', e);
+		}
+
+		try {
+			const u = get(user);
+			isOnboarded = db.isOnboarded();
+
+			if (u) {
+				const hadLocalData = db.isOnboarded();
+				await db.init();
+				if (hadLocalData) {
+					await db.migrateToCloud();
+				}
+				db.setOnboarded();
+				isOnboarded = true;
+			} else if (!isOnboarded) {
+				showAuth = true;
 			}
-			db.setOnboarded();
-			isOnboarded = true;
-		} else if (!isOnboarded) {
-			showAuth = true;
+		} catch (e: any) {
+			console.error('Init failed:', e);
+			initError = e?.message || 'Error al cargar la app';
 		}
 
 		ready = true;
 	});
 </script>
 
-{#if !ready}
+{#if initError}
+	<div style="position:fixed;inset:0;background:#0a0a0a;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;padding:20px;">
+		<div style="color:#f87171;margin-bottom:8px;">
+			<svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+		</div>
+		<div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#f2f2f2;">Error al cargar</div>
+		<div style="font-family:'DM Mono',monospace;font-size:11px;color:#777;text-align:center;max-width:300px;">{initError}</div>
+		<button onclick={() => window.location.reload()} style="background:#E8FF3A;color:#000;border:none;border-radius:12px;padding:12px 24px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer;margin-top:8px;">
+			REINTENTAR
+		</button>
+	</div>
+{:else if !ready}
 	<div style="position:fixed;inset:0;background:#0a0a0a;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:24px;">
 		<div style="text-align:center;">
 			<div style="
