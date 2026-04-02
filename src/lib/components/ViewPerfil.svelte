@@ -90,7 +90,7 @@ Mi rutina es:
 	let bwInput = $state('');
 	let bwExpanded = $state(false);
 	let bwChartCanvas: HTMLCanvasElement;
-	let bwChartInstance: any = null;
+	let bwChartInstance: { destroy: () => void } | null = null;
 
 	// Dropdowns
 	let rutinaOpen = $state(false);
@@ -110,7 +110,7 @@ Mi rutina es:
 	let fileInput: HTMLInputElement;
 
 	// PWA install
-	let deferredPrompt: any = null;
+	let deferredPrompt: Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: string }> } | null = null;
 	let showInstall = $state(false);
 
 	// ── Derived: profile header stats ──
@@ -159,9 +159,9 @@ Mi rutina es:
 		renderBWChart();
 
 		// PWA install event
-		window.addEventListener('beforeinstallprompt', (e: any) => {
+		window.addEventListener('beforeinstallprompt', (e: Event) => {
 			e.preventDefault();
-			deferredPrompt = e;
+			deferredPrompt = e as typeof deferredPrompt;
 			showInstall = true;
 		});
 
@@ -342,7 +342,7 @@ Mi rutina es:
 				datasets: [{
 					data: bws.map(b => b.v),
 					borderColor: '#3ab4ff',
-					backgroundColor: (ctx: any) => {
+					backgroundColor: (ctx: { chart: { ctx: CanvasRenderingContext2D } }) => {
 						const g = ctx.chart.ctx.createLinearGradient(0, 0, 0, 100);
 						g.addColorStop(0, 'rgba(58,180,255,0.18)');
 						g.addColorStop(1, 'rgba(58,180,255,0)');
@@ -363,7 +363,7 @@ Mi rutina es:
 					tooltip: {
 						backgroundColor: '#1a1a1a',
 						bodyColor: '#f2f2f2',
-						callbacks: { label: (ctx: any) => `${ctx.raw} kg` }
+						callbacks: { label: (ctx: { raw: number }) => `${ctx.raw} kg` }
 					}
 				},
 				scales: {
@@ -471,7 +471,7 @@ Mi rutina es:
 	function installPWA() {
 		if (!deferredPrompt) { ontoast('Abre en tu navegador para instalar'); return; }
 		deferredPrompt.prompt();
-		deferredPrompt.userChoice.then((r: any) => {
+		deferredPrompt.userChoice.then((r: { outcome: string }) => {
 			if (r.outcome === 'accepted') ontoast('App instalada');
 			deferredPrompt = null;
 			showInstall = false;

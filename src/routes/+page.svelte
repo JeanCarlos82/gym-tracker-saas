@@ -77,8 +77,9 @@
 			} else if (!isOnboarded) {
 				showAuth = true;
 			}
-		} catch (e: any) {
+		} catch (e: unknown) {
 			console.error('Init failed:', e);
+			initError = e instanceof Error ? e.message : 'Error al cargar la app';
 			isOnboarded = db.isOnboarded();
 			if (!isOnboarded) showAuth = true;
 		}

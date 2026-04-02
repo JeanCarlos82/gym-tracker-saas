@@ -2,6 +2,7 @@
 	import { db } from '$lib/stores/db';
 	import { get } from 'svelte/store';
 	import type { DayKey, Goal, Experience, Sex, Routine, ExerciseEntry } from '$lib/types';
+	import type { DayRoutine } from '$lib/data/types';
 	import {
 		selectTemplate,
 		buildRoutineFromWizard,
@@ -103,7 +104,7 @@
 	let isInstalled = $derived(
 		typeof window !== 'undefined' &&
 		(window.matchMedia('(display-mode: standalone)').matches ||
-		(window.navigator as any).standalone === true)
+		(window.navigator as Navigator & { standalone?: boolean }).standalone === true)
 	);
 
 	let isIOS = $derived(
@@ -182,7 +183,7 @@
 
 	function initWizard() {
 		const current = db.isOnboarded();
-		let dbData: any = get(db);
+		let dbData = get(db);
 
 		if (current) {
 			step = 1; // Skip install for re-launch
@@ -228,7 +229,7 @@
 
 	function importRoutine() {
 		// Save profile first
-		let dbData: any = get(db);
+		let dbData = get(db);
 
 		db.saveProfile({
 			...dbData.profile,
@@ -315,7 +316,7 @@
 
 	function applyAutoRoutine() {
 		if (!resultRoutine) return;
-		db.saveRoutine(resultRoutine as any);
+		db.saveRoutine(resultRoutine!);
 		db.saveObjective(goalToObjective(wizGoal!));
 		db.saveProfile({
 			name: wizName || 'Usuario',
@@ -400,11 +401,11 @@
 	}
 
 	function applyManualRoutine() {
-		const full: Record<string, any> = {};
+		const full: Record<string, DayRoutine> = {};
 		ALL_DAY_KEYS.forEach(dk => {
 			full[dk] = manualRoutine[dk] || { label: 'Descanso', rest: true, exercises: [] };
 		});
-		db.saveRoutine(full as any);
+		db.saveRoutine(full as Routine);
 		db.saveProfile({
 			name: wizName || 'Usuario',
 			age: wizAge || '25',

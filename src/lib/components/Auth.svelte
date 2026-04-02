@@ -45,8 +45,8 @@
 				await resetPassword(email);
 				message = 'Te enviamos un email para restablecer tu contraseña';
 			}
-		} catch (e: any) {
-			error = e.message || 'Error desconocido';
+		} catch (e: unknown) {
+			error = e instanceof Error ? e.message : 'Error desconocido';
 		} finally {
 			loading = false;
 		}
@@ -57,8 +57,8 @@
 		loading = true;
 		try {
 			await signInWithGoogle();
-		} catch (e: any) {
-			error = e.message || 'Error con Google';
+		} catch (e: unknown) {
+			error = e instanceof Error ? e.message : 'Error con Google';
 			loading = false;
 		}
 	}

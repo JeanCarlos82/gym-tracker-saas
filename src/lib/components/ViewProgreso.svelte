@@ -13,8 +13,8 @@
 	import type { Entry, WeightEntry, CardioEntry, Session } from '$lib/stores/db';
 
 	// Chart.js loaded dynamically
-	let Chart: any;
-	let chartInstance: any = null;
+	let Chart: typeof import('chart.js/auto').default | null = null;
+	let chartInstance: { destroy: () => void } | null = null;
 	let chartCanvas: HTMLCanvasElement;
 	let chartReady = $state(false);
 
@@ -330,7 +330,7 @@
 						{
 							data: minVals,
 							borderColor: '#38bdf8',
-							backgroundColor: (ctx: any) => {
+							backgroundColor: (ctx: { chart: { ctx: CanvasRenderingContext2D } }) => {
 								const g = ctx.chart.ctx.createLinearGradient(0, 0, 0, 200);
 								g.addColorStop(0, 'rgba(56,189,248,0.2)');
 								g.addColorStop(1, 'rgba(56,189,248,0)');
@@ -356,7 +356,7 @@
 						}
 					]
 				},
-				options: chartOptions((ctx: any) => {
+				options: chartOptions((ctx: { dataIndex: number }) => {
 					const p = _cpts[ctx.dataIndex];
 					const parts: string[] = [];
 					if (p?.intensity !== 'media') parts.push(p?.intensity || '');
@@ -384,7 +384,7 @@
 						{
 							data: mxVals,
 							borderColor: '#E8FF3A',
-							backgroundColor: (ctx: any) => {
+							backgroundColor: (ctx: { chart: { ctx: CanvasRenderingContext2D } }) => {
 								const g = ctx.chart.ctx.createLinearGradient(0, 0, 0, 200);
 								g.addColorStop(0, 'rgba(232,255,58,0.2)');
 								g.addColorStop(1, 'rgba(232,255,58,0)');
@@ -414,7 +414,7 @@
 						}
 					]
 				},
-				options: chartOptions((ctx: any) => {
+				options: chartOptions((ctx: { dataIndex: number }) => {
 					const p = _wpts[ctx.dataIndex];
 					return p?.notes ? `\u270E ${p.notes}` : '';
 				}, unit)
@@ -429,7 +429,7 @@
 		};
 	});
 
-	function chartOptions(afterLabelCb: (ctx: any) => string, unitLabel: string) {
+	function chartOptions(afterLabelCb: (ctx: { dataIndex: number }) => string, unitLabel: string) {
 		return {
 			responsive: true,
 			maintainAspectRatio: false,
@@ -442,9 +442,9 @@
 					borderColor: '#202020',
 					borderWidth: 1,
 					padding: 9,
-					filter: (item: any) => item.datasetIndex === 0,
+					filter: (item: { datasetIndex: number }) => item.datasetIndex === 0,
 					callbacks: {
-						label: (ctx: any) => `${ctx.raw} ${unitLabel}`,
+						label: (ctx: { raw: number }) => `${ctx.raw} ${unitLabel}`,
 						afterLabel: afterLabelCb
 					}
 				}

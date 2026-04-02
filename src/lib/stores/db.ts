@@ -64,12 +64,12 @@ async function loadFromSupabase(userId: string): Promise<Database> {
 
 		const routine: Routine = routineRes.data?.data || DEFAULT_ROUTINE;
 
-		const sessions: Session[] = (sessionsRes.data || []).map((s: any) => ({
+		const sessions: Session[] = (sessionsRes.data || []).map((s: { date: string; day_key: string; start_time: string; end_time: string; entries: Entry[] }) => ({
 			date: s.date, dayKey: s.day_key, startTime: s.start_time,
 			endTime: s.end_time, entries: s.entries || [],
 		}));
 
-		const bw: BodyWeightRecord[] = (bwRes.data || []).map((b: any) => ({ date: b.date, v: b.value }));
+		const bw: BodyWeightRecord[] = (bwRes.data || []).map((b: { date: string; value: number }) => ({ date: b.date, v: b.value }));
 
 		return { routine, sessions, profile, objective: p?.objective || 'hipertrofia', bw };
 	} catch (e) {
