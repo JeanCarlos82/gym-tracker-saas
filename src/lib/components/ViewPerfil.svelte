@@ -529,12 +529,8 @@ Mi rutina es:
 			localStorage.removeItem('gym_bw');
 			localStorage.removeItem('gym_onboarded');
 		}
-		// Reload store with empty data
-		db.reload();
-		ontoast('Datos borrados');
-		// Launch wizard
-		onrelaunch();
-		confirmDelete = false;
+		// Reload page — shows landing for fresh start
+		window.location.href = '/';
 	}
 
 	function exportData() {
