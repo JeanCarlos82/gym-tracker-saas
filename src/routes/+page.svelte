@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { get } from 'svelte/store';
 	import { db } from '$lib/stores/db';
-	import { user, authReady, initAuth } from '$lib/stores/auth';
+	import { user, initAuth } from '$lib/stores/auth';
 	import Nav from '$lib/components/Nav.svelte';
 	import Header from '$lib/components/Header.svelte';
 	import Toast from '$lib/components/Toast.svelte';
@@ -18,52 +18,44 @@
 	let isOnboarded = $state(false);
 	let ready = $state(false);
 	let showAuth = $state(false);
-
 	let modalVisible = $state(false);
 	let modalExercise = $state('');
 	let modalType = $state<'pesas' | 'cardio'>('pesas');
 	let wizardVisible = $state(false);
-
 	let toast: Toast;
 
 	function switchView(view: string) { activeView = view; }
-	function openModal(name: string, type: 'pesas' | 'cardio') {
-		modalExercise = name; modalType = type; modalVisible = true;
-	}
+	function openModal(name: string, type: 'pesas' | 'cardio') { modalExercise = name; modalType = type; modalVisible = true; }
 	function showToast(msg: string) { toast?.show(msg); }
 	function onWizardComplete() { isOnboarded = true; wizardVisible = false; }
 	function relaunchWizard() { wizardVisible = true; }
 
 	async function onAuthComplete() {
 		showAuth = false;
-		const currentUser = get(user);
-		if (currentUser) {
+		const u = get(user);
+		if (u) {
 			await db.init();
 			db.setOnboarded();
 			isOnboarded = true;
 			const data = get(db);
-			const hasRoutine = Object.values(data.routine).some(d => d.exercises?.length > 0);
-			if (!hasRoutine) wizardVisible = true;
+			if (!Object.values(data.routine).some(d => d.exercises?.length > 0)) {
+				wizardVisible = true;
+			}
 		} else {
-			isOnboarded = db.isOnboarded();
-			if (!isOnboarded) wizardVisible = true;
+			if (!db.isOnboarded()) wizardVisible = true;
+			else isOnboarded = true;
 		}
 	}
 
 	onMount(async () => {
-		try {
-			await initAuth();
-		} catch (e) {
-			console.error('initAuth error:', e);
-		}
-
-		const currentUser = get(user);
+		await initAuth();
+		const u = get(user);
 		isOnboarded = db.isOnboarded();
 
-		if (currentUser) {
+		if (u) {
 			await db.init();
-			isOnboarded = true;
 			db.setOnboarded();
+			isOnboarded = true;
 		} else if (!isOnboarded) {
 			showAuth = true;
 		}
