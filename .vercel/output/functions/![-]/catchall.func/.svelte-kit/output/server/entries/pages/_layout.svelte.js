@@ -1,9 +1,9 @@
-import "../../chunks/server.js";
-//#region src/routes/+layout.svelte
+import "clsx";
 function _layout($$renderer, $$props) {
-	let { children } = $$props;
-	children($$renderer);
-	$$renderer.push(`<!---->`);
+  let { children } = $$props;
+  children($$renderer);
+  $$renderer.push(`<!---->`);
 }
-//#endregion
-export { _layout as default };
+export {
+  _layout as default
+};

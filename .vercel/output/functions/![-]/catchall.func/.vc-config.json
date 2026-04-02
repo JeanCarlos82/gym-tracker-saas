@@ -1,5 +1,5 @@
 {
-	"runtime": "nodejs24.x",
+	"runtime": "nodejs22.x",
 	"handler": "..\\..\\..\\..\\..\\..\\Users\\jcarl\\Desktop\\WSPP\\SaaS\\.svelte-kit\\vercel-tmp\\index.js",
 	"launcherType": "Nodejs",
 	"experimentalResponseStreaming": true,
