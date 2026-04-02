@@ -16,9 +16,11 @@
 	let Chart: any;
 	let chartInstance: any = null;
 	let chartCanvas: HTMLCanvasElement;
+	let chartReady = $state(false);
 
 	onMount(async () => {
 		Chart = (await import('chart.js/auto')).default;
+		chartReady = true;
 	});
 
 	// ── State ──
@@ -676,12 +678,19 @@
 
 			<!-- Chart -->
 			<div class="chart-box">
-				<div class="chart-top">
-					<span class="chart-title">{isCardio ? 'TIEMPO POR SESION' : 'PESO MAXIMO POR SESION'}</span>
-				</div>
-				<div class="chart-canvas-wrap">
-					<canvas bind:this={chartCanvas}></canvas>
-				</div>
+				{#if chartReady}
+					<div class="chart-top">
+						<span class="chart-title">{isCardio ? 'TIEMPO POR SESION' : 'PESO MAXIMO POR SESION'}</span>
+					</div>
+					<div class="chart-canvas-wrap">
+						<canvas bind:this={chartCanvas}></canvas>
+					</div>
+				{:else}
+					<div style="padding:12px">
+						<div class="skeleton skeleton-text short" style="margin-bottom:16px"></div>
+						<div class="skeleton" style="height:200px;border-radius:12px"></div>
+					</div>
+				{/if}
 			</div>
 
 			<!-- Best Sets by Reps (weight only) -->

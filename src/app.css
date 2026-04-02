@@ -49,8 +49,12 @@ input,textarea{-webkit-user-select:text;user-select:text;}
 .scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:0 var(--margin);padding-left:calc(var(--margin) + var(--safe-left));padding-right:calc(var(--margin) + var(--safe-right));padding-bottom:calc(80px + env(safe-area-inset-bottom,0px));-webkit-overflow-scrolling:touch;scrollbar-width:none;}
 .scroll::-webkit-scrollbar{display:none;}
 .view{display:none;}
-.view.active{display:block;padding-top:12px;padding-bottom:10px;animation:viewFadeIn 0.3s ease;}
+.view.active{display:block;padding-top:12px;padding-bottom:10px;}
+.view.active.slide-left{animation:slideInLeft 0.28s ease;}
+.view.active.slide-right{animation:slideInRight 0.28s ease;}
 @keyframes viewFadeIn{from{opacity:0;}to{opacity:1;}}
+@keyframes slideInLeft{from{transform:translateX(30px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+@keyframes slideInRight{from{transform:translateX(-30px);opacity:0;}to{transform:translateX(0);opacity:1;}}
 
 /* ── SECTION LABEL ── */
 .slbl{font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:3px;color:var(--muted2);padding:16px 0 8px;display:flex;align-items:center;gap:10px;}
@@ -874,3 +878,8 @@ input,textarea{-webkit-user-select:text;user-select:text;}
   .wizard{max-width:430px;}
   .fab-reorder{right:calc(50% - 215px + 16px);}
 }
+
+/* Offline banner */
+.offline-banner{position:fixed;top:0;left:0;right:0;z-index:1000;display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 16px;background:rgba(255,170,58,0.12);border-bottom:1px solid rgba(255,170,58,0.25);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.5px;color:var(--orange);animation:offlineSlideDown 0.3s ease;}
+.offline-banner svg{flex-shrink:0;}
+@keyframes offlineSlideDown{from{transform:translateY(-100%);opacity:0;}to{transform:translateY(0);opacity:1;}}

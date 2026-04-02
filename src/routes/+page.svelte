@@ -14,6 +14,7 @@
 	import Wizard from '$lib/components/Wizard.svelte';
 	import Auth from '$lib/components/Auth.svelte';
 	import GymGuide from '$lib/components/GymGuide.svelte';
+	import OfflineBanner from '$lib/components/OfflineBanner.svelte';
 
 	let activeView = $state('hoy');
 	let isOnboarded = $state(false);
@@ -25,8 +26,10 @@
 	let wizardVisible = $state(false);
 	let guideVisible = $state(false);
 	let toast: Toast;
+	const VIEW_INDEX: Record<string, number> = { hoy: 0, prog: 1, hist: 2, perfil: 3 };
+	let slideDir = $state<'left' | 'right'>('left');
 
-	function switchView(view: string) { activeView = view; }
+	function switchView(view: string) { slideDir = VIEW_INDEX[view] > VIEW_INDEX[activeView] ? 'left' : 'right'; activeView = view; }
 	function openModal(name: string, type: 'pesas' | 'cardio') { modalExercise = name; modalType = type; modalVisible = true; }
 	function showToast(msg: string) { toast?.show(msg); }
 	function onWizardComplete() { isOnboarded = true; wizardVisible = false; }
@@ -133,6 +136,8 @@
 		</style>`}
 	</div>
 {:else}
+	<OfflineBanner />
+
 	{#if showAuth}
 		<Auth oncomplete={onAuthComplete} />
 	{/if}
@@ -146,13 +151,13 @@
 			<Header />
 			<div class="scroll" id="scroll">
 				{#if activeView === 'hoy'}
-					<div class="view active"><ViewHoy onopenmodal={openModal} ontoast={showToast} /></div>
+					<div class="view active slide-{slideDir}"><ViewHoy onopenmodal={openModal} ontoast={showToast} /></div>
 				{:else if activeView === 'prog'}
-					<div class="view active"><ViewProgreso ontoast={showToast} /></div>
+					<div class="view active slide-{slideDir}"><ViewProgreso ontoast={showToast} /></div>
 				{:else if activeView === 'hist'}
-					<div class="view active"><ViewHistorial /></div>
+					<div class="view active slide-{slideDir}"><ViewHistorial /></div>
 				{:else if activeView === 'perfil'}
-					<div class="view active"><ViewPerfil ontoast={showToast} onrelaunch={relaunchWizard} onopenguide={openGuide} /></div>
+					<div class="view active slide-{slideDir}"><ViewPerfil ontoast={showToast} onrelaunch={relaunchWizard} onopenguide={openGuide} /></div>
 				{/if}
 			</div>
 			<Nav active={activeView} onswitch={switchView} />

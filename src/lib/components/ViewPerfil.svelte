@@ -6,10 +6,12 @@
 	import { getExerciseInfo, getExerciseMuscleGroup } from '$lib/data/exercises';
 
 	let userEmail = $state<string | null>(null);
+	let emailLoading = $state(true);
 
 	onMount(async () => {
 		const { data } = await supabase.auth.getSession();
 		userEmail = data.session?.user?.email ?? null;
+		emailLoading = false;
 	});
 	import type { Profile, DayRoutine, ExerciseRef } from '$lib/data/types';
 
@@ -853,7 +855,12 @@ Mi rutina es:
 <!-- ═══════════════════════════════════════════════════════ -->
 <!-- ACCOUNT SECTION                                        -->
 <!-- ═══════════════════════════════════════════════════════ -->
-{#if userEmail}
+{#if emailLoading}
+<div class="psec" style="text-align:center;padding:16px;">
+	<div class="skeleton skeleton-text" style="width:100px;margin:0 auto 8px"></div>
+	<div class="skeleton skeleton-text" style="width:180px;margin:0 auto 12px"></div>
+</div>
+{:else if userEmail}
 <div class="psec" style="text-align:center;padding:16px;">
 	<div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);margin-bottom:8px;">Conectado como</div>
 	<div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);margin-bottom:12px;">{userEmail}</div>
