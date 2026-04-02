@@ -76,11 +76,13 @@
 
 	onMount(async () => {
 		const wasOnboarded = db.isOnboarded();
+		const authPending = typeof sessionStorage !== 'undefined' && sessionStorage.getItem('gym_auth_pending') === '1';
+		if (authPending) sessionStorage.removeItem('gym_auth_pending');
 
 		// Safety: never hang more than 5s
 		const safety = setTimeout(() => {
 			if (!ready) {
-				showLanding = true;
+				if (!authPending) showLanding = true;
 				ready = true;
 			}
 		}, 5000);
@@ -89,21 +91,22 @@
 			await initAuth();
 			const u = get(user);
 
-			if (u && wasOnboarded) {
-				// Returning logged-in user — skip landing, go to app
-				await db.init();
-				isOnboarded = true;
-			} else if (u && !wasOnboarded) {
-				// Just logged in (OAuth callback) — load data, then app or wizard
+			if (u) {
+				// User logged in — go to app
 				await db.init();
 				db.setOnboarded();
 				isOnboarded = true;
-				const data = get(db);
-				if (!Object.values(data.routine).some(d => d.exercises?.length > 0)) {
-					wizardVisible = true;
+				if (!wasOnboarded) {
+					const data = get(db);
+					if (!Object.values(data.routine).some(d => d.exercises?.length > 0)) {
+						wizardVisible = true;
+					}
 				}
+			} else if (authPending) {
+				// Came from OAuth but no user yet — wait for subscriber
+				showLanding = false;
 			} else {
-				// No user — show landing
+				// No user, normal visit — show landing
 				showLanding = true;
 			}
 		} catch (e: unknown) {

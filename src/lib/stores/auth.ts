@@ -38,6 +38,7 @@ export async function signIn(email: string, password: string) {
 }
 
 export async function signInWithGoogle() {
+	if (typeof sessionStorage !== 'undefined') sessionStorage.setItem('gym_auth_pending', '1');
 	const { error } = await supabase.auth.signInWithOAuth({
 		provider: 'google',
 		options: { redirectTo: typeof window !== 'undefined' ? window.location.origin : '' }
