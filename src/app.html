@@ -26,22 +26,6 @@
 	%sveltekit.head%
 </head>
 <body>
-	<script>
-		// One-time cleanup of stale service workers
-		if ('serviceWorker' in navigator && !sessionStorage.getItem('sw_ok')) {
-			sessionStorage.setItem('sw_ok', '1');
-			navigator.serviceWorker.getRegistrations().then(function(regs) {
-				if (regs.length) {
-					regs.forEach(function(r) { r.unregister(); });
-					caches.keys().then(function(keys) {
-						Promise.all(keys.map(function(k) { return caches.delete(k); })).then(function() {
-							location.reload();
-						});
-					});
-				}
-			});
-		}
-	</script>
 	<div>%sveltekit.body%</div>
 </body>
 </html>

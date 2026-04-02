@@ -56,32 +56,22 @@
 	let initError = $state('');
 
 	onMount(async () => {
-		// Safety net: never hang on loading screen more than 8s
+		// Safety net: NEVER hang on loading screen
 		const safetyTimeout = setTimeout(() => {
 			if (!ready) {
-				console.warn('Init timeout — forcing ready');
 				isOnboarded = db.isOnboarded();
 				if (!isOnboarded) showAuth = true;
 				ready = true;
 			}
-		}, 8000);
+		}, 5000);
 
 		try {
 			await initAuth();
-		} catch (e) {
-			console.error('Auth init failed:', e);
-		}
-
-		try {
 			const u = get(user);
 			isOnboarded = db.isOnboarded();
 
 			if (u) {
-				const hadLocalData = db.isOnboarded();
 				await db.init();
-				if (hadLocalData) {
-					await db.migrateToCloud();
-				}
 				db.setOnboarded();
 				isOnboarded = true;
 			} else if (!isOnboarded) {
@@ -89,11 +79,17 @@
 			}
 		} catch (e: any) {
 			console.error('Init failed:', e);
-			initError = e?.message || 'Error al cargar la app';
+			isOnboarded = db.isOnboarded();
+			if (!isOnboarded) showAuth = true;
 		}
 
 		clearTimeout(safetyTimeout);
 		ready = true;
+
+		// Handle OAuth callback: user appears after redirect
+		return user.subscribe(u => {
+			if (u && showAuth) onAuthComplete();
+		});
 	});
 </script>
 
