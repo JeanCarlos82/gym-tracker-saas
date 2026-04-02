@@ -50,7 +50,7 @@
 </script>
 
 <div class="overlay" class:open={visible} id="picker-overlay" onclick={close}>
-	<div class="modal" style="max-height:85dvh">
+	<div class="modal" style="max-height:85dvh;overflow-y:scroll;-webkit-overflow-scrolling:touch;overscroll-behavior:contain" onclick={(e) => e.stopPropagation()}>
 		<div class="mhandle"></div>
 		<div class="mtitle">AGREGAR EJERCICIOS</div>
 		<div class="msub">Toca para seleccionar o quitar</div>

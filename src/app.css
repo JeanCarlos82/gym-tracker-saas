@@ -26,7 +26,7 @@ input,textarea{-webkit-user-select:text;user-select:text;}
 /* ── HEADER ── */
 .hdr{
   flex-shrink:0;
-  padding:6px var(--margin) 6px;
+  padding:4px var(--margin) 4px;
   padding-left:calc(var(--margin) + var(--safe-left));
   padding-right:calc(var(--margin) + var(--safe-right));
   display:flex;align-items:center;justify-content:space-between;
