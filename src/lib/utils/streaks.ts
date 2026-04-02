@@ -77,18 +77,20 @@ export function sessionImproved(sess: Session, allSessions: Session[]): boolean 
     if (curVol > prevVol) return true; // Volume up
 
     // Same weight, more reps on best set
-    if (curMax && prevMax && curMax === prevMax) {
+    if (curMax && prevMax && curMax === prevMax && entry.type === 'pesas' && prevEntry.type === 'pesas') {
       const curSets = (entry as WeightEntry).sets || [];
       const prevSets = (prevEntry as WeightEntry).sets || [];
       const curBestReps = Math.max(
         ...curSets
           .filter((s) => !s.warmup && parseFloat(String(s.w)) === curMax)
-          .map((s) => parseInt(String(s.r)) || 0)
+          .map((s) => parseInt(String(s.r)) || 0),
+        0
       );
       const prevBestReps = Math.max(
         ...prevSets
           .filter((s) => !s.warmup && parseFloat(String(s.w)) === prevMax)
-          .map((s) => parseInt(String(s.r)) || 0)
+          .map((s) => parseInt(String(s.r)) || 0),
+        0
       );
       if (curBestReps > prevBestReps) return true;
     }

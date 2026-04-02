@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { db } from '$lib/stores/db';
+	import { get } from 'svelte/store';
 	import type { DayKey, Goal, Experience, Sex, Routine, ExerciseEntry } from '$lib/types';
 	import {
 		selectTemplate,
@@ -181,9 +182,7 @@
 
 	function initWizard() {
 		const current = db.isOnboarded();
-		let dbData: any;
-		const unsub = db.subscribe(d => { dbData = d; });
-		unsub();
+		let dbData: any = get(db);
 
 		if (current) {
 			step = 1; // Skip install for re-launch
@@ -229,9 +228,7 @@
 
 	function importRoutine() {
 		// Save profile first
-		let dbData: any;
-		const unsub = db.subscribe(d => { dbData = d; });
-		unsub();
+		let dbData: any = get(db);
 
 		db.saveProfile({
 			...dbData.profile,
@@ -246,25 +243,27 @@
 		visible = false;
 
 		// Trigger file picker
-		const input = document.createElement('input');
-		input.type = 'file';
-		input.accept = '.json';
-		input.onchange = (e: Event) => {
-			const file = (e.target as HTMLInputElement).files?.[0];
-			if (!file) return;
-			const reader = new FileReader();
-			reader.onload = () => {
-				const success = db.importData(reader.result as string);
-				if (success) {
-					showToast('Rutina importada');
-					oncomplete?.();
-				} else {
-					showToast('Error al importar');
-				}
+		if (typeof document !== 'undefined') {
+			const input = document.createElement('input');
+			input.type = 'file';
+			input.accept = '.json';
+			input.onchange = (e: Event) => {
+				const file = (e.target as HTMLInputElement).files?.[0];
+				if (!file) return;
+				const reader = new FileReader();
+				reader.onload = () => {
+					const success = db.importData(reader.result as string);
+					if (success) {
+						showToast('Rutina importada');
+						oncomplete?.();
+					} else {
+						showToast('Error al importar');
+					}
+				};
+				reader.readAsText(file);
 			};
-			reader.readAsText(file);
-		};
-		input.click();
+			input.click();
+		}
 	}
 
 	function selectActivity(level: number) {

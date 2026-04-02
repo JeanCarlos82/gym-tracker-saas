@@ -418,6 +418,13 @@
 				}, unit)
 			});
 		}
+
+		return () => {
+			if (chartInstance) {
+				chartInstance.destroy();
+				chartInstance = null;
+			}
+		};
 	});
 
 	function chartOptions(afterLabelCb: (ctx: any) => string, unitLabel: string) {

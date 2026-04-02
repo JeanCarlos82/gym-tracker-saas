@@ -158,7 +158,9 @@ export function linearRegression(pts: number[]): LinearRegressionResult {
     sxx += i * i;
     sxy += i * pts[i];
   }
-  const slope = (n * sxy - sx * sy) / (n * sxx - sx * sx);
+  const denom = n * sxx - sx * sx;
+  if (denom === 0) return { slope: 0, intercept: sy / n };
+  const slope = (n * sxy - sx * sy) / denom;
   const intercept = (sy - slope * sx) / n;
   return { slope, intercept };
 }

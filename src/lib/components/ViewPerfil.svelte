@@ -860,8 +860,10 @@ Mi rutina es:
 	<button
 		onclick={async () => {
 			await signOut();
-			localStorage.clear();
-			window.location.href = '/';
+			if (typeof window !== 'undefined') {
+				localStorage.clear();
+				window.location.href = '/';
+			}
 		}}
 		style="width:100%;padding:12px;background:rgba(248,113,113,0.06);border:1px solid rgba(248,113,113,0.2);border-radius:10px;color:#f87171;font-family:'DM Mono',monospace;font-size:11px;font-weight:500;cursor:pointer;-webkit-tap-highlight-color:transparent;"
 	>

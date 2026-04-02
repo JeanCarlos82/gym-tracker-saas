@@ -204,13 +204,14 @@ export function adaptExercises(
   }
 
   // Apply substitutions
+  const swapMap = new Map<string, string>(swaps.map(([from, to]) => [from, to]));
   const adapted = {} as Routine;
   for (const dk of Object.keys(routine) as DayKey[]) {
     adapted[dk] = { ...routine[dk] };
     if (adapted[dk].exercises) {
       adapted[dk].exercises = adapted[dk].exercises.map((ex) => {
-        const swap = swaps.find((s) => s[0] === ex.name);
-        return swap ? { ...ex, name: swap[1] } : ex;
+        const replacement = swapMap.get(ex.name);
+        return replacement ? { ...ex, name: replacement } : ex;
       });
     }
   }
@@ -404,25 +405,6 @@ export function adaptExercises(
         d.exercises[d.exercises.length - 1] = { name: optCardio, type: 'cardio' };
         d.label = d.label + ' + Cardio';
         cardioAdded++;
-      }
-    }
-  }
-
-  if (goal === 'musculo') {
-    // Hypertrophy: if 5+ days, add light cardio on 1 day (active recovery)
-    const trainDayKeys = (Object.keys(adapted) as DayKey[]).filter(
-      (dk) => !adapted[dk].rest && adapted[dk].exercises?.length
-    );
-    if (trainDayKeys.length >= 5) {
-      const lastTrainDay = trainDayKeys[trainDayKeys.length - 1];
-      const d = adapted[lastTrainDay];
-      const hasCardio = d.exercises.some((e) => e.type === 'cardio');
-      if (!hasCardio) {
-        let cardioName = isFem ? 'Stairmaster' : 'Elíptica';
-        if (isHeavy || isOlder) cardioName = 'Elíptica';
-        if (isVeryHeavy) cardioName = 'Bicicleta estática';
-        d.exercises[d.exercises.length - 1] = { name: cardioName, type: 'cardio' };
-        d.label = d.label + ' + Cardio ligero';
       }
     }
   }

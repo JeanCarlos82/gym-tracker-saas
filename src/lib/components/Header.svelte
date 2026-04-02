@@ -9,12 +9,12 @@
 
 	let dayName = $derived(DL[$todayDayKey] || '—');
 
-	let dateStr = $derived(() => {
+	let dateStr = $derived.by(() => {
 		const d = new Date();
 		return `${d.getDate()} ${MO[d.getMonth()]}`;
 	});
 
-	let badge = $derived(() => {
+	let badge = $derived.by(() => {
 		const day = $db.routine[$todayDayKey];
 		return day?.rest ? 'DESCANSO' : (day?.label || '—');
 	});
