@@ -53,7 +53,12 @@
 		isOnboarded = db.isOnboarded();
 
 		if (u) {
+			// If user has local data but just logged in, migrate first
+			const hadLocalData = db.isOnboarded();
 			await db.init();
+			if (hadLocalData) {
+				await db.migrateToCloud();
+			}
 			db.setOnboarded();
 			isOnboarded = true;
 		} else if (!isOnboarded) {

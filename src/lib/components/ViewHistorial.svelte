@@ -289,7 +289,7 @@
 
 														<!-- Notes -->
 														{#if entry.notes}
-															<div class="sess-note">{escapeHtml(entry.notes)}</div>
+															<div class="sess-note">{entry.notes}</div>
 														{/if}
 													</div>
 												{/each}

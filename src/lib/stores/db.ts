@@ -172,6 +172,22 @@ function createDB() {
 		async saveSessions(sessions: Session[]) {
 			update(db => { db.sessions = sessions; return db; });
 			persistLocal('gym_sessions', sessions);
+			// Sync changed sessions to cloud
+			const userId = getUserId();
+			if (userId) {
+				try {
+					const todayStr = new Date().toISOString().split('T')[0];
+					const todaySession = sessions.find(s => s.date === todayStr);
+					if (todaySession) {
+						await supabase.from('sessions').delete().eq('user_id', userId).eq('date', todayStr);
+						await supabase.from('sessions').insert({
+							user_id: userId, date: todaySession.date, day_key: todaySession.dayKey,
+							start_time: todaySession.startTime, end_time: todaySession.endTime,
+							entries: todaySession.entries
+						});
+					}
+				} catch (e) { console.error('Failed to sync sessions to cloud:', e); }
+			}
 		},
 
 		async saveBW(bw: BodyWeightRecord[]) {
@@ -253,11 +269,17 @@ function createDB() {
 
 export const db = createDB();
 
-// ── Derived stores ──
-export const todayDate = derived(db, () => new Date().toISOString().split('T')[0]);
-export const todayDayKey = derived(db, () => {
+// ── Derived stores (independent of db — only depend on current date) ──
+const _today = () => new Date().toISOString().split('T')[0];
+const _todayDK = () => {
 	const DK = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
 	return DK[new Date().getDay()];
-});
+};
+export const todayDate = writable(_today());
+export const todayDayKey = writable(_todayDK());
+// Refresh at midnight
+if (typeof window !== 'undefined') {
+	setInterval(() => { todayDate.set(_today()); todayDayKey.set(_todayDK()); }, 60000);
+}
 export const todayRoutine = derived([db, todayDayKey], ([$db, $dk]) => $db.routine[$dk] || { label: '', rest: true, exercises: [] });
 export const todaySession = derived([db, todayDate], ([$db, $date]) => $db.sessions.find(s => s.date === $date) || null);
