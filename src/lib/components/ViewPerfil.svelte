@@ -1,27 +1,16 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { db } from '$lib/stores/db';
-	import { user, signOut } from '$lib/stores/auth';
-	import { get } from 'svelte/store';
+	import { signOut } from '$lib/stores/auth';
+	import { supabase } from '$lib/supabase';
 	import { getExerciseInfo, getExerciseMuscleGroup } from '$lib/data/exercises';
 
-	let currentUser = $state<any>(null);
+	let userEmail = $state<string | null>(null);
 
-	$effect(() => {
-		const unsub = user.subscribe(u => { currentUser = u; });
-		return unsub;
+	onMount(async () => {
+		const { data } = await supabase.auth.getSession();
+		userEmail = data.session?.user?.email ?? null;
 	});
-
-	async function handleSignOut() {
-		await signOut();
-		localStorage.removeItem('gym_onboarded');
-		localStorage.removeItem('gym_routine');
-		localStorage.removeItem('gym_sessions');
-		localStorage.removeItem('gym_profile');
-		localStorage.removeItem('gym_objective');
-		localStorage.removeItem('gym_bw');
-		window.location.reload();
-	}
 	import type { Profile, DayRoutine, ExerciseRef } from '$lib/data/types';
 
 	// ── Constants ──
@@ -864,26 +853,28 @@ Mi rutina es:
 <!-- ═══════════════════════════════════════════════════════ -->
 <!-- ACCOUNT SECTION                                        -->
 <!-- ═══════════════════════════════════════════════════════ -->
-{#if currentUser}
+{#if userEmail}
 <div class="psec" style="text-align:center;padding:16px;">
 	<div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);margin-bottom:8px;">Conectado como</div>
-	<div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);margin-bottom:12px;">{currentUser.email}</div>
+	<div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);margin-bottom:12px;">{userEmail}</div>
 	<button
-		onclick={handleSignOut}
-		style="width:100%;padding:10px;background:rgba(248,113,113,0.06);border:1px solid rgba(248,113,113,0.2);border-radius:10px;color:#f87171;font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;-webkit-tap-highlight-color:transparent;"
+		onclick={async () => {
+			await signOut();
+			localStorage.clear();
+			window.location.href = '/';
+		}}
+		style="width:100%;padding:12px;background:rgba(248,113,113,0.06);border:1px solid rgba(248,113,113,0.2);border-radius:10px;color:#f87171;font-family:'DM Mono',monospace;font-size:11px;font-weight:500;cursor:pointer;-webkit-tap-highlight-color:transparent;"
 	>
 		CERRAR SESIÓN
 	</button>
 </div>
-{/if}
-
-{#if !currentUser}
+{:else}
 <div class="psec" style="text-align:center;padding:16px;">
 	<div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);margin-bottom:8px;">No has iniciado sesión</div>
 	<div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:12px;">Tus datos solo están en este dispositivo</div>
 	<button
-		onclick={() => window.location.reload()}
-		style="width:100%;padding:10px;background:rgba(232,255,58,0.06);border:1px solid rgba(232,255,58,0.2);border-radius:10px;color:var(--accent);font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;"
+		onclick={() => { localStorage.clear(); window.location.href = '/'; }}
+		style="width:100%;padding:12px;background:rgba(232,255,58,0.06);border:1px solid rgba(232,255,58,0.2);border-radius:10px;color:var(--accent);font-family:'DM Mono',monospace;font-size:11px;font-weight:500;cursor:pointer;-webkit-tap-highlight-color:transparent;"
 	>
 		INICIAR SESIÓN
 	</button>
