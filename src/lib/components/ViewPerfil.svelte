@@ -5,15 +5,36 @@
 	import { supabase } from '$lib/supabase';
 	import { getExerciseInfo, getExerciseMuscleGroup } from '$lib/data/exercises';
 	import ExercisePicker from '$lib/components/ExercisePicker.svelte';
+	import { buildShareURL } from '$lib/utils/share';
+	import { get } from 'svelte/store';
+	import { notificationsEnabled, reminderHour, requestPermission, toggleNotifications, setReminderHour } from '$lib/stores/notifications';
 
 	let userEmail = $state<string | null>(null);
 	let emailLoading = $state(true);
+	let notifEnabled = $state(false);
+	let notifHour = $state(18);
+	let notifDenied = $state(false);
 
 	onMount(async () => {
 		const { data } = await supabase.auth.getSession();
 		userEmail = data.session?.user?.email ?? null;
 		emailLoading = false;
+		notifEnabled = get(notificationsEnabled);
+		notifHour = get(reminderHour);
+		notifDenied = typeof Notification !== 'undefined' && Notification.permission === 'denied';
 	});
+
+	async function handleNotifToggle() {
+		if (!notifEnabled) {
+			const granted = await requestPermission();
+			if (!granted) { notifDenied = true; return; }
+			notifEnabled = true;
+			toggleNotifications(true);
+		} else {
+			notifEnabled = false;
+			toggleNotifications(false);
+		}
+	}
 	import type { Profile, DayRoutine, ExerciseRef } from '$lib/data/types';
 
 	// ── Constants ──
@@ -419,6 +440,21 @@ Mi rutina es:
 		});
 	}
 
+	// ── Routine sharing ──
+	async function shareRoutine() {
+		const url = buildShareURL(dbData.routine);
+		if (!url) { ontoast('Error al generar link'); return; }
+
+		if (navigator.share) {
+			try {
+				await navigator.share({ title: 'Mi rutina GYM', text: 'Te comparto mi rutina de gym', url });
+			} catch { /* user cancelled */ }
+		} else {
+			await navigator.clipboard.writeText(url);
+			ontoast('Link copiado');
+		}
+	}
+
 	// ── Routine management ──
 	function toggleDay(dk: string) {
 		openDays = { ...openDays, [dk]: !openDays[dk] };
@@ -739,6 +775,9 @@ Mi rutina es:
 	</div>
 	{#if rutinaOpen}
 		<div class="drop-body open">
+			<button class="copy-day-btn" style="width:100%;padding:10px;font-size:11px;margin-bottom:12px" onclick={shareRoutine}>
+				COMPARTIR MI RUTINA
+			</button>
 			{#each DK_WEEK as dk}
 				{@const day = routine[dk] || { label: '', rest: true, exercises: [] }}
 				{@const isRest = day.rest}
@@ -922,6 +961,33 @@ Mi rutina es:
 			<div style="text-align:center;padding:0 0 10px">
 				<div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);margin-bottom:8px">Ayudanos a mejorar la app</div>
 				<button class="feedback-btn" onclick={openFeedback}>ENVIAR FEEDBACK</button>
+			</div>
+
+			<!-- Notification Reminder -->
+			<div style="border-top:1px solid var(--border);padding-top:10px;margin-top:10px">
+				<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+					<span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);letter-spacing:1px">RECORDATORIO</span>
+					<div class="tog" class:on={notifEnabled} onclick={handleNotifToggle}>
+						<div class="tog-knob"></div>
+					</div>
+				</div>
+				{#if notifDenied}
+					<div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--red);line-height:1.5">
+						Notificaciones bloqueadas. Activalas desde los ajustes del navegador.
+					</div>
+				{:else if notifEnabled}
+					<div style="display:flex;align-items:center;gap:8px">
+						<span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2)">Recordar a las</span>
+						<select style="background:var(--card2);color:var(--text);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:6px 10px;font-family:'DM Mono',monospace;font-size:12px;outline:none" bind:value={notifHour} onchange={() => setReminderHour(notifHour)}>
+							<option value={16}>4:00 PM</option>
+							<option value={17}>5:00 PM</option>
+							<option value={18}>6:00 PM</option>
+							<option value={19}>7:00 PM</option>
+							<option value={20}>8:00 PM</option>
+							<option value={21}>9:00 PM</option>
+						</select>
+					</div>
+				{/if}
 			</div>
 
 			<div style="border-top:1px solid var(--border);padding-top:10px">

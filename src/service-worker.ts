@@ -22,6 +22,16 @@ self.addEventListener('activate', (event: ExtendableEvent) => {
 	);
 });
 
+self.addEventListener('notificationclick', (event: NotificationEvent) => {
+	event.notification.close();
+	event.waitUntil(
+		(self as any).clients.matchAll({ type: 'window' }).then((clients: any[]) => {
+			if (clients.length) clients[0].focus();
+			else (self as any).clients.openWindow('/');
+		})
+	);
+});
+
 self.addEventListener('fetch', (event: FetchEvent) => {
 	if (event.request.method !== 'GET') return;
 

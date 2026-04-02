@@ -3,6 +3,7 @@
 	import { get } from 'svelte/store';
 	import { db } from '$lib/stores/db';
 	import { user, initAuth } from '$lib/stores/auth';
+	import { startReminderCheck } from '$lib/stores/notifications';
 	import Nav from '$lib/components/Nav.svelte';
 	import Header from '$lib/components/Header.svelte';
 	import Toast from '$lib/components/Toast.svelte';
@@ -15,6 +16,7 @@
 	import Auth from '$lib/components/Auth.svelte';
 	import GymGuide from '$lib/components/GymGuide.svelte';
 	import OfflineBanner from '$lib/components/OfflineBanner.svelte';
+	import { decodeRoutine } from '$lib/utils/share';
 
 	let activeView = $state('hoy');
 	let isOnboarded = $state(false);
@@ -94,6 +96,29 @@
 		clearTimeout(safety);
 		ready = true;
 
+		// Start notification reminder check
+		startReminderCheck(() => {
+			const today = new Date().toISOString().split('T')[0];
+			const data = get(db);
+			return data.sessions.some(s => s.date === today && s.entries?.length > 0);
+		});
+
+		// Check for shared routine import
+		if (typeof window !== 'undefined' && window.location.hash.startsWith('#import=')) {
+			const encoded = window.location.hash.slice(8);
+			const imported = decodeRoutine(encoded);
+			if (imported) {
+				const confirm = window.confirm('Quieres importar esta rutina compartida?');
+				if (confirm) {
+					db.saveRoutine(imported);
+					db.setOnboarded();
+					isOnboarded = true;
+					showToast('Rutina importada');
+				}
+			}
+			window.history.replaceState({}, '', window.location.pathname);
+		}
+
 		// Handle OAuth callback: user appears after redirect
 		return user.subscribe(u => {
 			if (u && showAuth) onAuthComplete();
@@ -155,23 +180,67 @@
 
 	{#if showLanding}
 		<div class="landing">
-			<div class="landing-content">
+			<!-- Hero -->
+			<div class="landing-section landing-hero-section">
 				<div class="landing-logo">GYM</div>
 				<div class="landing-tagline">Tu entrenamiento, simplificado</div>
-				<div class="landing-features">
+				<div class="landing-hero-sub">Registra, analiza y mejora. Gratis.</div>
+			</div>
+
+			<!-- Features -->
+			<div class="landing-section">
+				<div class="landing-section-title">Todo lo que necesitas</div>
+				<div class="landing-grid">
 					<div class="landing-feat">
 						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="12" x2="20" y2="12"/><rect x="2" y="9" width="4" height="6" rx="1.5"/><rect x="18" y="9" width="4" height="6" rx="1.5"/></svg>
-						<span>Registra ejercicios y series</span>
+						<div><b>Registra ejercicios</b><span>Series, reps, peso, cardio y mas</span></div>
 					</div>
 					<div class="landing-feat">
 						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
-						<span>Visualiza tu progreso</span>
+						<div><b>Visualiza tu progreso</b><span>Graficas, PRs y tendencias</span></div>
 					</div>
 					<div class="landing-feat">
 						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-						<span>Funciona sin internet</span>
+						<div><b>Funciona sin internet</b><span>Entrena donde sea</span></div>
+					</div>
+					<div class="landing-feat">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.52 0 7-3.58 7-7.5 0-4.05-3.5-7.5-7-10.5-3.5 3-7 6.45-7 10.5C5 18.42 7.03 22 12 22z"/></svg>
+						<div><b>Rutinas personalizadas</b><span>Adaptadas a tu nivel y objetivo</span></div>
+					</div>
+					<div class="landing-feat">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3-9 4 18 3-9h4"/></svg>
+						<div><b>Metricas de salud</b><span>IMC, TMB, TDEE, peso ideal</span></div>
+					</div>
+					<div class="landing-feat">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+						<div><b>Sync en la nube</b><span>Tus datos seguros con cuenta</span></div>
 					</div>
 				</div>
+			</div>
+
+			<!-- Testimonials -->
+			<div class="landing-section">
+				<div class="landing-section-title">Lo que dicen los usuarios</div>
+				<div class="landing-testimonials">
+					<div class="landing-testimonial">
+						<div class="landing-testimonial-text">"Por fin una app de gym que no tiene anuncios y es facil de usar. La uso todos los dias."</div>
+						<div class="landing-testimonial-author">— Carlos M.</div>
+					</div>
+					<div class="landing-testimonial">
+						<div class="landing-testimonial-text">"Me encanta ver mi progreso en las graficas. Me motiva a seguir entrenando."</div>
+						<div class="landing-testimonial-author">— Maria L.</div>
+					</div>
+					<div class="landing-testimonial">
+						<div class="landing-testimonial-text">"La sugerencia de peso es genial. Ya no tengo que pensar cuanto poner."</div>
+						<div class="landing-testimonial-author">— Andres R.</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- CTA -->
+			<div class="landing-section" style="text-align:center;padding-bottom:48px">
+				<div class="landing-section-title">Empieza gratis hoy</div>
+				<div style="color:var(--muted);font-family:'DM Mono',monospace;font-size:11px;margin-bottom:24px">Sin anuncios. Sin limites. Para siempre.</div>
 				<button class="landing-cta" onclick={startFromLanding}>COMENZAR</button>
 				<button class="landing-skip" onclick={() => { showLanding = false; onAuthComplete(); }}>Continuar sin cuenta</button>
 			</div>
