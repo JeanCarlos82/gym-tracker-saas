@@ -26,7 +26,7 @@
 	let wizSex = $state<Sex>('H');
 	let wizHeight = $state('');
 	let wizWeight = $state('');
-	let wizActivityLevel = $state(2);
+	let wizActivityLevel = $state(-1);
 	let wizGoal = $state<Goal | null>(null);
 	let wizExperience = $state<Experience | null>(null);
 	let wizSelectedDays = $state<DayKey[]>([]);
@@ -200,7 +200,7 @@
 		wizSex = dbData?.profile?.sex || 'H';
 		wizHeight = dbData?.profile?.height || '';
 		wizWeight = dbData?.profile?.weight || '';
-		wizActivityLevel = dbData?.profile?.activityLevel ?? 2;
+		wizActivityLevel = dbData?.profile?.activityLevel ?? -1;
 		wizGoal = objToGoal[dbData?.objective] || null;
 		wizExperience = null;
 		wizSelectedDays = [];
@@ -212,6 +212,13 @@
 	}
 
 	// ── Navigation helpers ──
+	function goBack() {
+		if (step === 'result') { step = 6; return; }
+		if (step === 'manual_build') { step = 'manual_days'; return; }
+		if (step === 'manual_days') { step = 2; return; }
+		if (typeof step === 'number' && step > 1) step = (step - 1) as typeof step;
+	}
+
 	function nextProfile() {
 		step = 2;
 	}
@@ -471,16 +478,27 @@ Mi rutina es:
 {#if visible}
 <div class="wizard-overlay">
 	<div class="wizard">
-		<!-- Dots -->
+		<!-- Navigation -->
 		{#if step !== 0 && step !== 'result' && step !== 'manual_build'}
-			<div class="wizard-dots">
-				{#each Array.from({ length: totalDots }, (_, i) => i + 1) as n}
-					<span
-						class="wiz-dot"
-						class:active={n === dotStep}
-						class:done={n < dotStep}
-					></span>
-				{/each}
+			<div style="display:flex;align-items:center;padding:16px var(--margin) 0">
+				{#if typeof step === 'number' ? step > 1 : true}
+					<button onclick={goBack} style="background:none;border:none;color:var(--muted2);font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;padding:4px 8px;display:flex;align-items:center;gap:4px;-webkit-tap-highlight-color:transparent" aria-label="Volver">
+						<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+						Volver
+					</button>
+				{:else}
+					<div style="width:60px"></div>
+				{/if}
+				<div class="wizard-dots" style="flex:1;justify-content:center">
+					{#each Array.from({ length: totalDots }, (_, i) => i + 1) as n}
+						<span
+							class="wiz-dot"
+							class:active={n === dotStep}
+							class:done={n < dotStep}
+						></span>
+					{/each}
+				</div>
+				<div style="width:60px"></div>
 			</div>
 		{/if}
 
@@ -772,6 +790,10 @@ Mi rutina es:
 			{:else if step === 'result' && resultRoutine}
 				{@const trainDays = ALL_DAY_KEYS.filter(dk => !resultRoutine![dk].rest)}
 				{@const restCount = 7 - trainDays.length}
+				<button onclick={goBack} style="background:none;border:none;color:var(--muted2);font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;padding:4px 0;display:flex;align-items:center;gap:4px;margin-bottom:8px;-webkit-tap-highlight-color:transparent">
+					<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+					Cambiar opciones
+				</button>
 				<div class="wiz-title">Tu rutina personalizada</div>
 				<div class="wiz-subtitle">{trainDays.length} dias de entrenamiento &middot; {restCount} de descanso</div>
 				<div class="wiz-result-scroll">
