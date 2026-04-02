@@ -35,8 +35,8 @@
 		onSave,
 		onDelete,
 		onClose,
-		onToast
-	}: Props = $props();
+		ontoast: onToast
+	}: { exerciseName: string; exerciseType: 'pesas' | 'cardio'; visible: boolean; onSave?: () => void; onDelete?: () => void; onClose?: () => void; ontoast?: (msg: string) => void } = $props();
 
 	// ── Local state ──
 	interface SetRow {

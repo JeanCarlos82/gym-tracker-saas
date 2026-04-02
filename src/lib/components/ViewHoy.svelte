@@ -18,7 +18,7 @@
 		onToast?: (msg: string) => void;
 	}
 
-	let { onOpenModal, onToast }: Props = $props();
+	let { onopenmodal: onOpenModal, ontoast: onToast }: { onopenmodal?: (name: string, type: 'pesas' | 'cardio') => void; ontoast?: (msg: string) => void } = $props();
 
 	// ── Local state ──
 	let reorderMode = $state(false);
