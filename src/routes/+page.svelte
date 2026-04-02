@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { get } from 'svelte/store';
 	import { db } from '$lib/stores/db';
 	import { user, authLoading, initAuth, signOut } from '$lib/stores/auth';
 	import Nav from '$lib/components/Nav.svelte';
@@ -53,34 +54,51 @@
 
 	async function onAuthComplete() {
 		showAuth = false;
-		// Re-check auth state
 		await initAuth();
 		if ($user) {
 			await db.init();
-			if (!db.isOnboarded()) {
-				await db.migrateToCloud();
+			db.setOnboarded();
+			isOnboarded = true;
+			// Check if user has a routine in cloud
+			const data = get(db);
+			const hasRoutine = Object.values(data.routine).some(d => d.exercises?.length > 0);
+			if (!hasRoutine) {
+				wizardVisible = true;
 			}
-		}
-		isOnboarded = db.isOnboarded();
-		if (!isOnboarded) {
-			wizardVisible = true;
+		} else {
+			// Continued without account
+			isOnboarded = db.isOnboarded();
+			if (!isOnboarded) {
+				wizardVisible = true;
+			}
 		}
 	}
 
 	onMount(async () => {
 		await initAuth();
+
+		// After initAuth, check if OAuth set onboarded
 		isOnboarded = db.isOnboarded();
 
-		if (!isOnboarded) {
-			// Not onboarded — show auth screen
-			showAuth = true;
+		if ($user) {
+			// User is logged in — load cloud data
+			await db.init();
+			isOnboarded = db.isOnboarded();
+
+			if (!isOnboarded) {
+				// First login — try migrate, then wizard
+				await db.migrateToCloud();
+				db.setOnboarded();
+				isOnboarded = true;
+				wizardVisible = true;
+			}
 			mounted = true;
 			return;
 		}
 
-		// Onboarded — load data
-		if ($user) {
-			await db.init();
+		// No user
+		if (!isOnboarded) {
+			showAuth = true;
 		}
 		mounted = true;
 	});
