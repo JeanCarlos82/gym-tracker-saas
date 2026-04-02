@@ -1,5 +1,8 @@
 {
-  "buildCommand": "npm run build",
+  "buildCommand": "",
   "outputDirectory": "build",
-  "framework": "sveltekit"
+  "framework": null,
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }
