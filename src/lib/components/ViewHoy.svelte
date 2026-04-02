@@ -87,34 +87,48 @@
 		reorderSelected = null;
 	}
 
-	let reorderAnimating = $state<number | null>(null);
+	// ── Touch drag reorder ──
+	let dragIdx = $state<number | null>(null);
+	let dragOverIdx = $state<number | null>(null);
+	let dragY = $state(0);
+	let dragStartY = 0;
+	let cardHeight = 0;
 
-	function moveUp(idx: number) {
-		if (idx <= 0) return;
-		reorderAnimating = idx;
-		setTimeout(() => {
-			const routine = { ...$db.routine };
-			const exs = [...routine[dayKey].exercises];
-			[exs[idx - 1], exs[idx]] = [exs[idx], exs[idx - 1]];
-			routine[dayKey] = { ...routine[dayKey], exercises: exs };
-			db.saveRoutine(routine);
-			reorderAnimating = null;
-		}, 150);
-		if (navigator.vibrate) navigator.vibrate(20);
+	function onDragStart(idx: number, e: TouchEvent) {
+		e.preventDefault();
+		dragIdx = idx;
+		dragStartY = e.touches[0].clientY;
+		dragY = 0;
+		const card = (e.target as HTMLElement).closest('.ex-card');
+		cardHeight = card?.getBoundingClientRect().height ?? 56;
+		if (navigator.vibrate) navigator.vibrate(15);
 	}
 
-	function moveDown(idx: number) {
-		if (idx >= exercises.length - 1) return;
-		reorderAnimating = idx;
-		setTimeout(() => {
-			const routine = { ...$db.routine };
-			const exs = [...routine[dayKey].exercises];
-			[exs[idx], exs[idx + 1]] = [exs[idx + 1], exs[idx]];
-			routine[dayKey] = { ...routine[dayKey], exercises: exs };
-			db.saveRoutine(routine);
-			reorderAnimating = null;
-		}, 150);
-		if (navigator.vibrate) navigator.vibrate(20);
+	function onDragMove(e: TouchEvent) {
+		if (dragIdx === null) return;
+		e.preventDefault();
+		const y = e.touches[0].clientY;
+		dragY = y - dragStartY;
+		const offset = Math.round(dragY / (cardHeight + 6));
+		const newIdx = Math.max(0, Math.min(exercises.length - 1, dragIdx + offset));
+		if (newIdx !== dragOverIdx) {
+			dragOverIdx = newIdx;
+			if (navigator.vibrate) navigator.vibrate(10);
+		}
+	}
+
+	function onDragEnd() {
+		if (dragIdx === null || dragOverIdx === null || dragIdx === dragOverIdx) {
+			dragIdx = null; dragOverIdx = null; dragY = 0;
+			return;
+		}
+		const routine = { ...$db.routine };
+		const exs = [...routine[dayKey].exercises];
+		const [moved] = exs.splice(dragIdx, 1);
+		exs.splice(dragOverIdx, 0, moved);
+		routine[dayKey] = { ...routine[dayKey], exercises: exs };
+		db.saveRoutine(routine);
+		dragIdx = null; dragOverIdx = null; dragY = 0;
 	}
 
 	function removeExercise(idx: number) {
@@ -175,18 +189,19 @@
 	<div class="ex-list">
 		{#each exercises as ex, exIdx (ex.name)}
 			{#if reorderMode}
-				<!-- Reorder mode card -->
+				<!-- Reorder mode card with touch drag -->
+				{@const isDragging = dragIdx === exIdx}
+				{@const isOver = dragOverIdx === exIdx && dragIdx !== null && dragIdx !== exIdx}
 				<div
 					class="ex-card reorder"
-					class:reorder-moving={reorderAnimating === exIdx}
+					class:reorder-dragging={isDragging}
+					class:reorder-over={isOver}
+					style={isDragging ? `transform:translateY(${dragY}px) scale(1.03);z-index:10;` : ''}
+					ontouchmove={onDragMove}
+					ontouchend={onDragEnd}
 				>
-					<div class="reorder-arrows">
-						<button class="reorder-arrow" disabled={exIdx === 0} onclick={() => moveUp(exIdx)} aria-label="Subir">
-							<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
-						</button>
-						<button class="reorder-arrow" disabled={exIdx === exercises.length - 1} onclick={() => moveDown(exIdx)} aria-label="Bajar">
-							<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-						</button>
+					<div class="reorder-handle" ontouchstart={(e) => onDragStart(exIdx, e)}>
+						<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="16" y2="18"/></svg>
 					</div>
 					<span class="reorder-num">{exIdx + 1}</span>
 					<div class="reorder-info">
