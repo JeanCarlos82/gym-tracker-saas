@@ -27,19 +27,35 @@ self.addEventListener('fetch', (event: FetchEvent) => {
 
 	const url = new URL(event.request.url);
 
-	// Skip external requests
+	// Skip external requests (Supabase, Google, etc.)
 	if (url.origin !== location.origin) return;
 
-	event.respondWith(
-		caches.match(event.request).then(cached => {
-			if (cached) return cached;
-			return fetch(event.request).then(response => {
-				if (response.ok && event.request.method === 'GET') {
+	// Hashed assets (_app/immutable/*): cache-first (they never change)
+	const isImmutable = url.pathname.startsWith('/_app/immutable/');
+
+	if (isImmutable) {
+		event.respondWith(
+			caches.match(event.request).then(cached => {
+				if (cached) return cached;
+				return fetch(event.request).then(response => {
+					if (response.ok) {
+						const clone = response.clone();
+						caches.open(CACHE).then(cache => cache.put(event.request, clone));
+					}
+					return response;
+				});
+			})
+		);
+	} else {
+		// HTML and other files: network-first (always get latest)
+		event.respondWith(
+			fetch(event.request).then(response => {
+				if (response.ok) {
 					const clone = response.clone();
 					caches.open(CACHE).then(cache => cache.put(event.request, clone));
 				}
 				return response;
-			}).catch(() => caches.match('/') as Promise<Response>);
-		})
-	);
+			}).catch(() => caches.match(event.request).then(c => c || caches.match('/') as Promise<Response>))
+		);
+	}
 });

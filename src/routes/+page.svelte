@@ -56,6 +56,16 @@
 	let initError = $state('');
 
 	onMount(async () => {
+		// Safety net: never hang on loading screen more than 8s
+		const safetyTimeout = setTimeout(() => {
+			if (!ready) {
+				console.warn('Init timeout — forcing ready');
+				isOnboarded = db.isOnboarded();
+				if (!isOnboarded) showAuth = true;
+				ready = true;
+			}
+		}, 8000);
+
 		try {
 			await initAuth();
 		} catch (e) {
@@ -82,6 +92,7 @@
 			initError = e?.message || 'Error al cargar la app';
 		}
 
+		clearTimeout(safetyTimeout);
 		ready = true;
 	});
 </script>
