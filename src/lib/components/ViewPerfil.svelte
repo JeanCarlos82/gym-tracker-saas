@@ -1,7 +1,13 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { db } from '$lib/stores/db';
+	import { user, signOut } from '$lib/stores/auth';
 	import { getExerciseInfo, getExerciseMuscleGroup } from '$lib/data/exercises';
+
+	async function handleSignOut() {
+		await signOut();
+		window.location.reload();
+	}
 	import type { Profile, DayRoutine, ExerciseRef } from '$lib/data/types';
 
 	// ── Constants ──
@@ -841,6 +847,22 @@ Mi rutina es:
 <!-- ═══════════════════════════════════════════════════════ -->
 <!-- 9. CREATOR SECTION                                     -->
 <!-- ═══════════════════════════════════════════════════════ -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- ACCOUNT SECTION                                        -->
+<!-- ═══════════════════════════════════════════════════════ -->
+{#if $user}
+<div class="psec" style="text-align:center;padding:16px;">
+	<div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);margin-bottom:8px;">Conectado como</div>
+	<div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);margin-bottom:12px;">{$user.email}</div>
+	<button
+		onclick={handleSignOut}
+		style="width:100%;padding:10px;background:rgba(248,113,113,0.06);border:1px solid rgba(248,113,113,0.2);border-radius:10px;color:#f87171;font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;-webkit-tap-highlight-color:transparent;"
+	>
+		CERRAR SESIÓN
+	</button>
+</div>
+{/if}
+
 <div class="creator">
 	<div class="creator-line"></div>
 	<div class="creator-info">
