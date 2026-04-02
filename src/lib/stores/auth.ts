@@ -5,21 +5,44 @@ import type { User } from '@supabase/supabase-js';
 export const user = writable<User | null>(null);
 
 export async function initAuth(): Promise<void> {
-	try {
-		const { data } = await supabase.auth.getSession();
-		if (data.session?.user) {
-			user.set(data.session.user);
-			if (typeof localStorage !== 'undefined') {
+	// Check if this is an OAuth callback (has code or hash token)
+	const isCallback = typeof window !== 'undefined' &&
+		(window.location.search.includes('code=') ||
+		 window.location.hash.includes('access_token'));
+
+	return new Promise<void>((resolve) => {
+		let resolved = false;
+		const done = () => { if (!resolved) { resolved = true; resolve(); } };
+
+		// Listen for auth state changes — this handles OAuth callbacks too
+		supabase.auth.onAuthStateChange((event, session) => {
+			user.set(session?.user ?? null);
+			if (session?.user && typeof localStorage !== 'undefined') {
 				localStorage.setItem('gym_onboarded', 'true');
 			}
-		}
-	} catch (e) {
-		console.error('initAuth error:', e);
-	}
+			// On OAuth callback, wait for SIGNED_IN event specifically
+			if (isCallback) {
+				if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+					done();
+				}
+			} else {
+				done();
+			}
+		});
 
-	// Listen for changes (OAuth callback, logout, etc)
-	supabase.auth.onAuthStateChange((_event, s) => {
-		user.set(s?.user ?? null);
+		// Also try getSession for cached sessions
+		supabase.auth.getSession().then(({ data }) => {
+			if (data.session?.user) {
+				user.set(data.session.user);
+				if (typeof localStorage !== 'undefined') {
+					localStorage.setItem('gym_onboarded', 'true');
+				}
+			}
+			if (!isCallback) done();
+		}).catch(() => done());
+
+		// Timeout fallback — never hang forever
+		setTimeout(done, 5000);
 	});
 }
 

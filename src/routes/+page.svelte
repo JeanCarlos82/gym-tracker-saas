@@ -49,15 +49,6 @@
 
 	let initError = $state('');
 
-	// React to OAuth callback: when user store changes from null to logged in
-	let currentUser = $state($user);
-	const unsubUser = user.subscribe(v => currentUser = v);
-	$effect(() => {
-		if (currentUser && showAuth && ready) {
-			onAuthComplete();
-		}
-	});
-
 	onMount(async () => {
 		try {
 			await initAuth();
@@ -86,8 +77,6 @@
 		}
 
 		ready = true;
-
-		return () => unsubUser();
 	});
 </script>
 
