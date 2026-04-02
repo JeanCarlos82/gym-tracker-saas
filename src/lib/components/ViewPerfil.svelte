@@ -103,12 +103,16 @@ Mi rutina es:
 
 	let profileSaved = $state(false);
 
+	// Derived weight unit from profile
+	let weightUnit = $derived(dbData.profile.weightUnit || 'kg');
+
 	// Profile form local values
 	let pName = $state('');
 	let pAge = $state('');
 	let pHeight = $state('');
 	let pWeight = $state('');
 	let pSex = $state<'H' | 'M'>('H');
+	let pWeightUnit = $state<'kg' | 'lb'>('kg');
 	let pActivityLevel = $state(2);
 
 	// File input ref
@@ -158,6 +162,7 @@ Mi rutina es:
 		pHeight = p.height || '';
 		pWeight = p.weight || '';
 		pSex = p.sex || 'H';
+		pWeightUnit = p.weightUnit || 'kg';
 		pActivityLevel = p.activityLevel ?? 2;
 
 		// Render BW chart
@@ -249,31 +254,40 @@ Mi rutina es:
 	// ── Health metrics computation ──
 	function computeHealth() {
 		const h = parseFloat(pHeight);
-		const w = parseFloat(pWeight);
+		const wRaw = parseFloat(pWeight);
 		const age = parseInt(pAge) || 25;
 		const sex = pSex;
 		const actLevel = pActivityLevel;
+		const unit = pWeightUnit;
 
-		if (!h || !w || h < 50 || w < 20) return null;
+		if (!h || !wRaw || h < 50 || wRaw < 20) return null;
+
+		// Convert to kg for internal calculations
+		const w = unit === 'lb' ? wRaw * 0.453592 : wRaw;
 		const hm = h / 100;
 
-		// IMC
+		// Helper to display weight in user's unit
+		const toDisplay = (kg: number) => unit === 'lb' ? kg / 0.453592 : kg;
+
+		// IMC (always in kg/m^2)
 		const imc = w / (hm * hm);
 		const cat = IMC_C.find(c => imc < c.max) || IMC_C[IMC_C.length - 1];
 
-		// Peso ideal (4 formulas average)
+		// Peso ideal (4 formulas average) - these formulas return kg
 		const hInches = (h / 2.54) - 60;
 		const devine = sex === 'H' ? 50 + 2.3 * hInches : 45.5 + 2.3 * hInches;
 		const robinson = sex === 'H' ? 52 + 1.9 * hInches : 49 + 1.7 * hInches;
 		const miller = sex === 'H' ? 56.2 + 1.41 * hInches : 53.1 + 1.36 * hInches;
 		const hamwi = sex === 'H' ? 48 + 2.7 * hInches : 45.5 + 2.2 * hInches;
-		const idealMin = Math.min(devine, robinson, miller, hamwi).toFixed(1);
-		const idealMax = Math.max(devine, robinson, miller, hamwi).toFixed(1);
+		const idealMinKg = Math.min(devine, robinson, miller, hamwi);
+		const idealMaxKg = Math.max(devine, robinson, miller, hamwi);
 		const idealAvg = (devine + robinson + miller + hamwi) / 4;
-		const diffIdeal = (w - idealAvg).toFixed(1);
-		const diffStr = parseFloat(diffIdeal) > 0 ? `+${diffIdeal}kg` : `${diffIdeal}kg`;
+		const idealMin = toDisplay(idealMinKg).toFixed(1);
+		const idealMax = toDisplay(idealMaxKg).toFixed(1);
+		const diffIdeal = toDisplay(w - idealAvg).toFixed(1);
+		const diffStr = parseFloat(diffIdeal) > 0 ? `+${diffIdeal}${unit}` : `${diffIdeal}${unit}`;
 
-		// TMB (Mifflin-St Jeor)
+		// TMB (Mifflin-St Jeor) - needs kg and cm
 		const tmb = sex === 'H' ? (10 * w + 6.25 * h - 5 * age + 5) : (10 * w + 6.25 * h - 5 * age - 161);
 
 		// TDEE
@@ -297,6 +311,7 @@ Mi rutina es:
 			age: pAge,
 			height: pHeight,
 			weight: pWeight,
+			weightUnit: pWeightUnit,
 			sex: pSex,
 			activityLevel: pActivityLevel
 		});
@@ -374,7 +389,7 @@ Mi rutina es:
 					tooltip: {
 						backgroundColor: '#1a1a1a',
 						bodyColor: '#f2f2f2',
-						callbacks: { label: (ctx: { raw: number }) => `${ctx.raw} kg` }
+						callbacks: { label: (ctx: { raw: number }) => `${ctx.raw} ${weightUnit}` }
 					}
 				},
 				scales: {
@@ -538,7 +553,7 @@ Mi rutina es:
 				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4"/><circle cx="12" cy="3" r="1"/><path d="M6.5 10L12 7l5.5 3"/><rect x="4" y="14" width="16" height="4" rx="2"/><line x1="8" y1="18" x2="8" y2="20"/><line x1="16" y1="18" x2="16" y2="20"/></svg>
 			</span>
 			<span class="ph-stat-val">{latestBW}</span>
-			<span class="ph-stat-lbl">kg</span>
+			<span class="ph-stat-lbl">{weightUnit}</span>
 		</div>
 		<div class="ph-stat">
 			<span class="ph-stat-ico">
@@ -576,7 +591,7 @@ Mi rutina es:
 		<div class="bw-wrap">
 			<input class="bwinput" type="number" bind:value={bwInput} placeholder="75.5" step="0.1" min="30" max="300"
 				onkeydown={(e) => { if (e.key === 'Enter') logBW(); }}>
-			<span class="bwunit">kg</span>
+			<span class="bwunit">{weightUnit}</span>
 		</div>
 		<button class="bw-addbtn" onclick={logBW}>+</button>
 	</div>
@@ -596,7 +611,7 @@ Mi rutina es:
 			{@const originalIndex = bwRecords.length - 1 - i}
 			<div class="bw-hrow">
 				<span class="bw-hdate">{fmtDF(bw.date)}</span>
-				<span class="bw-hval">{bw.v} kg</span>
+				<span class="bw-hval">{bw.v} {weightUnit}</span>
 				<button class="bw-hdel" onclick={() => { const idx = bwRecords.indexOf(bw); if (idx >= 0) delBW(idx); }}>x</button>
 			</div>
 		{/each}
@@ -831,8 +846,14 @@ Mi rutina es:
 					<input class="pinput pnum" type="number" bind:value={pHeight} placeholder="175" min="100" max="230" oninput={handleProfileInput}>
 				</div>
 				<div class="pfield">
-					<div class="plbl">PESO (kg)</div>
-					<input class="pinput pnum" type="number" bind:value={pWeight} placeholder="75" min="30" max="300" step="0.1" oninput={handleProfileInput}>
+					<div class="plbl">PESO ({pWeightUnit})</div>
+					<div style="display:flex;gap:6px;align-items:center">
+						<input class="pinput pnum" type="number" bind:value={pWeight} placeholder={pWeightUnit === 'lb' ? '165' : '75'} min="30" max={pWeightUnit === 'lb' ? '660' : '300'} step="0.1" oninput={handleProfileInput} style="flex:1">
+						<div class="sex-row" style="min-width:80px">
+							<div class="sex-btn" class:active={pWeightUnit === 'kg'} onclick={() => { pWeightUnit = 'kg'; saveProfileData(); }}>kg</div>
+							<div class="sex-btn" class:active={pWeightUnit === 'lb'} onclick={() => { pWeightUnit = 'lb'; saveProfileData(); }}>lb</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>

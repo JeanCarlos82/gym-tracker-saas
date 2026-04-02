@@ -65,6 +65,7 @@ export interface Profile {
   sex: 'H' | 'M';
   height: string;
   weight: string;
+  weightUnit: 'kg' | 'lb';
   restTimerSeconds: number;
   activityLevel: number;
 }

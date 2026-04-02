@@ -26,6 +26,7 @@
 	let wizSex = $state<Sex>('H');
 	let wizHeight = $state('');
 	let wizWeight = $state('');
+	let wizUnit = $state<'kg' | 'lb'>('kg');
 	let wizActivityLevel = $state(-1);
 	let wizGoal = $state<Goal | null>(null);
 	let wizExperience = $state<Experience | null>(null);
@@ -200,6 +201,7 @@
 		wizSex = dbData?.profile?.sex || 'H';
 		wizHeight = dbData?.profile?.height || '';
 		wizWeight = dbData?.profile?.weight || '';
+		wizUnit = dbData?.profile?.weightUnit || 'kg';
 		wizActivityLevel = dbData?.profile?.activityLevel ?? -1;
 		wizGoal = null;
 		wizExperience = null;
@@ -245,6 +247,7 @@
 			sex: wizSex || dbData.profile.sex,
 			height: wizHeight || dbData.profile.height,
 			weight: wizWeight || dbData.profile.weight,
+			weightUnit: wizUnit || 'kg',
 			activityLevel: wizActivityLevel ?? 2,
 		});
 		db.setOnboarded();
@@ -331,6 +334,7 @@
 			sex: wizSex || 'H',
 			height: wizHeight || '175',
 			weight: wizWeight || '75',
+			weightUnit: wizUnit || 'kg',
 			restTimerSeconds: 90,
 			activityLevel: wizActivityLevel ?? 2,
 		});
@@ -419,6 +423,7 @@
 			sex: wizSex || 'H',
 			height: wizHeight || '175',
 			weight: wizWeight || '75',
+			weightUnit: wizUnit || 'kg',
 			restTimerSeconds: 90,
 			activityLevel: wizActivityLevel ?? 2,
 		});
@@ -576,8 +581,14 @@ Mi rutina es:
 							<input class="wiz-input wiz-num" type="number" bind:value={wizHeight} placeholder="175" min="100" max="230">
 						</div>
 						<div class="wiz-field">
-							<label class="wiz-label">PESO (kg)</label>
-							<input class="wiz-input wiz-num" type="number" bind:value={wizWeight} placeholder="75" min="30" max="300" step="0.1">
+							<label class="wiz-label">PESO ({wizUnit})</label>
+							<div style="display:flex;gap:6px;align-items:center">
+								<input class="wiz-input wiz-num" type="number" bind:value={wizWeight} placeholder={wizUnit === 'lb' ? '165' : '75'} min="30" max={wizUnit === 'lb' ? '660' : '300'} step="0.1" style="flex:1">
+								<div class="wiz-sex-row" style="min-width:70px">
+									<div class="wiz-sex" class:active={wizUnit === 'kg'} onclick={() => { wizUnit = 'kg'; }}>kg</div>
+									<div class="wiz-sex" class:active={wizUnit === 'lb'} onclick={() => { wizUnit = 'lb'; }}>lb</div>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>

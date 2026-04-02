@@ -535,7 +535,7 @@
 			</svg>
 		</div>
 		<div class="prog-card-val" style="color:var(--orange)">{formattedVolume}</div>
-		<div class="prog-card-lbl">kg volumen</div>
+		<div class="prog-card-lbl">volumen</div>
 	</div>
 	<div class="prog-card">
 		<div class="prog-card-ico">
@@ -656,7 +656,7 @@
 					<div class="sbox">
 						<div class="slb">VOLUMEN</div>
 						<div class="sv">{Math.round(weightStats.totalVol).toLocaleString()}</div>
-						<div class="su">kg</div>
+						<div class="su">{weightStats.unit}</div>
 					</div>
 					<div class="sbox">
 						<div class="slb">SESIONES</div>
@@ -748,7 +748,7 @@
 							<div class="prog-recent-row">
 								<span class="prog-recent-date">{fmtD(s.date)}</span>
 								<span class="prog-recent-info">{sc}&times;{mx}{e && 'unit' in e ? (e as WeightEntry).unit || 'kg' : 'kg'}</span>
-								<span class="prog-recent-vol">{Math.round(vol)}kg vol</span>
+								<span class="prog-recent-vol">{Math.round(vol)}{e && 'unit' in e ? (e as WeightEntry).unit || 'kg' : 'kg'} vol</span>
 							</div>
 						{/each}
 					{/if}
