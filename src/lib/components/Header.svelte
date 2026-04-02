@@ -23,6 +23,7 @@
 
 <div class="hdr">
 	<div>
+		<div class="hdr-eyebrow">ENTRENAMIENTO HOY</div>
 		<div class="hdr-day">{dayName} <span class="hdr-date">{dateStr}</span></div>
 	</div>
 	<div class="hdr-right">

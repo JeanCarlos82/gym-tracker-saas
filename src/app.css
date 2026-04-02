@@ -33,6 +33,7 @@ input,textarea{-webkit-user-select:text;user-select:text;}
   border-bottom:1px solid var(--border);
   min-height:48px;
 }
+.hdr-eyebrow{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:2px;}
 .hdr-day{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;color:var(--text);line-height:1;display:flex;align-items:baseline;gap:8px;}
 .hdr-date{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);letter-spacing:0.5px;}
 .hdr-right{display:flex;align-items:center;gap:6px;}

@@ -11,8 +11,7 @@
 	import type { Session, Entry, WeightEntry, CardioEntry } from '$lib/data/types';
 
 	// ── Reactive state from store ──
-	let dbVal = $state($db);
-	const unsubscribe = db.subscribe((v) => (dbVal = v));
+	let dbVal = $derived($db);
 
 	// ── Collapse state ──
 	// Track which months & weeks are open by key
@@ -140,9 +139,6 @@
 		);
 	}
 
-	// Cleanup on destroy
-	import { onDestroy } from 'svelte';
-	onDestroy(unsubscribe);
 </script>
 
 {#if months.length === 0}
