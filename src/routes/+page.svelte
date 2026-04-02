@@ -82,10 +82,22 @@
 		}, 5000);
 
 		try {
-			await initAuth();
+			// Detect OAuth callback — skip landing
+			const isOAuthCallback = typeof window !== 'undefined' &&
+				(window.location.hash.includes('access_token') || window.location.search.includes('code='));
 
-			// Always show landing first
-			showLanding = true;
+			await initAuth();
+			const u = get(user);
+
+			if (isOAuthCallback && u) {
+				// OAuth just completed — go straight to app
+				await db.init();
+				db.setOnboarded();
+				isOnboarded = true;
+			} else {
+				// Show landing for everyone else
+				showLanding = true;
+			}
 		} catch (e: unknown) {
 			console.error('Init failed:', e);
 			showLanding = true;
