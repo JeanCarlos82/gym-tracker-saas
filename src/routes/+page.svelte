@@ -61,36 +61,40 @@
 		// Cancel HTML fallback timer
 		if (typeof window !== 'undefined' && (window as any).__cancelFallback) (window as any).__cancelFallback();
 
-		// If user was onboarded before, show app immediately (data loads in bg)
 		const wasOnboarded = db.isOnboarded();
-		if (wasOnboarded) {
-			isOnboarded = true;
-			ready = true;
-		}
+
+		// Safety: never hang more than 5s
+		const safety = setTimeout(() => {
+			if (!ready) {
+				if (wasOnboarded) isOnboarded = true;
+				else showLanding = true;
+				ready = true;
+			}
+		}, 5000);
 
 		try {
 			await initAuth();
 			const u = get(user);
 
 			if (u) {
-				db.init().then(() => {
-					db.setOnboarded();
-					isOnboarded = true;
-				}).catch(() => {});
-				if (!wasOnboarded) {
-					isOnboarded = true;
-					db.setOnboarded();
-				}
-			} else if (!wasOnboarded) {
+				// User logged in: load cloud data BEFORE showing app
+				await db.init();
+				db.setOnboarded();
+				isOnboarded = true;
+			} else if (wasOnboarded) {
+				// Guest user who was onboarded: show app with local data
+				isOnboarded = true;
+			} else {
+				// New user: show landing
 				showLanding = true;
 			}
 		} catch (e: unknown) {
 			console.error('Init failed:', e);
-			if (!wasOnboarded) {
-				showLanding = true;
-			}
+			if (wasOnboarded) isOnboarded = true;
+			else showLanding = true;
 		}
 
+		clearTimeout(safety);
 		ready = true;
 
 		// Handle OAuth callback: user appears after redirect

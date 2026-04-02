@@ -13,6 +13,10 @@ import { entryMaxWeight, entryVolume } from '$lib/utils/calculations.js';
  * @param routine - the weekly routine (to know which days are rest)
  */
 export function calcStreak(sessions: Session[], routine: Routine): number {
+  // Guard: if all days are rest (default routine), no streak possible
+  const hasTrainingDays = Object.values(routine).some(d => d && !d.rest);
+  if (!hasTrainingDays || !sessions.length) return 0;
+
   const dates = new Set(
     sessions.filter((s) => s.entries?.length > 0).map((s) => s.date)
   );
@@ -20,7 +24,8 @@ export function calcStreak(sessions: Session[], routine: Routine): number {
   const d = new Date();
   if (!dates.has(today())) d.setDate(d.getDate() - 1);
 
-  while (true) {
+  let maxIter = 400;
+  while (maxIter-- > 0) {
     const k = d.toISOString().split('T')[0];
     const dk = DK[d.getDay()];
     const isRest = routine[dk]?.rest;
