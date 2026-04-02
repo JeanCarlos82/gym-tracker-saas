@@ -36,7 +36,7 @@
 	// ── Derived: sorted sessions grouped by month -> week ──
 	let months = $derived.by(() => {
 		const sorted = [...dbVal.sessions].sort((a, b) => b.date.localeCompare(a.date));
-		if (!sorted.length) return [] as MonthGroup[];
+		if (!sorted.length) return { groups: [] as MonthGroup[], firstMonthKey: '', firstWeekKey: '' };
 
 		const monthMap = new Map<
 			string,
