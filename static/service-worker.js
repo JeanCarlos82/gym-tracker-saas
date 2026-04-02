@@ -1,16 +1,15 @@
-// Self-destructing service worker: clears all caches and unregisters itself
+// Self-destructing service worker: unregisters first, then reloads
 self.addEventListener('install', function() { self.skipWaiting(); });
-self.addEventListener('activate', function(e) {
-  e.waitUntil(
+self.addEventListener('activate', function(event) {
+  event.waitUntil(
     caches.keys().then(function(keys) {
       return Promise.all(keys.map(function(k) { return caches.delete(k); }));
     }).then(function() {
-      return self.clients.matchAll();
-    }).then(function(clients) {
-      clients.forEach(function(c) { c.navigate(c.url); });
       return self.registration.unregister();
+    }).then(function() {
+      return self.clients.matchAll({ type: 'window' });
+    }).then(function(clients) {
+      clients.forEach(function(client) { client.navigate(client.url); });
     })
   );
 });
-// Don't intercept any requests - let everything go to network
-self.addEventListener('fetch', function() {});
