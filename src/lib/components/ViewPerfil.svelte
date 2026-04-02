@@ -5,7 +5,7 @@
 	import { supabase } from '$lib/supabase';
 	import { getExerciseInfo, getExerciseMuscleGroup } from '$lib/data/exercises';
 	import ExercisePicker from '$lib/components/ExercisePicker.svelte';
-	import { buildShareURL } from '$lib/utils/share';
+	import { shareRoutine as shareRoutineFn } from '$lib/utils/share';
 	import { get } from 'svelte/store';
 	import { notificationsEnabled, reminderHour, requestPermission, toggleNotifications, setReminderHour } from '$lib/stores/notifications';
 
@@ -441,8 +441,11 @@ Mi rutina es:
 	}
 
 	// ── Routine sharing ──
+	let sharing = $state(false);
 	async function shareRoutine() {
-		const url = buildShareURL(dbData.routine);
+		sharing = true;
+		const url = await shareRoutineFn(dbData.routine);
+		sharing = false;
 		if (!url) { ontoast('Error al generar link'); return; }
 
 		if (navigator.share) {
@@ -775,8 +778,8 @@ Mi rutina es:
 	</div>
 	{#if rutinaOpen}
 		<div class="drop-body open">
-			<button class="copy-day-btn" style="width:100%;padding:10px;font-size:11px;margin-bottom:12px" onclick={shareRoutine}>
-				COMPARTIR MI RUTINA
+			<button class="copy-day-btn" style="width:100%;padding:10px;font-size:11px;margin-bottom:12px" onclick={shareRoutine} disabled={sharing}>
+				{sharing ? 'GENERANDO...' : 'COMPARTIR MI RUTINA'}
 			</button>
 			{#each DK_WEEK as dk}
 				{@const day = routine[dk] || { label: '', rest: true, exercises: [] }}

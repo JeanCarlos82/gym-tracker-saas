@@ -1,26 +1,32 @@
 import type { Routine } from '$lib/data/types';
+import { supabase } from '$lib/supabase';
 
-export function encodeRoutine(routine: Routine): string {
+export async function shareRoutine(routine: Routine): Promise<string> {
   try {
-    const json = JSON.stringify(routine);
-    return btoa(encodeURIComponent(json));
-  } catch { return ''; }
+    const { data, error } = await supabase
+      .from('shared_routines')
+      .insert({ data: routine })
+      .select('id')
+      .single();
+
+    if (error || !data) return '';
+    return `${window.location.origin}/#r=${data.id}`;
+  } catch {
+    return '';
+  }
 }
 
-export function decodeRoutine(encoded: string): Routine | null {
+export async function fetchSharedRoutine(code: string): Promise<Routine | null> {
   try {
-    const json = decodeURIComponent(atob(encoded));
-    const data = JSON.parse(json);
-    // Basic validation: must have at least one day key
-    if (typeof data === 'object' && ('lunes' in data || 'monday' in data)) {
-      return data as Routine;
-    }
+    const { data, error } = await supabase
+      .from('shared_routines')
+      .select('data')
+      .eq('id', code)
+      .single();
+
+    if (error || !data) return null;
+    return data.data as Routine;
+  } catch {
     return null;
-  } catch { return null; }
-}
-
-export function buildShareURL(routine: Routine): string {
-  const encoded = encodeRoutine(routine);
-  if (!encoded) return '';
-  return `${window.location.origin}/#import=${encoded}`;
+  }
 }

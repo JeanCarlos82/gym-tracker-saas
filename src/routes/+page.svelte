@@ -16,7 +16,7 @@
 	import Auth from '$lib/components/Auth.svelte';
 	import GymGuide from '$lib/components/GymGuide.svelte';
 	import OfflineBanner from '$lib/components/OfflineBanner.svelte';
-	import { decodeRoutine } from '$lib/utils/share';
+	import { fetchSharedRoutine } from '$lib/utils/share';
 
 	let activeView = $state('hoy');
 	let isOnboarded = $state(false);
@@ -103,17 +103,19 @@
 			return data.sessions.some(s => s.date === today && s.entries?.length > 0);
 		});
 
-		// Check for shared routine import
-		if (typeof window !== 'undefined' && window.location.hash.startsWith('#import=')) {
-			const encoded = window.location.hash.slice(8);
-			const imported = decodeRoutine(encoded);
-			if (imported) {
-				const confirm = window.confirm('Quieres importar esta rutina compartida?');
-				if (confirm) {
-					db.saveRoutine(imported);
-					db.setOnboarded();
-					isOnboarded = true;
-					showToast('Rutina importada');
+		// Check for shared routine import (short code)
+		if (typeof window !== 'undefined' && window.location.hash.startsWith('#r=')) {
+			const code = window.location.hash.slice(3);
+			if (code) {
+				const imported = await fetchSharedRoutine(code);
+				if (imported) {
+					const ok = window.confirm('Quieres importar esta rutina compartida?');
+					if (ok) {
+						db.saveRoutine(imported);
+						db.setOnboarded();
+						isOnboarded = true;
+						showToast('Rutina importada');
+					}
 				}
 			}
 			window.history.replaceState({}, '', window.location.pathname);
