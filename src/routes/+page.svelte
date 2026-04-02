@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { get } from 'svelte/store';
 	import { db } from '$lib/stores/db';
-	import { user, authLoading, initAuth } from '$lib/stores/auth';
+	import { user, authReady, initAuth } from '$lib/stores/auth';
 	import Nav from '$lib/components/Nav.svelte';
 	import Header from '$lib/components/Header.svelte';
 	import Toast from '$lib/components/Toast.svelte';
@@ -16,7 +16,7 @@
 
 	let activeView = $state('hoy');
 	let isOnboarded = $state(false);
-	let mounted = $state(false);
+	let ready = $state(false);
 	let showAuth = $state(false);
 
 	let modalVisible = $state(false);
@@ -27,69 +27,52 @@
 	let toast: Toast;
 
 	function switchView(view: string) { activeView = view; }
-
 	function openModal(name: string, type: 'pesas' | 'cardio') {
-		modalExercise = name;
-		modalType = type;
-		modalVisible = true;
+		modalExercise = name; modalType = type; modalVisible = true;
 	}
-
 	function showToast(msg: string) { toast?.show(msg); }
-
-	function onWizardComplete() {
-		isOnboarded = true;
-		wizardVisible = false;
-	}
-
+	function onWizardComplete() { isOnboarded = true; wizardVisible = false; }
 	function relaunchWizard() { wizardVisible = true; }
 
 	async function onAuthComplete() {
 		showAuth = false;
-		// Re-check auth
 		const currentUser = get(user);
 		if (currentUser) {
 			await db.init();
 			db.setOnboarded();
 			isOnboarded = true;
-			// Check if user has a routine
 			const data = get(db);
 			const hasRoutine = Object.values(data.routine).some(d => d.exercises?.length > 0);
-			if (!hasRoutine) {
-				wizardVisible = true;
-			}
+			if (!hasRoutine) wizardVisible = true;
 		} else {
-			// Guest mode
 			isOnboarded = db.isOnboarded();
-			if (!isOnboarded) {
-				wizardVisible = true;
-			}
+			if (!isOnboarded) wizardVisible = true;
 		}
 	}
 
 	onMount(async () => {
-		await initAuth();
+		try {
+			await initAuth();
+		} catch (e) {
+			console.error('initAuth error:', e);
+		}
 
 		const currentUser = get(user);
 		isOnboarded = db.isOnboarded();
 
 		if (currentUser) {
-			// User logged in — load cloud data
 			await db.init();
 			isOnboarded = true;
 			db.setOnboarded();
-			mounted = true;
-			return;
-		}
-
-		// No user
-		if (!isOnboarded) {
+		} else if (!isOnboarded) {
 			showAuth = true;
 		}
-		mounted = true;
+
+		ready = true;
 	});
 </script>
 
-{#if !mounted || $authLoading}
+{#if !ready}
 	<div style="position:fixed;inset:0;background:#0a0a0a;display:flex;align-items:center;justify-content:center;">
 		<div style="text-align:center;">
 			<div style="font-family:'Bebas Neue',sans-serif;font-size:48px;color:#E8FF3A;letter-spacing:2px;">GYM</div>
@@ -102,46 +85,28 @@
 	{/if}
 
 	{#if !showAuth && (!isOnboarded || wizardVisible)}
-		<Wizard
-			bind:visible={wizardVisible}
-			oncomplete={onWizardComplete}
-		/>
+		<Wizard bind:visible={wizardVisible} oncomplete={onWizardComplete} />
 	{/if}
 
 	{#if !showAuth && isOnboarded}
 		<div id="app">
 			<Header />
-
 			<div class="scroll" id="scroll">
 				{#if activeView === 'hoy'}
-					<div class="view active">
-						<ViewHoy onopenmodal={openModal} ontoast={showToast} />
-					</div>
+					<div class="view active"><ViewHoy onopenmodal={openModal} ontoast={showToast} /></div>
 				{:else if activeView === 'prog'}
-					<div class="view active">
-						<ViewProgreso ontoast={showToast} />
-					</div>
+					<div class="view active"><ViewProgreso ontoast={showToast} /></div>
 				{:else if activeView === 'hist'}
-					<div class="view active">
-						<ViewHistorial />
-					</div>
+					<div class="view active"><ViewHistorial /></div>
 				{:else if activeView === 'perfil'}
-					<div class="view active">
-						<ViewPerfil ontoast={showToast} onrelaunch={relaunchWizard} />
-					</div>
+					<div class="view active"><ViewPerfil ontoast={showToast} onrelaunch={relaunchWizard} /></div>
 				{/if}
 			</div>
-
 			<Nav active={activeView} onswitch={switchView} />
 		</div>
 	{/if}
 
-	<ExerciseModal
-		bind:visible={modalVisible}
-		exerciseName={modalExercise}
-		exerciseType={modalType}
-		ontoast={showToast}
-	/>
+	<ExerciseModal bind:visible={modalVisible} exerciseName={modalExercise} exerciseType={modalType} ontoast={showToast} />
 {/if}
 
 <Toast bind:this={toast} />

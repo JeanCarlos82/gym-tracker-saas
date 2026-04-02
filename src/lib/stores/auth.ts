@@ -4,54 +4,47 @@ import type { User, Session } from '@supabase/supabase-js';
 
 export const user = writable<User | null>(null);
 export const session = writable<Session | null>(null);
-export const authLoading = writable(true);
+export const authReady = writable(false);
 
-let authListenerRegistered = false;
+let initialized = false;
 
-export async function initAuth() {
-	// Register listener once — this catches OAuth redirects AND future auth changes
-	if (!authListenerRegistered) {
-		authListenerRegistered = true;
-		supabase.auth.onAuthStateChange((_event, s) => {
+export async function initAuth(): Promise<void> {
+	if (initialized) {
+		authReady.set(true);
+		return;
+	}
+	initialized = true;
+
+	try {
+		// Get current session (works for both normal load and OAuth redirect)
+		const { data, error } = await supabase.auth.getSession();
+
+		if (data.session) {
+			session.set(data.session);
+			user.set(data.session.user);
+			if (typeof localStorage !== 'undefined') {
+				localStorage.setItem('gym_onboarded', 'true');
+			}
+		}
+
+		// Listen for future auth changes (login, logout, token refresh)
+		supabase.auth.onAuthStateChange((event, s) => {
 			session.set(s);
 			user.set(s?.user ?? null);
-			authLoading.set(false);
 			if (s?.user && typeof localStorage !== 'undefined') {
 				localStorage.setItem('gym_onboarded', 'true');
 			}
+			// If this is the OAuth callback completing, reload the page
+			if (event === 'SIGNED_IN' && typeof window !== 'undefined' && window.location.hash.includes('access_token')) {
+				window.history.replaceState(null, '', window.location.pathname);
+				window.location.reload();
+			}
 		});
+	} catch (e) {
+		console.error('Auth init failed:', e);
 	}
 
-	// Check if returning from OAuth redirect (hash contains token)
-	const isOAuthReturn = typeof window !== 'undefined' && window.location.hash.includes('access_token');
-
-	if (isOAuthReturn) {
-		// Wait for Supabase to process the hash token via onAuthStateChange
-		// The listener above will fire and set user/session/authLoading
-		await new Promise<void>((resolve) => {
-			const checkInterval = setInterval(() => {
-				const currentUser = get(user);
-				if (currentUser) {
-					clearInterval(checkInterval);
-					// Clean the URL hash
-					window.history.replaceState(null, '', window.location.pathname);
-					resolve();
-				}
-			}, 100);
-			// Timeout after 5 seconds to prevent infinite wait
-			setTimeout(() => {
-				clearInterval(checkInterval);
-				authLoading.set(false);
-				resolve();
-			}, 5000);
-		});
-	} else {
-		// Normal load — just get existing session
-		const { data } = await supabase.auth.getSession();
-		session.set(data.session);
-		user.set(data.session?.user ?? null);
-		authLoading.set(false);
-	}
+	authReady.set(true);
 }
 
 export async function signUp(email: string, password: string) {
