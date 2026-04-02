@@ -495,9 +495,9 @@ input,textarea{-webkit-user-select:text;user-select:text;}
 .wiz-opt:active{transform:scale(0.97);}
 .wiz-opt.active{border-color:var(--accent);background:rgba(232,255,58,0.04);}
 .wiz-emoji{font-size:28px;flex-shrink:0;}
-.wiz-svg-ico{font-size:initial;width:28px;height:28px;display:flex;align-items:center;justify-content:center;color:var(--accent);}
+.wiz-svg-ico{font-size:initial;width:28px;height:28px;display:flex;align-items:center;justify-content:center;color:var(--muted2);}
 .wiz-svg-ico svg{width:22px;height:22px;}
-.wiz-opt.active .wiz-svg-ico{color:var(--green);}
+.wiz-opt.active .wiz-svg-ico{color:var(--accent);}
 .wiz-opt-title{font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;color:var(--text);display:block;}
 .wiz-opt-desc{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);display:block;margin-top:2px;}
 .wiz-opt.active .wiz-opt-title{color:var(--accent);}
