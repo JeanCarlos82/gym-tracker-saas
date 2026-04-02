@@ -98,6 +98,8 @@ Mi rutina es:
 	let appOpen = $state(false);
 	let openDays = $state<Record<string, boolean>>({});
 
+	let profileSaved = $state(false);
+
 	// Profile form local values
 	let pName = $state('');
 	let pAge = $state('');
@@ -291,6 +293,8 @@ Mi rutina es:
 			sex: pSex,
 			activityLevel: pActivityLevel
 		});
+		profileSaved = true;
+		setTimeout(() => (profileSaved = false), 1500);
 	}
 
 	function handleProfileInput() {
@@ -535,7 +539,7 @@ Mi rutina es:
 
 	<div class="bw-chart-box">
 		{#if bwRecords.length < 2}
-			<div class="bw-chart-empty">Sin registros aun</div>
+			<div class="bw-chart-empty">Registra al menos 2 pesos para ver la grafica</div>
 		{:else}
 			<div class="bw-canvas-wrap" style="height:120px;position:relative">
 				<canvas bind:this={bwChartCanvas}></canvas>
@@ -749,6 +753,7 @@ Mi rutina es:
 		<span class="drop-title drop-title-ico">
 			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
 			DATOS PERSONALES
+			{#if profileSaved}<span class="save-indicator">✓</span>{/if}
 		</span>
 		<span class="drop-arrow" style="transform:{datosOpen ? 'rotate(90deg)' : ''}">&#x203A;</span>
 	</div>

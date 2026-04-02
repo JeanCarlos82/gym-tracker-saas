@@ -20,6 +20,7 @@
 	let isOnboarded = $state(false);
 	let ready = $state(false);
 	let showAuth = $state(false);
+	let showLanding = $state(false);
 	let modalVisible = $state(false);
 	let modalExercise = $state('');
 	let modalType = $state<'pesas' | 'cardio'>('pesas');
@@ -35,6 +36,7 @@
 	function onWizardComplete() { isOnboarded = true; wizardVisible = false; }
 	function relaunchWizard() { wizardVisible = true; }
 	function openGuide() { guideVisible = true; }
+	function startFromLanding() { showLanding = false; showAuth = true; }
 
 	async function onAuthComplete() {
 		showAuth = false;
@@ -60,7 +62,7 @@
 		const safetyTimeout = setTimeout(() => {
 			if (!ready) {
 				isOnboarded = db.isOnboarded();
-				if (!isOnboarded) showAuth = true;
+				if (!isOnboarded) showLanding = true;
 				ready = true;
 			}
 		}, 5000);
@@ -75,13 +77,13 @@
 				db.setOnboarded();
 				isOnboarded = true;
 			} else if (!isOnboarded) {
-				showAuth = true;
+				showLanding = true;
 			}
 		} catch (e: unknown) {
 			console.error('Init failed:', e);
 			initError = e instanceof Error ? e.message : 'Error al cargar la app';
 			isOnboarded = db.isOnboarded();
-			if (!isOnboarded) showAuth = true;
+			if (!isOnboarded) showLanding = true;
 		}
 
 		clearTimeout(safetyTimeout);
@@ -146,15 +148,40 @@
 {:else}
 	<OfflineBanner />
 
+	{#if showLanding}
+		<div class="landing">
+			<div class="landing-content">
+				<div class="landing-logo">GYM</div>
+				<div class="landing-tagline">Tu entrenamiento, simplificado</div>
+				<div class="landing-features">
+					<div class="landing-feat">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="12" x2="20" y2="12"/><rect x="2" y="9" width="4" height="6" rx="1.5"/><rect x="18" y="9" width="4" height="6" rx="1.5"/></svg>
+						<span>Registra ejercicios y series</span>
+					</div>
+					<div class="landing-feat">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+						<span>Visualiza tu progreso</span>
+					</div>
+					<div class="landing-feat">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+						<span>Funciona sin internet</span>
+					</div>
+				</div>
+				<button class="landing-cta" onclick={startFromLanding}>COMENZAR</button>
+				<button class="landing-skip" onclick={() => { showLanding = false; onAuthComplete(); }}>Continuar sin cuenta</button>
+			</div>
+		</div>
+	{/if}
+
 	{#if showAuth}
 		<Auth oncomplete={onAuthComplete} />
 	{/if}
 
-	{#if !showAuth && (!isOnboarded || wizardVisible)}
+	{#if !showAuth && !showLanding && (!isOnboarded || wizardVisible)}
 		<Wizard bind:visible={wizardVisible} oncomplete={onWizardComplete} />
 	{/if}
 
-	{#if !showAuth && isOnboarded}
+	{#if !showAuth && !showLanding && isOnboarded}
 		<div id="app">
 			<Header />
 			<div class="scroll" id="scroll">

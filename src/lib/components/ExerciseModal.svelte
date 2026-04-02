@@ -56,6 +56,10 @@
 	let cardioCal = $state('');
 	let cardioIntensity: 'baja' | 'media' | 'alta' = $state('media');
 
+	// Save feedback state
+	let saving = $state(false);
+	let shakeError = $state(false);
+
 	// Swipe state
 	let swipeStartY = $state(0);
 	let swipeCurrentY = $state(0);
@@ -320,6 +324,8 @@
 			const valid = currentSets.filter((s) => s.w !== '' && s.r !== '');
 			if (!valid.length) {
 				onToast?.('Agrega al menos una serie');
+				shakeError = true;
+				setTimeout(() => (shakeError = false), 500);
 				return;
 			}
 			entry = {
@@ -367,9 +373,13 @@
 		})();
 		db.saveSessions($db.sessions);
 
-		visible = false;
-		onSave?.();
-		onToast?.('Guardado \u2713');
+		saving = true;
+		setTimeout(() => {
+			saving = false;
+			visible = false;
+			onSave?.();
+			onToast?.('Guardado \u2713');
+		}, 400);
 	}
 
 	// ── Delete ──
@@ -582,7 +592,7 @@
 			</div>
 
 			<!-- Sets list -->
-			<div id="sets-list">
+			<div id="sets-list" class:shake={shakeError}>
 				{#each currentSets as set, i}
 					<div class="set-row" class:set-warmup={set.warmup}>
 						<span
@@ -749,7 +759,7 @@
 					<path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
 				</svg>
 			</button>
-			<button class="sbtn" onclick={saveEntry}>GUARDAR</button>
+			<button class="sbtn" class:sbtn-saving={saving} disabled={saving} onclick={saveEntry}>{saving ? '✓' : 'GUARDAR'}</button>
 		</div>
 
 		{#if hasExistingEntry}

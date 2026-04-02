@@ -157,8 +157,7 @@
 			</svg>
 		</div>
 		<div class="empty-txt">
-			Aun no hay sesiones.<br />
-			¡Empieza hoy!
+			Aun no hay sesiones registradas.<br/>Ve a <b style="color:var(--accent)">Hoy</b> y registra tu primer ejercicio.
 		</div>
 	</div>
 {:else}
