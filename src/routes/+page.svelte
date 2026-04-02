@@ -38,13 +38,17 @@
 	function onWizardComplete() { isOnboarded = true; wizardVisible = false; }
 	function relaunchWizard() { wizardVisible = true; }
 	function openGuide() { guideVisible = true; }
-	function startFromLanding() {
+	async function startFromLanding() {
 		showLanding = false;
 		const u = get(user);
-		if (u || db.isOnboarded()) {
-			// Already has account or was onboarded — go to app
+		if (u) {
+			await db.init();
+			db.setOnboarded();
 			isOnboarded = true;
-			if (u) db.init();
+			const data = get(db);
+			if (!Object.values(data.routine).some(d => d.exercises?.length > 0)) {
+				wizardVisible = true;
+			}
 		} else {
 			showAuth = true;
 		}
