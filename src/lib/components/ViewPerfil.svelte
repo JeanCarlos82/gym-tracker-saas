@@ -520,7 +520,7 @@ Mi rutina es:
 
 	// ── Export / Import ──
 	async function deleteAllData() {
-		// Only clear gym data, not auth tokens
+		// Clear gym data
 		if (typeof localStorage !== 'undefined') {
 			localStorage.removeItem('gym_sessions');
 			localStorage.removeItem('gym_routine');
@@ -529,7 +529,9 @@ Mi rutina es:
 			localStorage.removeItem('gym_bw');
 			localStorage.removeItem('gym_onboarded');
 		}
-		// Reload page — shows landing for fresh start
+		// Sign out to force fresh start
+		try { await signOut(); } catch (_) {}
+		// Reload page — no session + no onboarded = landing page
 		window.location.href = '/';
 	}
 
