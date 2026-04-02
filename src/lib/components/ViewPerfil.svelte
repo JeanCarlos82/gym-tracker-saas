@@ -6,6 +6,12 @@
 
 	async function handleSignOut() {
 		await signOut();
+		localStorage.removeItem('gym_onboarded');
+		localStorage.removeItem('gym_routine');
+		localStorage.removeItem('gym_sessions');
+		localStorage.removeItem('gym_profile');
+		localStorage.removeItem('gym_objective');
+		localStorage.removeItem('gym_bw');
 		window.location.reload();
 	}
 	import type { Profile, DayRoutine, ExerciseRef } from '$lib/data/types';
