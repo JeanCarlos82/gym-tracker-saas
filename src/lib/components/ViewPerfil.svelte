@@ -456,12 +456,12 @@ Mi rutina es:
 			localStorage.removeItem('gym_bw');
 			localStorage.removeItem('gym_onboarded');
 		}
-		// Sign out if logged in
-		try { await signOut(); } catch (_) {}
+		// Reload store with empty data
+		db.reload();
 		ontoast('Datos borrados');
-		setTimeout(() => {
-			window.location.href = '/';
-		}, 500);
+		// Launch wizard
+		onrelaunch();
+		confirmDelete = false;
 	}
 
 	function exportData() {
