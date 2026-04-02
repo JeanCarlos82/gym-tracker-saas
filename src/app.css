@@ -161,9 +161,9 @@ input,textarea{-webkit-user-select:text;user-select:text;}
 .ni.active .nlbl{max-width:80px;opacity:1;}
 
 /* ── MODAL ── */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:100;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity 0.25s;}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:100;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity 0.25s;}
 .overlay.open{opacity:1;pointer-events:all;}
-.modal{width:100%;background:var(--card);border-radius:20px 20px 0 0;border-top:1px solid var(--border2);padding:0 var(--margin) calc(20px + var(--safe-bottom));padding-left:calc(var(--margin) + var(--safe-left));padding-right:calc(var(--margin) + var(--safe-right));transform:translateY(100%);transition:transform 0.35s cubic-bezier(0.32,0.72,0,1);max-height:92dvh;overflow-y:auto;}
+.modal{width:100%;background:rgba(20,20,20,0.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:20px 20px 0 0;border-top:1px solid rgba(255,255,255,0.08);border-left:1px solid rgba(255,255,255,0.04);border-right:1px solid rgba(255,255,255,0.04);padding:0 var(--margin) calc(20px + var(--safe-bottom));padding-left:calc(var(--margin) + var(--safe-left));padding-right:calc(var(--margin) + var(--safe-right));transform:translateY(100%);transition:transform 0.35s cubic-bezier(0.32,0.72,0,1);max-height:92dvh;overflow-y:auto;box-shadow:0 -8px 40px rgba(0,0,0,0.5);}
 .overlay.open .modal{transform:translateY(0);}
 .mhandle{width:40px;height:4px;background:var(--border2);border-radius:2px;margin:12px auto 18px;}
 .mtitle{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;margin-bottom:2px;}
@@ -435,7 +435,7 @@ input,textarea{-webkit-user-select:text;user-select:text;}
 .backup-btn.imp .backup-lbl{color:var(--blue);}
 
 /* rutina */
-.day-block{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:8px;animation:fadeSlideIn 0.3s ease forwards;transition:border-color 0.2s;}
+.day-block{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:8px;animation:fadeSlideIn 0.3s ease forwards;transition:all 0.15s ease;}
 .day-block.day-rest{opacity:0.4;}
 .day-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background 0.1s;}
 .day-hdr:active{background:var(--card2);}
@@ -712,7 +712,7 @@ input,textarea{-webkit-user-select:text;user-select:text;}
 .guide-cat{margin-bottom:20px;}
 .guide-cat:last-child{margin-bottom:0;}
 .guide-cat-hdr{font-family:'DM Mono',monospace;font-size:10px;font-weight:600;letter-spacing:2px;color:var(--cat-color);padding:4px 0 8px;border-bottom:1px solid var(--border);margin-bottom:8px;}
-.guide-card{background:var(--card2);border:1px solid var(--border);border-radius:10px;margin-bottom:6px;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:border-color 0.2s;}
+.guide-card{background:var(--card2);border:1px solid var(--border);border-radius:10px;margin-bottom:6px;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all 0.15s ease;}
 .guide-card:active{opacity:0.8;}
 .guide-card.expanded{border-color:var(--border2);}
 .guide-card-top{display:flex;align-items:center;gap:10px;padding:12px 14px;}
@@ -769,6 +769,90 @@ input,textarea{-webkit-user-select:text;user-select:text;}
 .wiz-skip-btn:active{color:var(--text);}
 .wiz-copy-prompt{background:var(--accent);color:#000;border:none;border-radius:6px;padding:5px 12px;font-family:'DM Mono',monospace;font-size:9px;font-weight:600;letter-spacing:1px;cursor:pointer;margin-top:8px;-webkit-tap-highlight-color:transparent;}
 .wiz-copy-prompt:active{opacity:0.7;}
+
+/* ── UI/UX PRO MAX ENHANCEMENTS ── */
+
+/* 1. Cursor pointer on all interactive elements (where not already set) */
+.chip,.creator-link,.reorder{cursor:pointer;}
+
+/* 2. Smooth transitions (where not already present or needs upgrade) */
+.chip{transition:all 0.15s ease;}
+.sess-card{transition:all 0.15s ease;}
+.wiz-opt{transition:all 0.15s ease;}
+
+/* 3. Touch targets — ensure minimum 44px tap area */
+.ni{min-height:44px;}
+.wiz-day-btn{min-width:44px;min-height:44px;}
+.act-dot{min-width:44px;min-height:44px;}
+.prog-period{min-height:44px;display:flex;align-items:center;justify-content:center;}
+.c-int-opt{min-height:44px;display:flex;align-items:center;justify-content:center;}
+
+/* 5. Active press states (where not already present) */
+.wiz-opt:active{transform:scale(0.97);}
+.pick-item:active{transform:scale(0.97);}
+.sess-card:active{transform:scale(0.97);}
+.guide-card:active{transform:scale(0.97);}
+
+/* 6. Loading skeleton shimmer */
+.skeleton{background:linear-gradient(90deg,var(--card) 25%,var(--card2) 50%,var(--card) 75%);background-size:200% 100%;animation:skeletonShimmer 1.5s ease infinite;border-radius:8px;min-height:20px;}
+@keyframes skeletonShimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+.skeleton-text{height:12px;margin-bottom:8px;border-radius:4px;}
+.skeleton-text.short{width:60%;}
+.skeleton-card{height:64px;border-radius:12px;margin-bottom:6px;}
+.skeleton-circle{width:44px;height:44px;border-radius:50%;}
+
+/* 7. Better nav active indicator — accent dot under active nav item */
+.ni.active::after{content:'';position:absolute;bottom:6px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:rgba(0,0,0,0.35);}
+
+/* 9. Focus visible states for all interactive elements */
+.ni:focus-visible,
+.wiz-opt:focus-visible,
+.wiz-sex:focus-visible,
+.wiz-day-btn:focus-visible,
+.drop-header:focus-visible,
+.tog:focus-visible,
+.act-dot:focus-visible,
+.sex-btn:focus-visible,
+.backup-btn:focus-visible,
+.chip:focus-visible,
+.pick-item:focus-visible,
+.ex-card:focus-visible,
+.day-hdr:focus-visible,
+.creator-link:focus-visible,
+.guide-card:focus-visible,
+.sess-hdr:focus-visible,
+.hist-month-hdr:focus-visible,
+.hist-week-hdr:focus-visible,
+.prog-period:focus-visible,
+.prog-ex-item:focus-visible,
+.sbtn:focus-visible,
+.dbtn:focus-visible,
+.ubtn:focus-visible,
+.mg-tab:focus-visible,
+.echip:focus-visible,
+.fab-reorder:focus-visible,
+.obj-opt:focus-visible,
+.timer-opt:focus-visible,
+.c-int-opt:focus-visible,
+.feedback-btn:focus-visible,
+.install-btn:focus-visible,
+.wiz-activity:focus-visible,
+.reorder:focus-visible{outline:2px solid var(--accent);outline-offset:2px;box-shadow:0 0 0 4px rgba(232,255,58,0.15);}
+
+/* 10. Custom scrollbar styling for dark theme */
+*{scrollbar-width:thin;scrollbar-color:var(--card3) transparent;}
+*::-webkit-scrollbar{width:6px;height:6px;}
+*::-webkit-scrollbar-track{background:transparent;}
+*::-webkit-scrollbar-thumb{background:var(--card3);border-radius:3px;}
+*::-webkit-scrollbar-thumb:hover{background:var(--muted);}
+/* Keep hidden scrollbars where explicitly set */
+.scroll::-webkit-scrollbar,.wizard::-webkit-scrollbar,.mg-tabs-wrap::-webkit-scrollbar,.ex-scroll::-webkit-scrollbar,.wiz-result-scroll::-webkit-scrollbar{display:none;}
+.scroll,.wizard,.mg-tabs-wrap,.ex-scroll,.wiz-result-scroll{scrollbar-width:none;}
+/* Modal scrollbar visible with dark theme style */
+.modal::-webkit-scrollbar{width:4px;}
+.modal::-webkit-scrollbar-track{background:transparent;margin:20px 0;}
+.modal::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.modal::-webkit-scrollbar-thumb:hover{background:var(--muted);}
 
 /* ── RESPONSIVE: small Android (360px) ── */
 @media(max-width:374px){

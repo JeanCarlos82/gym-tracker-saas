@@ -65,11 +65,42 @@
 </script>
 
 {#if !ready}
-	<div style="position:fixed;inset:0;background:#0a0a0a;display:flex;align-items:center;justify-content:center;">
+	<div style="position:fixed;inset:0;background:#0a0a0a;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:24px;">
 		<div style="text-align:center;">
-			<div style="font-family:'Bebas Neue',sans-serif;font-size:48px;color:#E8FF3A;letter-spacing:2px;">GYM</div>
-			<div style="font-family:'DM Mono',monospace;font-size:11px;color:#555;">Cargando...</div>
+			<div style="
+				font-family:'Bebas Neue',sans-serif;
+				font-size:56px;
+				color:#E8FF3A;
+				letter-spacing:6px;
+				animation:logoGlow 2s ease-in-out infinite;
+				text-shadow:0 0 20px rgba(232,255,58,0.4), 0 0 40px rgba(232,255,58,0.15);
+			">GYM</div>
+			<div style="
+				display:flex;
+				align-items:center;
+				justify-content:center;
+				gap:4px;
+				margin-top:16px;
+				font-family:'DM Mono',monospace;
+				font-size:11px;
+				color:#444;
+				letter-spacing:2px;
+			">
+				<span style="animation:dotPulse 1.4s ease-in-out infinite 0s;">.</span>
+				<span style="animation:dotPulse 1.4s ease-in-out infinite 0.2s;">.</span>
+				<span style="animation:dotPulse 1.4s ease-in-out infinite 0.4s;">.</span>
+			</div>
 		</div>
+		{@html `<style>
+			@keyframes logoGlow {
+				0%, 100% { opacity: 1; text-shadow: 0 0 20px rgba(232,255,58,0.4), 0 0 40px rgba(232,255,58,0.15); }
+				50% { opacity: 0.85; text-shadow: 0 0 30px rgba(232,255,58,0.6), 0 0 60px rgba(232,255,58,0.25); }
+			}
+			@keyframes dotPulse {
+				0%, 100% { opacity: 0.2; transform: translateY(0); }
+				50% { opacity: 1; transform: translateY(-3px); }
+			}
+		</style>`}
 	</div>
 {:else}
 	{#if showAuth}
