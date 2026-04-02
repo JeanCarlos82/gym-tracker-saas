@@ -88,8 +88,16 @@ function createDB() {
 		async init() {
 			const userId = getUserId();
 			if (userId) {
-				const data = await loadFromSupabase(userId);
-				set(data);
+				try {
+					const data = await Promise.race([
+						loadFromSupabase(userId),
+						new Promise<Database>((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
+					]);
+					set(data);
+				} catch (e) {
+					console.warn('Cloud load timeout, using local data:', e);
+					set(loadLocal());
+				}
 			} else {
 				set(loadLocal());
 			}

@@ -31,16 +31,20 @@ export async function initAuth(): Promise<void> {
 			window.history.replaceState({}, '', window.location.pathname);
 		}
 	} else {
-		// Normal visit: get cached session immediately
+		// Normal visit: get cached session with timeout (mobile can hang)
 		try {
-			const { data } = await supabase.auth.getSession();
+			const sessionPromise = supabase.auth.getSession();
+			const { data } = await Promise.race([
+				sessionPromise,
+				new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000))
+			]);
 			if (data.session?.user) {
 				user.set(data.session.user);
 			}
 		} catch (e) {
 			console.error('initAuth error:', e);
 		}
-		// Also wait for the listener to fire (it provides the definitive state)
+		// Also wait for the listener to fire (max 1s)
 		await Promise.race([
 			firstEvent,
 			new Promise<void>(r => setTimeout(r, 1000))
