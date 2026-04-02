@@ -99,6 +99,7 @@ Mi rutina es:
 	let datosOpen = $state(false);
 	let appOpen = $state(false);
 	let openDays = $state<Record<string, boolean>>({});
+	let confirmDelete = $state(false);
 
 	let profileSaved = $state(false);
 
@@ -445,6 +446,16 @@ Mi rutina es:
 	}
 
 	// ── Export / Import ──
+	function deleteAllData() {
+		if (typeof localStorage !== 'undefined') {
+			localStorage.clear();
+		}
+		ontoast('Datos borrados');
+		setTimeout(() => {
+			window.location.reload();
+		}, 500);
+	}
+
 	function exportData() {
 		const json = db.exportData();
 		const blob = new Blob([json], { type: 'application/json' });
@@ -878,6 +889,32 @@ Mi rutina es:
 				<!-- Install PWA -->
 				{#if showInstall}
 					<button class="install-btn" onclick={installPWA}>INSTALAR APP</button>
+				{/if}
+			</div>
+
+			<!-- Delete all data -->
+			<div style="border-top:1px solid var(--border);padding-top:14px;margin-top:14px">
+				{#if !confirmDelete}
+					<button style="width:100%;padding:12px;background:none;border:1px solid var(--red);color:var(--red);border-radius:var(--radius-md);font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1.5px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick={() => confirmDelete = true}>
+						BORRAR TODOS LOS DATOS
+					</button>
+					<div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-align:center;margin-top:8px;line-height:1.5">
+						Esto eliminara todas tus sesiones, rutina, perfil y peso registrado. No se puede deshacer.
+					</div>
+				{:else}
+					<div style="text-align:center;padding:8px 0">
+						<div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--red);margin-bottom:12px">
+							¿Estas seguro? Se borrara todo.
+						</div>
+						<div style="display:flex;gap:8px">
+							<button style="flex:1;padding:12px;background:var(--red);color:#fff;border:none;border-radius:var(--radius-md);font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer" onclick={deleteAllData}>
+								SI, BORRAR TODO
+							</button>
+							<button style="flex:1;padding:12px;background:var(--card2);color:var(--text);border:1px solid var(--border2);border-radius:var(--radius-md);font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer" onclick={() => confirmDelete = false}>
+								CANCELAR
+							</button>
+						</div>
+					</div>
 				{/if}
 			</div>
 		</div>
