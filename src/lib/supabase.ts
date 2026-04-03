@@ -3,7 +3,7 @@ import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/publi
 
 export const supabase = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
 	auth: {
-		flowType: 'pkce',
+		flowType: 'implicit',
 		detectSessionInUrl: true,
 		autoRefreshToken: true,
 		persistSession: true,
