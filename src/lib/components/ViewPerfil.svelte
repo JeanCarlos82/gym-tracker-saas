@@ -521,17 +521,20 @@ Mi rutina es:
 
 	// ── Export / Import ──
 	async function deleteAllData() {
-		// Delete cloud data first (while still authenticated)
-		await db.deleteAllCloud();
+		try {
+			// Delete cloud data first (while still authenticated)
+			await db.deleteAllCloud();
+		} catch (e) {
+			console.error('deleteAllCloud threw:', e);
+		}
 		// Clear gym data from localStorage
 		if (typeof localStorage !== 'undefined') {
-			localStorage.removeItem('gym_sessions');
-			localStorage.removeItem('gym_routine');
-			localStorage.removeItem('gym_profile');
-			localStorage.removeItem('gym_objective');
-			localStorage.removeItem('gym_bw');
+			const keys = Object.keys(localStorage).filter(k => k.startsWith('gym_'));
+			keys.forEach(k => localStorage.removeItem(k));
 			localStorage.removeItem('gym_onboarded');
 		}
+		// Reset store to defaults
+		db.reload();
 		// Sign out to force fresh start
 		try { await signOut(); } catch (_) {}
 		// Reload page — no session + no onboarded = landing page

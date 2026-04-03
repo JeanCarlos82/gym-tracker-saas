@@ -241,16 +241,22 @@ function createDB() {
 		},
 
 		async deleteAllCloud() {
-			const userId = getUserId();
+			// Get userId from store OR directly from Supabase session
+			let userId = getUserId();
+			if (!userId) {
+				const { data } = await supabase.auth.getSession();
+				userId = data.session?.user?.id ?? null;
+			}
 			if (!userId) return;
-			// DELETE sessions & body_weight (have DELETE RLS policies)
+			const errors: string[] = [];
+			// DELETE sessions & body_weight
 			const [r1, r2] = await Promise.all([
 				supabase.from('sessions').delete().eq('user_id', userId),
 				supabase.from('body_weight').delete().eq('user_id', userId),
 			]);
-			if (r1.error) console.error('Delete sessions failed:', r1.error);
-			if (r2.error) console.error('Delete body_weight failed:', r2.error);
-			// UPDATE routines & profile to defaults (may not have DELETE policy)
+			if (r1.error) errors.push('sessions: ' + r1.error.message);
+			if (r2.error) errors.push('body_weight: ' + r2.error.message);
+			// RESET routines & profile to defaults
 			const [r3, r4] = await Promise.all([
 				supabase.from('routines').update({ data: DEFAULT_ROUTINE, updated_at: new Date().toISOString() }).eq('user_id', userId),
 				supabase.from('profiles').update({
@@ -260,8 +266,9 @@ function createDB() {
 					updated_at: new Date().toISOString()
 				}).eq('id', userId),
 			]);
-			if (r3.error) console.error('Reset routines failed:', r3.error);
-			if (r4.error) console.error('Reset profile failed:', r4.error);
+			if (r3.error) errors.push('routines: ' + r3.error.message);
+			if (r4.error) errors.push('profile: ' + r4.error.message);
+			if (errors.length) console.error('deleteAllCloud errors:', errors);
 		},
 
 		// Migrate local data to cloud after first login
