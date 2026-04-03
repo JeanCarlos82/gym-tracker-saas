@@ -4,24 +4,20 @@ import type { User } from '@supabase/supabase-js';
 
 export const user = writable<User | null>(null);
 
-// Register auth listener once (called at module load)
+// Register auth listener once at module load
 supabase.auth.onAuthStateChange((_event, session) => {
 	user.set(session?.user ?? null);
 });
 
 export async function initAuth(): Promise<void> {
-	// Try to get existing session with timeout
+	// getSession() awaits _initialize() which handles PKCE code exchange.
+	// NO timeout — must let the exchange complete fully.
 	try {
-		const result = await Promise.race([
-			supabase.auth.getSession(),
-			new Promise<null>(r => setTimeout(() => r(null), 8000))
-		]);
-		if (result && 'data' in result && result.data.session?.user) {
-			user.set(result.data.session.user);
+		const { data } = await supabase.auth.getSession();
+		if (data.session?.user) {
+			user.set(data.session.user);
 		}
-	} catch (_) {
-		// Error — continue without session
-	}
+	} catch (_) {}
 }
 
 export async function signUp(email: string, password: string) {
@@ -38,7 +34,6 @@ export async function signIn(email: string, password: string) {
 }
 
 export async function signInWithGoogle() {
-	if (typeof sessionStorage !== 'undefined') sessionStorage.setItem('gym_auth_pending', '1');
 	const { error } = await supabase.auth.signInWithOAuth({
 		provider: 'google',
 		options: { redirectTo: typeof window !== 'undefined' ? window.location.origin : '' }

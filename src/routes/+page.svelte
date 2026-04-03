@@ -89,59 +89,37 @@
 
 	onMount(async () => {
 		const wasOnboarded = db.isOnboarded();
-		const authPending = typeof sessionStorage !== 'undefined' && sessionStorage.getItem('gym_auth_pending') === '1';
-		if (authPending) sessionStorage.removeItem('gym_auth_pending');
 
-		if (authPending) {
-			// Coming back from Google OAuth (PKCE flow)
-			// onAuthStateChange (registered at module load) will fire when
-			// Supabase processes the ?code= param. Just wait for it.
-			const u = await new Promise<any>((resolve) => {
-				const timeout = setTimeout(() => resolve(null), 10000);
-				const unsub = user.subscribe((val) => {
-					if (val) {
-						clearTimeout(timeout);
-						unsub();
-						resolve(val);
-					}
-				});
-			});
-			if (u) {
-				db.setOnboarded();
-				enterApp(true);
-			} else {
-				showLanding = true;
-				ready = true;
-			}
-			return;
-		}
-
-		// Normal visit (not OAuth callback)
+		// 1. Wait for Supabase to process everything (including PKCE exchange if ?code= present)
 		try {
 			await initAuth();
-			const u = get(user);
+		} catch {}
 
-			if (u) {
-				await db.init();
-				db.setOnboarded();
-				enterApp(!wasOnboarded);
-			} else {
-				showLanding = true;
-				ready = true;
-			}
-		} catch {
+		const u = get(user);
+
+		// 2. Decide what to show
+		if (u) {
+			// Logged in user → app
+			db.setOnboarded();
+			enterApp(!wasOnboarded);
+		} else if (wasOnboarded) {
+			// Guest who was onboarded → app with local data
+			isOnboarded = true;
+			ready = true;
+		} else {
+			// New user → landing
 			showLanding = true;
 			ready = true;
 		}
 
-		// Start notification reminder
+		// 3. Start notification reminder
 		startReminderCheck(() => {
 			const today = new Date().toISOString().split('T')[0];
 			const data = get(db);
 			return data.sessions.some(s => s.date === today && s.entries?.length > 0);
 		});
 
-		// Check for shared routine import
+		// 4. Check for shared routine import
 		if (typeof window !== 'undefined' && window.location.hash.startsWith('#r=')) {
 			const code = window.location.hash.slice(3);
 			if (code) {
@@ -156,10 +134,11 @@
 			window.history.replaceState({}, '', window.location.pathname);
 		}
 
-		// Subscriber for auth changes (login from auth screen)
+		// 5. Listen for auth from Auth screen (Google login from within the app)
 		return user.subscribe(u => {
-			if (u && showAuth) {
+			if (u && (showAuth || showLanding)) {
 				showAuth = false;
+				showLanding = false;
 				db.setOnboarded();
 				enterApp(true);
 			}
