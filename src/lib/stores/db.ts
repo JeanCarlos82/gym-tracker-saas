@@ -243,14 +243,25 @@ function createDB() {
 		async deleteAllCloud() {
 			const userId = getUserId();
 			if (!userId) return;
-			try {
-				await Promise.all([
-					supabase.from('sessions').delete().eq('user_id', userId),
-					supabase.from('body_weight').delete().eq('user_id', userId),
-					supabase.from('routines').delete().eq('user_id', userId),
-					supabase.from('profiles').delete().eq('id', userId),
-				]);
-			} catch (e) { console.error('Failed to delete cloud data:', e); }
+			// DELETE sessions & body_weight (have DELETE RLS policies)
+			const [r1, r2] = await Promise.all([
+				supabase.from('sessions').delete().eq('user_id', userId),
+				supabase.from('body_weight').delete().eq('user_id', userId),
+			]);
+			if (r1.error) console.error('Delete sessions failed:', r1.error);
+			if (r2.error) console.error('Delete body_weight failed:', r2.error);
+			// UPDATE routines & profile to defaults (may not have DELETE policy)
+			const [r3, r4] = await Promise.all([
+				supabase.from('routines').update({ data: DEFAULT_ROUTINE, updated_at: new Date().toISOString() }).eq('user_id', userId),
+				supabase.from('profiles').update({
+					name: '', age: '', sex: 'H', height: '', weight: '',
+					weight_unit: 'kg', height_unit: 'cm', rest_timer_seconds: 90,
+					activity_level: 2, objective: 'hipertrofia',
+					updated_at: new Date().toISOString()
+				}).eq('id', userId),
+			]);
+			if (r3.error) console.error('Reset routines failed:', r3.error);
+			if (r4.error) console.error('Reset profile failed:', r4.error);
 		},
 
 		// Migrate local data to cloud after first login
