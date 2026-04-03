@@ -7,6 +7,5 @@ export const supabase = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_K
 		detectSessionInUrl: true,
 		autoRefreshToken: true,
 		persistSession: true,
-		debug: true,
 	},
 });

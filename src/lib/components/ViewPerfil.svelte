@@ -1069,7 +1069,12 @@ Mi rutina es:
 		onclick={async () => {
 			await signOut();
 			if (typeof window !== 'undefined') {
-				localStorage.clear();
+				localStorage.removeItem('gym_sessions');
+				localStorage.removeItem('gym_routine');
+				localStorage.removeItem('gym_profile');
+				localStorage.removeItem('gym_objective');
+				localStorage.removeItem('gym_bw');
+				localStorage.removeItem('gym_onboarded');
 				window.location.href = '/';
 			}
 		}}

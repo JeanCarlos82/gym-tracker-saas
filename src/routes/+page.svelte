@@ -96,6 +96,11 @@
 			await initAuth();
 		} catch {}
 
+		// Clean up OAuth code from URL after PKCE exchange (codes are single-use)
+		if (typeof window !== 'undefined' && window.location.search.includes('code=')) {
+			window.history.replaceState({}, '', window.location.pathname);
+		}
+
 		const u = get(user);
 
 		// 2. Decide what to show

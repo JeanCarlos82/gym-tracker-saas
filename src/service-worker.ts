@@ -40,6 +40,9 @@ self.addEventListener('fetch', (event: FetchEvent) => {
 	// Skip external requests (Supabase, Google, etc.)
 	if (url.origin !== location.origin) return;
 
+	// Skip OAuth callback URLs — let the browser handle them directly
+	if (url.searchParams.has('code')) return;
+
 	// Hashed assets (_app/immutable/*): cache-first (they never change)
 	const isImmutable = url.pathname.startsWith('/_app/immutable/');
 

@@ -11,16 +11,16 @@ supabase.auth.onAuthStateChange((_event, session) => {
 
 export async function initAuth(): Promise<void> {
 	// getSession() awaits _initialize() which handles PKCE code exchange.
-	// 15s timeout as safety net (PKCE exchange needs time but shouldn't hang forever).
+	// NO timeout — PKCE exchange MUST complete fully or it fails silently.
 	try {
-		const result = await Promise.race([
-			supabase.auth.getSession(),
-			new Promise<null>(r => setTimeout(() => r(null), 15000))
-		]);
-		if (result && 'data' in result && result.data.session?.user) {
-			user.set(result.data.session.user);
+		const { data, error } = await supabase.auth.getSession();
+		if (error) console.error('[initAuth] getSession error:', error.message);
+		if (data.session?.user) {
+			user.set(data.session.user);
 		}
-	} catch (_) {}
+	} catch (e) {
+		console.error('[initAuth] unexpected error:', e);
+	}
 }
 
 export async function signUp(email: string, password: string) {
