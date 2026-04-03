@@ -74,109 +74,91 @@
 
 	let initError = $state('');
 
+	function enterApp(runWizardCheck = false) {
+		isOnboarded = true;
+		ready = true;
+		db.init().then(() => {
+			if (runWizardCheck) {
+				const data = get(db);
+				if (!Object.values(data.routine).some(d => d.exercises?.length > 0)) {
+					wizardVisible = true;
+				}
+			}
+		}).catch(() => {});
+	}
+
 	onMount(async () => {
 		const wasOnboarded = db.isOnboarded();
 		const authPending = typeof sessionStorage !== 'undefined' && sessionStorage.getItem('gym_auth_pending') === '1';
 		if (authPending) sessionStorage.removeItem('gym_auth_pending');
 
-		// Safety: never hang more than 5s
-		const safety = setTimeout(() => {
-			if (!ready) {
-				if (!authPending) showLanding = true;
-				ready = true;
-			}
-		}, 5000);
+		if (authPending) {
+			// Coming back from Google OAuth
+			// Don't await initAuth (it can hang). Set up listener and poll.
+			initAuth();
+			let attempts = 0;
+			const poll = setInterval(() => {
+				attempts++;
+				const u = get(user);
+				if (u) {
+					clearInterval(poll);
+					db.setOnboarded();
+					enterApp(true);
+				} else if (attempts >= 10) {
+					clearInterval(poll);
+					showLanding = true;
+					ready = true;
+				}
+			}, 500);
+			return;
+		}
 
+		// Normal visit (not OAuth callback)
 		try {
 			await initAuth();
 			const u = get(user);
 
 			if (u) {
-				// User logged in — go to app
 				await db.init();
 				db.setOnboarded();
-				isOnboarded = true;
-				if (!wasOnboarded) {
-					const data = get(db);
-					if (!Object.values(data.routine).some(d => d.exercises?.length > 0)) {
-						wizardVisible = true;
-					}
-				}
-			} else if (authPending) {
-				// Came from OAuth — poll for user every 500ms, max 4s
-				let attempts = 0;
-				const poll = setInterval(() => {
-					attempts++;
-					const u = get(user);
-					if (u) {
-						clearInterval(poll);
-						db.setOnboarded();
-						isOnboarded = true;
-						ready = true;
-						db.init().then(() => {
-							const data = get(db);
-							if (!Object.values(data.routine).some(d => d.exercises?.length > 0)) {
-								wizardVisible = true;
-							}
-						}).catch(() => {});
-					} else if (attempts >= 8) {
-						clearInterval(poll);
-						showLanding = true;
-						ready = true;
-					}
-				}, 500);
+				enterApp(!wasOnboarded);
 			} else {
-				// No user, normal visit — show landing
 				showLanding = true;
+				ready = true;
 			}
-		} catch (e: unknown) {
-			console.error('Init failed:', e);
+		} catch {
 			showLanding = true;
+			ready = true;
 		}
 
-		clearTimeout(safety);
-		if (!authPending || isOnboarded) ready = true;
-
-		// Start notification reminder check
+		// Start notification reminder
 		startReminderCheck(() => {
 			const today = new Date().toISOString().split('T')[0];
 			const data = get(db);
 			return data.sessions.some(s => s.date === today && s.entries?.length > 0);
 		});
 
-		// Check for shared routine import (short code)
+		// Check for shared routine import
 		if (typeof window !== 'undefined' && window.location.hash.startsWith('#r=')) {
 			const code = window.location.hash.slice(3);
 			if (code) {
 				const imported = await fetchSharedRoutine(code);
-				if (imported) {
-					const ok = window.confirm('Quieres importar esta rutina compartida?');
-					if (ok) {
-						db.saveRoutine(imported);
-						db.setOnboarded();
-						isOnboarded = true;
-						showToast('Rutina importada');
-					}
+				if (imported && window.confirm('Quieres importar esta rutina compartida?')) {
+					db.saveRoutine(imported);
+					db.setOnboarded();
+					isOnboarded = true;
+					showToast('Rutina importada');
 				}
 			}
 			window.history.replaceState({}, '', window.location.pathname);
 		}
 
-		// Handle OAuth callback: user appears after redirect
+		// Subscriber for auth changes (login from auth screen)
 		return user.subscribe(u => {
-			if (u && (showAuth || showLanding || !ready)) {
+			if (u && showAuth) {
 				showAuth = false;
-				showLanding = false;
 				db.setOnboarded();
-				isOnboarded = true;
-				ready = true;
-				// Load cloud data in background
-				db.init().then(() => {
-					const data = get(db);
-					if (!Object.values(data.routine).some(d => d.exercises?.length > 0)) {
-						wizardVisible = true;
-					}
-				}).catch(() => {});
+				enterApp(true);
 			}
 		});
 	});
