@@ -38,6 +38,7 @@
 	function onWizardComplete() { isOnboarded = true; wizardVisible = false; }
 	function relaunchWizard() { wizardVisible = true; }
 	function openGuide() { guideVisible = true; }
+	function openLogin() { showAuth = true; }
 	async function startFromLanding() {
 		showLanding = false;
 		const u = get(user);
@@ -286,7 +287,7 @@
 				{:else if activeView === 'hist'}
 					<div class="view active slide-{slideDir}"><ViewHistorial /></div>
 				{:else if activeView === 'perfil'}
-					<div class="view active slide-{slideDir}"><ViewPerfil ontoast={showToast} onrelaunch={relaunchWizard} onopenguide={openGuide} /></div>
+					<div class="view active slide-{slideDir}"><ViewPerfil ontoast={showToast} onrelaunch={relaunchWizard} onopenguide={openGuide} onlogin={openLogin} /></div>
 				{/if}
 			</div>
 			<Nav active={activeView} onswitch={switchView} />

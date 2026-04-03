@@ -99,10 +99,11 @@ Mi rutina es:
 `;
 
 	// ── Props ──
-	let { ontoast = (msg: string) => {}, onopenguide = () => {}, onrelaunch = () => {} }: {
+	let { ontoast = (msg: string) => {}, onopenguide = () => {}, onrelaunch = () => {}, onlogin = () => {} }: {
 		ontoast?: (msg: string) => void;
 		onopenguide?: () => void;
 		onrelaunch?: () => void;
+		onlogin?: () => void;
 	} = $props();
 
 	// ── Reactive DB state ──
@@ -1082,7 +1083,7 @@ Mi rutina es:
 	<div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);margin-bottom:8px;">No has iniciado sesión</div>
 	<div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:12px;">Tus datos solo están en este dispositivo</div>
 	<button
-		onclick={() => { window.location.href = '/'; }}
+		onclick={onlogin}
 		style="width:100%;padding:12px;background:rgba(232,255,58,0.06);border:1px solid rgba(232,255,58,0.2);border-radius:10px;color:var(--accent);font-family:'DM Mono',monospace;font-size:11px;font-weight:500;cursor:pointer;-webkit-tap-highlight-color:transparent;"
 	>
 		INICIAR SESIÓN
