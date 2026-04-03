@@ -91,9 +91,6 @@
 	onMount(async () => {
 		const wasOnboarded = db.isOnboarded();
 		const hasCode = typeof window !== 'undefined' && window.location.search.includes('code=');
-		const hasToken = typeof window !== 'undefined' && window.location.hash.includes('access_token');
-		console.log('[MOUNT] wasOnboarded:', wasOnboarded, 'hasCode:', hasCode, 'hasToken:', hasToken);
-		console.log('[MOUNT] full URL:', window?.location?.href);
 
 		// 1. Wait for Supabase to process everything (including PKCE exchange if ?code= present)
 		try {
@@ -106,7 +103,6 @@
 		}
 
 		const u = get(user);
-		console.log('[MOUNT] after initAuth, user:', u ? u.email : 'null');
 
 		// 2. Decide what to show
 		if (u) {
