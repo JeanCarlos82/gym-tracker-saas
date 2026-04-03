@@ -240,6 +240,19 @@ function createDB() {
 			} catch { return false; }
 		},
 
+		async deleteAllCloud() {
+			const userId = getUserId();
+			if (!userId) return;
+			try {
+				await Promise.all([
+					supabase.from('sessions').delete().eq('user_id', userId),
+					supabase.from('body_weight').delete().eq('user_id', userId),
+					supabase.from('routines').delete().eq('user_id', userId),
+					supabase.from('profiles').delete().eq('id', userId),
+				]);
+			} catch (e) { console.error('Failed to delete cloud data:', e); }
+		},
+
 		// Migrate local data to cloud after first login
 		async migrateToCloud() {
 			const userId = getUserId();

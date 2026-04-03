@@ -521,7 +521,9 @@ Mi rutina es:
 
 	// ── Export / Import ──
 	async function deleteAllData() {
-		// Clear gym data
+		// Delete cloud data first (while still authenticated)
+		await db.deleteAllCloud();
+		// Clear gym data from localStorage
 		if (typeof localStorage !== 'undefined') {
 			localStorage.removeItem('gym_sessions');
 			localStorage.removeItem('gym_routine');
