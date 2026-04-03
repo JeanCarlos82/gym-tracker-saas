@@ -14,7 +14,7 @@ export async function initAuth(): Promise<void> {
 	try {
 		const result = await Promise.race([
 			supabase.auth.getSession(),
-			new Promise<null>(r => setTimeout(() => r(null), 3000))
+			new Promise<null>(r => setTimeout(() => r(null), 8000))
 		]);
 		if (result && 'data' in result && result.data.session?.user) {
 			user.set(result.data.session.user);

@@ -93,23 +93,19 @@
 		if (authPending) sessionStorage.removeItem('gym_auth_pending');
 
 		if (authPending) {
-			// Coming back from Google OAuth
-			// Don't await initAuth (it can hang). Set up listener and poll.
-			initAuth();
-			let attempts = 0;
-			const poll = setInterval(() => {
-				attempts++;
-				const u = get(user);
-				if (u) {
-					clearInterval(poll);
-					db.setOnboarded();
-					enterApp(true);
-				} else if (attempts >= 10) {
-					clearInterval(poll);
-					showLanding = true;
-					ready = true;
-				}
-			}, 500);
+			// Coming back from Google OAuth — MUST call getSession to exchange code
+			try {
+				await initAuth();
+			} catch {}
+			const u = get(user);
+			if (u) {
+				db.setOnboarded();
+				enterApp(true);
+			} else {
+				// Token exchange failed or timed out — show landing
+				showLanding = true;
+				ready = true;
+			}
 			return;
 		}
 
