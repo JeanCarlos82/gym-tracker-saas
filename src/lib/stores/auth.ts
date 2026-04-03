@@ -4,13 +4,13 @@ import type { User } from '@supabase/supabase-js';
 
 export const user = writable<User | null>(null);
 
-export async function initAuth(): Promise<void> {
-	// Listen for auth changes (fires on OAuth callback, session refresh, etc.)
-	supabase.auth.onAuthStateChange((_event, session) => {
-		user.set(session?.user ?? null);
-	});
+// Register auth listener once (called at module load)
+supabase.auth.onAuthStateChange((_event, session) => {
+	user.set(session?.user ?? null);
+});
 
-	// Try to get existing session with REAL timeout
+export async function initAuth(): Promise<void> {
+	// Try to get existing session with timeout
 	try {
 		const result = await Promise.race([
 			supabase.auth.getSession(),
