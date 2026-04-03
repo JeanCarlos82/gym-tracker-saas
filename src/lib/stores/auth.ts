@@ -4,14 +4,13 @@ import type { User } from '@supabase/supabase-js';
 
 export const user = writable<User | null>(null);
 
-// Register auth listener once at module load
-supabase.auth.onAuthStateChange((_event, session) => {
-	user.set(session?.user ?? null);
-});
+let initialized = false;
 
 export async function initAuth(): Promise<void> {
-	// getSession() awaits _initialize() which handles PKCE code exchange.
-	// NO timeout — PKCE exchange MUST complete fully or it fails silently.
+	if (initialized) return;
+	initialized = true;
+
+	// First: get session (this triggers PKCE exchange if ?code= present)
 	try {
 		const { data, error } = await supabase.auth.getSession();
 		if (error) console.error('[initAuth] getSession error:', error.message);
@@ -21,6 +20,11 @@ export async function initAuth(): Promise<void> {
 	} catch (e) {
 		console.error('[initAuth] unexpected error:', e);
 	}
+
+	// Then: listen for future auth changes
+	supabase.auth.onAuthStateChange((_event, session) => {
+		user.set(session?.user ?? null);
+	});
 }
 
 export async function signUp(email: string, password: string) {
