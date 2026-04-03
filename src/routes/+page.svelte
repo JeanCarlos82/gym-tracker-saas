@@ -93,11 +93,25 @@
 		if (authPending) sessionStorage.removeItem('gym_auth_pending');
 
 		if (authPending) {
-			// Coming back from Google OAuth — MUST call getSession to exchange code
+			// Coming back from Google OAuth — MUST call getSession to exchange PKCE code
 			try {
 				await initAuth();
 			} catch {}
-			const u = get(user);
+			let u = get(user);
+			if (!u) {
+				// initAuth may resolve before onAuthStateChange fires (setTimeout(0) in Supabase internals).
+				// Give the auth listener a moment to propagate the session.
+				u = await new Promise((resolve) => {
+					const timeout = setTimeout(() => resolve(null), 3000);
+					const unsub = user.subscribe((val) => {
+						if (val) {
+							clearTimeout(timeout);
+							unsub();
+							resolve(val);
+						}
+					});
+				});
+			}
 			if (u) {
 				db.setOnboarded();
 				enterApp(true);
