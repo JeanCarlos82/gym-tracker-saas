@@ -606,8 +606,8 @@ Mi rutina es:
 									<input class="wiz-input wiz-num" type="number" bind:value={wizHeight} placeholder="175" min="100" max="230">
 								{/if}
 								<div class="unit-group">
-									<button class="unit-toggle" class:active={wizHeightUnit === 'cm'} onclick={() => { wizHeightUnit = 'cm'; }}>cm</button>
-									<button class="unit-toggle" class:active={wizHeightUnit === 'ft'} onclick={() => { wizHeightUnit = 'ft'; }}>ft</button>
+									<button type="button" class="unit-toggle" class:active={wizHeightUnit === 'cm'} onclick={() => { wizHeightUnit = 'cm'; }}>cm</button>
+									<button type="button" class="unit-toggle" class:active={wizHeightUnit === 'ft'} onclick={() => { wizHeightUnit = 'ft'; }}>ft</button>
 								</div>
 							</div>
 						</div>
@@ -616,8 +616,8 @@ Mi rutina es:
 							<div class="unit-row">
 								<input class="wiz-input wiz-num" type="number" bind:value={wizWeight} placeholder={wizUnit === 'lb' ? '165' : '75'} min="30" max={wizUnit === 'lb' ? '660' : '300'} step="0.1">
 								<div class="unit-group">
-									<button class="unit-toggle" class:active={wizUnit === 'kg'} onclick={() => { wizUnit = 'kg'; }}>kg</button>
-									<button class="unit-toggle" class:active={wizUnit === 'lb'} onclick={() => { wizUnit = 'lb'; }}>lb</button>
+									<button type="button" class="unit-toggle" class:active={wizUnit === 'kg'} onclick={() => { wizUnit = 'kg'; }}>kg</button>
+									<button type="button" class="unit-toggle" class:active={wizUnit === 'lb'} onclick={() => { wizUnit = 'lb'; }}>lb</button>
 								</div>
 							</div>
 						</div>

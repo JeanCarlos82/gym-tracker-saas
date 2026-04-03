@@ -913,8 +913,8 @@ Mi rutina es:
 							<input class="pinput pnum" type="number" bind:value={pHeight} placeholder="175" min="100" max="230" oninput={handleProfileInput}>
 						{/if}
 						<div class="unit-group">
-							<button class="unit-toggle" class:active={pHeightUnit === 'cm'} onclick={() => { pHeightUnit = 'cm'; saveProfileData(); }}>cm</button>
-							<button class="unit-toggle" class:active={pHeightUnit === 'ft'} onclick={() => { pHeightUnit = 'ft'; saveProfileData(); }}>ft</button>
+							<button type="button" class="unit-toggle" class:active={pHeightUnit === 'cm'} onclick={() => { pHeightUnit = 'cm'; saveProfileData(); }}>cm</button>
+							<button type="button" class="unit-toggle" class:active={pHeightUnit === 'ft'} onclick={() => { pHeightUnit = 'ft'; saveProfileData(); }}>ft</button>
 						</div>
 					</div>
 				</div>
@@ -923,8 +923,8 @@ Mi rutina es:
 					<div class="unit-row">
 						<input class="pinput pnum" type="number" bind:value={pWeight} placeholder={pWeightUnit === 'lb' ? '165' : '75'} min="30" max={pWeightUnit === 'lb' ? '660' : '300'} step="0.1" oninput={handleProfileInput}>
 						<div class="unit-group">
-							<button class="unit-toggle" class:active={pWeightUnit === 'kg'} onclick={() => { pWeightUnit = 'kg'; saveProfileData(); }}>kg</button>
-							<button class="unit-toggle" class:active={pWeightUnit === 'lb'} onclick={() => { pWeightUnit = 'lb'; saveProfileData(); }}>lb</button>
+							<button type="button" class="unit-toggle" class:active={pWeightUnit === 'kg'} onclick={() => { pWeightUnit = 'kg'; saveProfileData(); }}>kg</button>
+							<button type="button" class="unit-toggle" class:active={pWeightUnit === 'lb'} onclick={() => { pWeightUnit = 'lb'; saveProfileData(); }}>lb</button>
 						</div>
 					</div>
 				</div>
