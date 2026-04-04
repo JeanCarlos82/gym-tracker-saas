@@ -1,10 +1,11 @@
 // ── Core Types ──
 // Re-export exercise-related types from their canonical source
-export type { ExerciseType, Zone, MuscleGroup, Exercise } from '$lib/data/exercises';
+export type { ExerciseType, Zone, MuscleGroup, Exercise, Category, Equipment, MovementType, Movement, Difficulty } from '$lib/data/exercises';
 
 import type { ExerciseType } from '$lib/data/exercises';
 
 export interface ExerciseEntry {
+  id: string;
   name: string;
   type: ExerciseType;
 }

@@ -44,6 +44,7 @@ export interface Session {
 
 /** Reference to an exercise inside a routine day */
 export interface ExerciseRef {
+  id: string;
   name: string;
   type: 'pesas' | 'cardio';
 }

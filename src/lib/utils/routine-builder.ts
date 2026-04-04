@@ -11,6 +11,13 @@ import type {
   TemplateKey
 } from '$lib/types';
 import { TEMPLATES_M, TEMPLATES_F } from '$lib/data/templates';
+import { getExerciseById } from '$lib/data/exercises';
+
+/** Helper: build an ExerciseEntry from an exercise ID */
+function exEntry(id: string, type: 'pesas' | 'cardio' = 'pesas'): ExerciseEntry {
+  const info = getExerciseById(id);
+  return { id, name: info?.name ?? id, type: info?.exerciseType ?? type };
+}
 
 // ── Interfaces ──
 
@@ -125,93 +132,94 @@ export function adaptExercises(
   // ═══════════════════════════════════════════
   // PHASE 1: Exercise substitutions by physical profile
   // ═══════════════════════════════════════════
+  // Swaps use exercise IDs (not display names)
   const swaps: [string, string][] = [];
 
   // === Adaptations by physical profile (apply to all levels) ===
 
   // Sentadilla: older/very heavy -> prensa always (independent of experience)
-  if (isOlder || isVeryHeavy) swaps.push(['Sentadilla', 'Prensa de pierna']);
-  else if (isHeavy) swaps.push(['Sentadilla', 'Sentadilla en máquina Smith']);
-  else if (isTall && !isAdvanced) swaps.push(['Sentadilla', 'Sentadilla en multipower']);
+  if (isOlder || isVeryHeavy) swaps.push(['sentadilla_barra', 'prensa_pierna']);
+  else if (isHeavy) swaps.push(['sentadilla_barra', 'sentadilla_smith']);
+  else if (isTall && !isAdvanced) swaps.push(['sentadilla_barra', 'sentadilla_multipower']);
 
   // Peso muerto: senior -> puente, older -> rumano safer
-  if (isSenior) swaps.push(['Peso muerto rumano', 'Puente de glúteo']);
-  else if (isVeryHeavy) swaps.push(['Peso muerto rumano', 'Puente de glúteo']);
-  if (isIntermediate && isSenior) swaps.push(['Peso muerto', 'Peso muerto rumano']);
+  if (isSenior) swaps.push(['peso_muerto_rumano', 'puente_gluteo']);
+  else if (isVeryHeavy) swaps.push(['peso_muerto_rumano', 'puente_gluteo']);
+  if (isIntermediate && isSenior) swaps.push(['peso_muerto', 'peso_muerto_rumano']);
 
   // Cardio: overweight/older -> low impact
-  if (isHeavy || isOlder) swaps.push(['Correr', 'Elíptica']);
-  if (isVeryHeavy) swaps.push(['Stairmaster', 'Bicicleta estática']);
+  if (isHeavy || isOlder) swaps.push(['correr', 'eliptica']);
+  if (isVeryHeavy) swaps.push(['stairmaster', 'bicicleta_estatica']);
 
   // Fondos: older/heavy -> polea (joints)
-  if (isOlder || isHeavy) swaps.push(['Fondos en paralelas', 'Tríceps en polea']);
+  if (isOlder || isHeavy) swaps.push(['fondos_paralelas', 'triceps_polea']);
 
   // === BEGINNER: guided machines and simpler versions ===
   if (isBeginner) {
-    swaps.push(['Sentadilla frontal', 'Sentadilla goblet']);
-    swaps.push(['Hack squat', 'Prensa de pierna']);
+    swaps.push(['sentadilla_frontal', 'sentadilla_goblet']);
+    swaps.push(['hack_squat', 'prensa_pierna']);
 
     // Chest: machine press is safer than barbell (no spotter needed)
-    swaps.push(['Press banca', 'Press en máquina']);
-    swaps.push(['Press inclinado', 'Press inclinado en máquina']);
-    swaps.push(['Press declinado', 'Press en máquina']);
-    swaps.push(['Aperturas mancuernas', 'Contractor de pecho']);
-    swaps.push(['Fondos en paralelas', 'Flexiones']);
+    swaps.push(['press_banca_barra', 'press_banca_maquina']);
+    swaps.push(['press_inclinado_barra', 'press_inclinado_maquina']);
+    swaps.push(['press_declinado_barra', 'press_banca_maquina']);
+    swaps.push(['aperturas_mancuernas', 'contractor_pecho']);
+    swaps.push(['fondos_paralelas', 'flexiones']);
 
     // Back: guided machines avoid lower back posture errors
-    swaps.push(['Remo con barra', 'Remo en máquina']);
-    swaps.push(['Remo con mancuerna', 'Remo en máquina']);
-    swaps.push(['Dominadas', 'Pulldown en máquina']);
-    swaps.push(['Remo T-bar', 'Remo en máquina']);
+    swaps.push(['remo_barra', 'remo_maquina']);
+    swaps.push(['remo_mancuerna', 'remo_maquina']);
+    swaps.push(['dominadas', 'pulldown_maquina']);
+    swaps.push(['remo_tbar', 'remo_maquina']);
 
     // Shoulders: machine press protects shoulder joint
-    swaps.push(['Press militar', 'Press de hombro en máquina']);
-    swaps.push(['Press Arnold', 'Press de hombro en máquina']);
-    swaps.push(['Elevaciones laterales', 'Elevaciones laterales en máquina']);
+    swaps.push(['press_militar_barra', 'press_hombro_maquina']);
+    swaps.push(['press_arnold', 'press_hombro_maquina']);
+    swaps.push(['elevaciones_laterales_mancuernas', 'elevaciones_laterales_maquina']);
 
     // Arms: pulley/machine more controllable for beginners
-    swaps.push(['Curl con barra', 'Curl en máquina']);
-    swaps.push(['Curl con barra Z', 'Curl en máquina']);
-    swaps.push(['Press francés', 'Tríceps en máquina']);
-    swaps.push(['Fondos en banco', 'Tríceps en máquina']);
+    swaps.push(['curl_barra', 'curl_maquina']);
+    swaps.push(['curl_barra_z', 'curl_maquina']);
+    swaps.push(['press_frances', 'triceps_maquina']);
+    swaps.push(['fondos_banco', 'triceps_maquina']);
 
     // Legs: guided machines for complex movements
-    swaps.push(['Peso muerto sumo', 'Hip thrust en máquina']);
-    swaps.push(['Sentadilla búlgara', 'Prensa de pierna']);
-    swaps.push(['Curl femoral', 'Curl femoral sentado']);
-    swaps.push(['Patada de glúteo', 'Patada de glúteo en máquina']);
-    swaps.push(['Hip thrust', 'Hip thrust en máquina']);
+    swaps.push(['peso_muerto_sumo', 'hip_thrust_maquina']);
+    swaps.push(['sentadilla_bulgara', 'prensa_pierna']);
+    swaps.push(['curl_femoral', 'curl_femoral_sentado']);
+    swaps.push(['patada_gluteo', 'patada_gluteo_maquina']);
+    swaps.push(['hip_thrust_barra', 'hip_thrust_maquina']);
 
     // Core: crunch machine has guided resistance
-    swaps.push(['Crunch en polea', 'Crunch en máquina']);
+    swaps.push(['crunch_polea', 'crunch_maquina']);
 
     // Sedentary beginner -> even more basic
     if (isSedentary) {
-      swaps.push(['Sentadilla', 'Sentadilla en máquina Smith']);
-      swaps.push(['Sentadilla goblet', 'Sentadilla en máquina Smith']);
-      swaps.push(['Zancadas', 'Prensa de pierna']);
+      swaps.push(['sentadilla_barra', 'sentadilla_smith']);
+      swaps.push(['sentadilla_goblet', 'sentadilla_smith']);
+      swaps.push(['zancadas', 'prensa_pierna']);
     }
   }
 
   // === INTERMEDIATE: transition to free weights but keep machines for some ===
   if (isIntermediate) {
-    swaps.push(['Dominadas', 'Jalón al pecho']); // Pull-ups require advanced strength
-    swaps.push(['Hack squat', 'Prensa de pierna']);
+    swaps.push(['dominadas', 'jalon_pecho']); // Pull-ups require advanced strength
+    swaps.push(['hack_squat', 'prensa_pierna']);
     if (isOlder) {
-      swaps.push(['Press militar', 'Press de hombro en máquina']);
-      swaps.push(['Fondos en paralelas', 'Tríceps en polea']);
+      swaps.push(['press_militar_barra', 'press_hombro_maquina']);
+      swaps.push(['fondos_paralelas', 'triceps_polea']);
     }
   }
 
-  // Apply substitutions
+  // Apply substitutions (swap map keyed by exercise ID)
   const swapMap = new Map<string, string>(swaps.map(([from, to]) => [from, to]));
   const adapted = {} as Routine;
   for (const dk of Object.keys(routine) as DayKey[]) {
     adapted[dk] = { ...routine[dk] };
     if (adapted[dk].exercises) {
       adapted[dk].exercises = adapted[dk].exercises.map((ex) => {
-        const replacement = swapMap.get(ex.name);
-        return replacement ? { ...ex, name: replacement } : ex;
+        const replacementId = swapMap.get(ex.id);
+        return replacementId ? exEntry(replacementId, ex.type) : ex;
       });
     }
   }
@@ -236,17 +244,15 @@ export function adaptExercises(
     // Advanced: add extra variation exercise if fewer than 6
     if (isAdvanced && d.exercises.length < 6) {
       const hasUpper = d.exercises.some((e) =>
-        ['Press banca', 'Press inclinado', 'Press con mancuernas', 'Jalón al pecho', 'Remo con barra'].includes(
-          e.name
-        )
+        ['press_banca_barra', 'press_inclinado_barra', 'press_banca_mancuernas', 'jalon_pecho', 'remo_barra'].includes(e.id)
       );
       const hasLower = d.exercises.some((e) =>
-        ['Sentadilla', 'Hip thrust', 'Peso muerto rumano', 'Prensa de pierna'].includes(e.name)
+        ['sentadilla_barra', 'hip_thrust_barra', 'peso_muerto_rumano', 'prensa_pierna'].includes(e.id)
       );
-      if (hasUpper && !d.exercises.some((e) => e.name === 'Face pull')) {
-        d.exercises.push({ name: 'Face pull', type: 'pesas' });
-      } else if (hasLower && !d.exercises.some((e) => e.name === 'Pantorrillas')) {
-        d.exercises.push({ name: 'Pantorrillas', type: 'pesas' });
+      if (hasUpper && !d.exercises.some((e) => e.id === 'face_pull')) {
+        d.exercises.push(exEntry('face_pull'));
+      } else if (hasLower && !d.exercises.some((e) => e.id === 'pantorrillas_pie')) {
+        d.exercises.push(exEntry('pantorrillas_pie'));
       }
     }
 
@@ -266,33 +272,34 @@ export function adaptExercises(
   // - Strength: minimal interference with recovery -> walking, bike
   // - Muscle: active recovery without catabolism -> elliptical, walking
   // - General: cardiovascular health -> moderate variety
-  function bestCardio(): string {
+  function bestCardioId(): string {
     // Physical restrictions first (safety)
-    if (isVeryHeavy) return 'Bicicleta estática'; // zero joint impact
-    if (isSedentary && isBeginner) return 'Caminadora'; // start gentle
-    if (isHeavy) return 'Elíptica'; // low impact
-    if (isSenior) return 'Elíptica'; // joints
+    if (isVeryHeavy) return 'bicicleta_estatica'; // zero joint impact
+    if (isSedentary && isBeginner) return 'caminadora'; // start gentle
+    if (isHeavy) return 'eliptica'; // low impact
+    if (isSenior) return 'eliptica'; // joints
 
     // By goal
     if (goal === 'grasa') {
-      if (isFem) return 'Stairmaster'; // glutes + burn
-      if (isAdvanced) return 'HIIT'; // max burn in short time
-      return 'Correr'; // high calorie burn
+      if (isFem) return 'stairmaster'; // glutes + burn
+      if (isAdvanced) return 'hiit'; // max burn in short time
+      return 'correr'; // high calorie burn
     }
     if (goal === 'fuerza') {
-      return 'Caminar'; // minimal interference with strength
+      return 'caminar'; // minimal interference with strength
     }
     if (goal === 'musculo') {
-      if (isFem) return 'Stairmaster'; // activates glutes without catabolism
-      return 'Elíptica'; // low impact, active recovery
+      if (isFem) return 'stairmaster'; // activates glutes without catabolism
+      return 'eliptica'; // low impact, active recovery
     }
     // General
-    if (isFem) return 'Stairmaster';
-    if (isOlder) return 'Elíptica';
-    return 'Elíptica';
+    if (isFem) return 'stairmaster';
+    if (isOlder) return 'eliptica';
+    return 'eliptica';
   }
 
-  const optCardio = bestCardio();
+  const optCardioId = bestCardioId();
+  const optCardioEntry = exEntry(optCardioId, 'cardio');
 
   if (goal === 'grasa') {
     // Fat loss: cardio at the end of every weight day (high frequency)
@@ -301,7 +308,7 @@ export function adaptExercises(
       if (d.rest || !d.exercises) continue;
       const hasCardio = d.exercises.some((e) => e.type === 'cardio');
       if (!hasCardio) {
-        d.exercises[d.exercises.length - 1] = { name: optCardio, type: 'cardio' };
+        d.exercises[d.exercises.length - 1] = { ...optCardioEntry };
         d.label = d.label + ' + Cardio';
       }
     }
@@ -316,20 +323,20 @@ export function adaptExercises(
         if (d.rest || !d.exercises) continue;
         d.exercises = d.exercises.map((ex) => {
           if (
-            ex.name === 'Aperturas mancuernas' ||
-            ex.name === 'Aperturas en polea' ||
-            ex.name === 'Contractor de pecho'
+            ex.id === 'aperturas_mancuernas' ||
+            ex.id === 'aperturas_polea' ||
+            ex.id === 'contractor_pecho'
           )
-            return { ...ex, name: 'Press cerrado' };
-          if (ex.name === 'Curl predicador' || ex.name === 'Curl en máquina')
-            return { ...ex, name: 'Curl con barra' };
-          if (ex.name === 'Patada de tríceps' || ex.name === 'Tríceps en máquina')
-            return { ...ex, name: 'Press francés' };
-          if (ex.name === 'Elevaciones frontales') return { ...ex, name: 'Press militar' };
-          if (isAdvanced && isFem && ex.name === 'Patada de glúteo')
-            return { ...ex, name: 'Peso muerto sumo' };
-          if (isAdvanced && isFem && ex.name === 'Patada de glúteo en máquina')
-            return { ...ex, name: 'Peso muerto sumo' };
+            return exEntry('press_cerrado');
+          if (ex.id === 'curl_predicador' || ex.id === 'curl_maquina')
+            return exEntry('curl_barra');
+          if (ex.id === 'patada_triceps' || ex.id === 'triceps_maquina')
+            return exEntry('press_frances');
+          if (ex.id === 'elevaciones_frontales') return exEntry('press_militar_barra');
+          if (isAdvanced && isFem && ex.id === 'patada_gluteo')
+            return exEntry('peso_muerto_sumo');
+          if (isAdvanced && isFem && ex.id === 'patada_gluteo_maquina')
+            return exEntry('peso_muerto_sumo');
           return ex;
         });
       }
@@ -341,7 +348,7 @@ export function adaptExercises(
       if (d.rest || !d.exercises || addedFCardio) continue;
       const hasCardio = d.exercises.some((e) => e.type === 'cardio');
       if (!hasCardio) {
-        d.exercises.push({ name: optCardio, type: 'cardio' });
+        d.exercises.push({ ...optCardioEntry });
         addedFCardio = true;
       }
     }
@@ -354,19 +361,19 @@ export function adaptExercises(
         const d = adapted[dk];
         if (d.rest || !d.exercises) continue;
         const hasChest = d.exercises.some((e) =>
-          ['Press banca', 'Press inclinado', 'Press con mancuernas', 'Press en máquina', 'Press inclinado en máquina'].includes(e.name)
+          ['press_banca_barra', 'press_inclinado_barra', 'press_banca_mancuernas', 'press_banca_maquina', 'press_inclinado_maquina'].includes(e.id)
         );
         const hasBack = d.exercises.some((e) =>
-          ['Jalón al pecho', 'Remo con barra', 'Remo con mancuerna', 'Remo en máquina', 'Pulldown en máquina'].includes(e.name)
+          ['jalon_pecho', 'remo_barra', 'remo_mancuerna', 'remo_maquina', 'pulldown_maquina'].includes(e.id)
         );
         if (
           hasChest &&
           d.exercises.length < 7 &&
-          !d.exercises.some((e) => ['Aperturas en polea', 'Contractor de pecho'].includes(e.name))
+          !d.exercises.some((e) => ['aperturas_polea', 'contractor_pecho'].includes(e.id))
         ) {
-          d.exercises.push({ name: 'Contractor de pecho', type: 'pesas' });
-        } else if (hasBack && d.exercises.length < 7 && !d.exercises.some((e) => e.name === 'Face pull')) {
-          d.exercises.push({ name: 'Face pull', type: 'pesas' });
+          d.exercises.push(exEntry('contractor_pecho'));
+        } else if (hasBack && d.exercises.length < 7 && !d.exercises.some((e) => e.id === 'face_pull')) {
+          d.exercises.push(exEntry('face_pull'));
         }
       }
     }
@@ -377,7 +384,7 @@ export function adaptExercises(
     if (trainDayKeys.length >= 5) {
       const lastDay = adapted[trainDayKeys[trainDayKeys.length - 1]];
       if (!lastDay.exercises.some((e) => e.type === 'cardio')) {
-        lastDay.exercises[lastDay.exercises.length - 1] = { name: optCardio, type: 'cardio' };
+        lastDay.exercises[lastDay.exercises.length - 1] = { ...optCardioEntry };
         lastDay.label = lastDay.label + ' + Cardio ligero';
       }
     }
@@ -385,7 +392,7 @@ export function adaptExercises(
 
   if (goal === 'general') {
     // General: core + cardio on 1-2 days for cardiovascular health
-    const coreExs = ['Plancha', 'Crunch', 'Elevación de piernas'];
+    const coreIds = ['plancha', 'crunch', 'elevacion_piernas'];
     let ci = 0;
     let cardioAdded = 0;
     const maxCardio = 2;
@@ -394,15 +401,15 @@ export function adaptExercises(
       const d = adapted[dk];
       if (d.rest || !d.exercises) continue;
       const hasCore = d.exercises.some(
-        (e) => coreExs.includes(e.name) || e.name === 'Russian twist'
+        (e) => coreIds.includes(e.id) || e.id === 'russian_twist'
       );
       if (!hasCore && d.exercises.length <= 6) {
-        d.exercises.push({ name: coreExs[ci % coreExs.length], type: 'pesas' });
+        d.exercises.push(exEntry(coreIds[ci % coreIds.length]));
         ci++;
       }
       const hasCardio = d.exercises.some((e) => e.type === 'cardio');
       if (!hasCardio && cardioAdded < maxCardio) {
-        d.exercises[d.exercises.length - 1] = { name: optCardio, type: 'cardio' };
+        d.exercises[d.exercises.length - 1] = { ...optCardioEntry };
         d.label = d.label + ' + Cardio';
         cardioAdded++;
       }
@@ -417,8 +424,8 @@ export function adaptExercises(
     if (!d.exercises) continue;
     const seen = new Set<string>();
     d.exercises = d.exercises.filter((ex) => {
-      if (seen.has(ex.name)) return false;
-      seen.add(ex.name);
+      if (seen.has(ex.id)) return false;
+      seen.add(ex.id);
       return true;
     });
   }

@@ -8,28 +8,28 @@ export const TEMPLATES_M: TemplateCollection = {
   fullbody_3: {
     exercises: [
       [
-        { name: 'Sentadilla', type: 'pesas' },
-        { name: 'Press banca', type: 'pesas' },
-        { name: 'Remo con barra', type: 'pesas' },
-        { name: 'Press militar', type: 'pesas' },
-        { name: 'Curl con barra', type: 'pesas' },
-        { name: 'Tríceps en polea', type: 'pesas' }
+        { id: 'sentadilla_barra', name: 'Sentadilla', type: 'pesas' },
+        { id: 'press_banca_barra', name: 'Press banca', type: 'pesas' },
+        { id: 'remo_barra', name: 'Remo con barra', type: 'pesas' },
+        { id: 'press_militar_barra', name: 'Press militar', type: 'pesas' },
+        { id: 'curl_barra', name: 'Curl con barra', type: 'pesas' },
+        { id: 'triceps_polea', name: 'Tríceps en polea', type: 'pesas' }
       ],
       [
-        { name: 'Peso muerto rumano', type: 'pesas' },
-        { name: 'Press inclinado', type: 'pesas' },
-        { name: 'Jalón al pecho', type: 'pesas' },
-        { name: 'Elevaciones laterales', type: 'pesas' },
-        { name: 'Curl martillo', type: 'pesas' },
-        { name: 'Press francés', type: 'pesas' }
+        { id: 'peso_muerto_rumano', name: 'Peso muerto rumano', type: 'pesas' },
+        { id: 'press_inclinado_barra', name: 'Press inclinado', type: 'pesas' },
+        { id: 'jalon_pecho', name: 'Jalón al pecho', type: 'pesas' },
+        { id: 'elevaciones_laterales_mancuernas', name: 'Elevaciones laterales', type: 'pesas' },
+        { id: 'curl_martillo', name: 'Curl martillo', type: 'pesas' },
+        { id: 'press_frances', name: 'Press francés', type: 'pesas' }
       ],
       [
-        { name: 'Prensa de pierna', type: 'pesas' },
-        { name: 'Press con mancuernas', type: 'pesas' },
-        { name: 'Remo en máquina', type: 'pesas' },
-        { name: 'Press Arnold', type: 'pesas' },
-        { name: 'Face pull', type: 'pesas' },
-        { name: 'Plancha', type: 'pesas' }
+        { id: 'prensa_pierna', name: 'Prensa de pierna', type: 'pesas' },
+        { id: 'press_banca_mancuernas', name: 'Press con mancuernas', type: 'pesas' },
+        { id: 'remo_maquina', name: 'Remo en máquina', type: 'pesas' },
+        { id: 'press_arnold', name: 'Press Arnold', type: 'pesas' },
+        { id: 'face_pull', name: 'Face pull', type: 'pesas' },
+        { id: 'plancha', name: 'Plancha', type: 'pesas' }
       ]
     ],
     labels: ['Full Body A', 'Full Body B', 'Full Body C']
@@ -38,22 +38,22 @@ export const TEMPLATES_M: TemplateCollection = {
   fullbody_cardio_3: {
     exercises: [
       [
-        { name: 'Sentadilla', type: 'pesas' },
-        { name: 'Press banca', type: 'pesas' },
-        { name: 'Remo en máquina', type: 'pesas' },
-        { name: 'Press militar', type: 'pesas' },
-        { name: 'Plancha', type: 'pesas' }
+        { id: 'sentadilla_barra', name: 'Sentadilla', type: 'pesas' },
+        { id: 'press_banca_barra', name: 'Press banca', type: 'pesas' },
+        { id: 'remo_maquina', name: 'Remo en máquina', type: 'pesas' },
+        { id: 'press_militar_barra', name: 'Press militar', type: 'pesas' },
+        { id: 'plancha', name: 'Plancha', type: 'pesas' }
       ],
       [
-        { name: 'Correr', type: 'cardio' },
-        { name: 'Elíptica', type: 'cardio' }
+        { id: 'correr', name: 'Correr', type: 'cardio' },
+        { id: 'eliptica', name: 'Elíptica', type: 'cardio' }
       ],
       [
-        { name: 'Peso muerto rumano', type: 'pesas' },
-        { name: 'Press inclinado', type: 'pesas' },
-        { name: 'Jalón al pecho', type: 'pesas' },
-        { name: 'Elevaciones laterales', type: 'pesas' },
-        { name: 'Crunch', type: 'pesas' }
+        { id: 'peso_muerto_rumano', name: 'Peso muerto rumano', type: 'pesas' },
+        { id: 'press_inclinado_barra', name: 'Press inclinado', type: 'pesas' },
+        { id: 'jalon_pecho', name: 'Jalón al pecho', type: 'pesas' },
+        { id: 'elevaciones_laterales_mancuernas', name: 'Elevaciones laterales', type: 'pesas' },
+        { id: 'crunch', name: 'Crunch', type: 'pesas' }
       ]
     ],
     labels: ['Full Body', 'Cardio', 'Full Body']
@@ -63,36 +63,36 @@ export const TEMPLATES_M: TemplateCollection = {
   upperlower_4: {
     exercises: [
       [
-        { name: 'Press banca', type: 'pesas' },
-        { name: 'Remo con barra', type: 'pesas' },
-        { name: 'Press militar', type: 'pesas' },
-        { name: 'Curl con barra', type: 'pesas' },
-        { name: 'Tríceps en polea', type: 'pesas' },
-        { name: 'Elevaciones laterales', type: 'pesas' }
+        { id: 'press_banca_barra', name: 'Press banca', type: 'pesas' },
+        { id: 'remo_barra', name: 'Remo con barra', type: 'pesas' },
+        { id: 'press_militar_barra', name: 'Press militar', type: 'pesas' },
+        { id: 'curl_barra', name: 'Curl con barra', type: 'pesas' },
+        { id: 'triceps_polea', name: 'Tríceps en polea', type: 'pesas' },
+        { id: 'elevaciones_laterales_mancuernas', name: 'Elevaciones laterales', type: 'pesas' }
       ],
       [
-        { name: 'Sentadilla', type: 'pesas' },
-        { name: 'Peso muerto rumano', type: 'pesas' },
-        { name: 'Prensa de pierna', type: 'pesas' },
-        { name: 'Curl femoral sentado', type: 'pesas' },
-        { name: 'Pantorrillas en prensa', type: 'pesas' },
-        { name: 'Plancha', type: 'pesas' }
+        { id: 'sentadilla_barra', name: 'Sentadilla', type: 'pesas' },
+        { id: 'peso_muerto_rumano', name: 'Peso muerto rumano', type: 'pesas' },
+        { id: 'prensa_pierna', name: 'Prensa de pierna', type: 'pesas' },
+        { id: 'curl_femoral_sentado', name: 'Curl femoral sentado', type: 'pesas' },
+        { id: 'pantorrillas_prensa', name: 'Pantorrillas en prensa', type: 'pesas' },
+        { id: 'plancha', name: 'Plancha', type: 'pesas' }
       ],
       [
-        { name: 'Press inclinado', type: 'pesas' },
-        { name: 'Jalón al pecho', type: 'pesas' },
-        { name: 'Press Arnold', type: 'pesas' },
-        { name: 'Curl martillo', type: 'pesas' },
-        { name: 'Tríceps en máquina', type: 'pesas' },
-        { name: 'Face pull', type: 'pesas' }
+        { id: 'press_inclinado_barra', name: 'Press inclinado', type: 'pesas' },
+        { id: 'jalon_pecho', name: 'Jalón al pecho', type: 'pesas' },
+        { id: 'press_arnold', name: 'Press Arnold', type: 'pesas' },
+        { id: 'curl_martillo', name: 'Curl martillo', type: 'pesas' },
+        { id: 'triceps_maquina', name: 'Tríceps en máquina', type: 'pesas' },
+        { id: 'face_pull', name: 'Face pull', type: 'pesas' }
       ],
       [
-        { name: 'Sentadilla búlgara', type: 'pesas' },
-        { name: 'Hip thrust', type: 'pesas' },
-        { name: 'Extensiones cuádriceps', type: 'pesas' },
-        { name: 'Curl femoral', type: 'pesas' },
-        { name: 'Pantorrillas', type: 'pesas' },
-        { name: 'Elevación de piernas', type: 'pesas' }
+        { id: 'sentadilla_bulgara', name: 'Sentadilla búlgara', type: 'pesas' },
+        { id: 'hip_thrust_barra', name: 'Hip thrust', type: 'pesas' },
+        { id: 'extensiones_cuadriceps', name: 'Extensiones cuádriceps', type: 'pesas' },
+        { id: 'curl_femoral', name: 'Curl femoral', type: 'pesas' },
+        { id: 'pantorrillas_pie', name: 'Pantorrillas', type: 'pesas' },
+        { id: 'elevacion_piernas', name: 'Elevación de piernas', type: 'pesas' }
       ]
     ],
     labels: ['Upper A', 'Lower A', 'Upper B', 'Lower B']
@@ -102,44 +102,44 @@ export const TEMPLATES_M: TemplateCollection = {
   pplul_5: {
     exercises: [
       [
-        { name: 'Press banca', type: 'pesas' },
-        { name: 'Press inclinado', type: 'pesas' },
-        { name: 'Contractor de pecho', type: 'pesas' },
-        { name: 'Press militar', type: 'pesas' },
-        { name: 'Elevaciones laterales', type: 'pesas' },
-        { name: 'Tríceps en polea', type: 'pesas' }
+        { id: 'press_banca_barra', name: 'Press banca', type: 'pesas' },
+        { id: 'press_inclinado_barra', name: 'Press inclinado', type: 'pesas' },
+        { id: 'contractor_pecho', name: 'Contractor de pecho', type: 'pesas' },
+        { id: 'press_militar_barra', name: 'Press militar', type: 'pesas' },
+        { id: 'elevaciones_laterales_mancuernas', name: 'Elevaciones laterales', type: 'pesas' },
+        { id: 'triceps_polea', name: 'Tríceps en polea', type: 'pesas' }
       ],
       [
-        { name: 'Jalón al pecho', type: 'pesas' },
-        { name: 'Remo con barra', type: 'pesas' },
-        { name: 'Remo en máquina', type: 'pesas' },
-        { name: 'Face pull', type: 'pesas' },
-        { name: 'Curl con barra', type: 'pesas' },
-        { name: 'Curl martillo', type: 'pesas' }
+        { id: 'jalon_pecho', name: 'Jalón al pecho', type: 'pesas' },
+        { id: 'remo_barra', name: 'Remo con barra', type: 'pesas' },
+        { id: 'remo_maquina', name: 'Remo en máquina', type: 'pesas' },
+        { id: 'face_pull', name: 'Face pull', type: 'pesas' },
+        { id: 'curl_barra', name: 'Curl con barra', type: 'pesas' },
+        { id: 'curl_martillo', name: 'Curl martillo', type: 'pesas' }
       ],
       [
-        { name: 'Sentadilla', type: 'pesas' },
-        { name: 'Prensa de pierna', type: 'pesas' },
-        { name: 'Peso muerto rumano', type: 'pesas' },
-        { name: 'Curl femoral sentado', type: 'pesas' },
-        { name: 'Hip thrust', type: 'pesas' },
-        { name: 'Pantorrillas en prensa', type: 'pesas' }
+        { id: 'sentadilla_barra', name: 'Sentadilla', type: 'pesas' },
+        { id: 'prensa_pierna', name: 'Prensa de pierna', type: 'pesas' },
+        { id: 'peso_muerto_rumano', name: 'Peso muerto rumano', type: 'pesas' },
+        { id: 'curl_femoral_sentado', name: 'Curl femoral sentado', type: 'pesas' },
+        { id: 'hip_thrust_barra', name: 'Hip thrust', type: 'pesas' },
+        { id: 'pantorrillas_prensa', name: 'Pantorrillas en prensa', type: 'pesas' }
       ],
       [
-        { name: 'Press inclinado', type: 'pesas' },
-        { name: 'Jalón al pecho', type: 'pesas' },
-        { name: 'Press de hombro en máquina', type: 'pesas' },
-        { name: 'Curl en máquina', type: 'pesas' },
-        { name: 'Tríceps en máquina', type: 'pesas' },
-        { name: 'Elevaciones laterales en máquina', type: 'pesas' }
+        { id: 'press_inclinado_barra', name: 'Press inclinado', type: 'pesas' },
+        { id: 'jalon_pecho', name: 'Jalón al pecho', type: 'pesas' },
+        { id: 'press_hombro_maquina', name: 'Press de hombro en máquina', type: 'pesas' },
+        { id: 'curl_maquina', name: 'Curl en máquina', type: 'pesas' },
+        { id: 'triceps_maquina', name: 'Tríceps en máquina', type: 'pesas' },
+        { id: 'elevaciones_laterales_maquina', name: 'Elevaciones laterales en máquina', type: 'pesas' }
       ],
       [
-        { name: 'Sentadilla búlgara', type: 'pesas' },
-        { name: 'Extensiones cuádriceps', type: 'pesas' },
-        { name: 'Curl femoral', type: 'pesas' },
-        { name: 'Hip thrust', type: 'pesas' },
-        { name: 'Pantorrillas', type: 'pesas' },
-        { name: 'Plancha', type: 'pesas' }
+        { id: 'sentadilla_bulgara', name: 'Sentadilla búlgara', type: 'pesas' },
+        { id: 'extensiones_cuadriceps', name: 'Extensiones cuádriceps', type: 'pesas' },
+        { id: 'curl_femoral', name: 'Curl femoral', type: 'pesas' },
+        { id: 'hip_thrust_barra', name: 'Hip thrust', type: 'pesas' },
+        { id: 'pantorrillas_pie', name: 'Pantorrillas', type: 'pesas' },
+        { id: 'plancha', name: 'Plancha', type: 'pesas' }
       ]
     ],
     labels: ['Push', 'Pull', 'Legs', 'Upper', 'Lower']
@@ -149,52 +149,52 @@ export const TEMPLATES_M: TemplateCollection = {
   ppl_6: {
     exercises: [
       [
-        { name: 'Press banca', type: 'pesas' },
-        { name: 'Press inclinado', type: 'pesas' },
-        { name: 'Aperturas mancuernas', type: 'pesas' },
-        { name: 'Press militar', type: 'pesas' },
-        { name: 'Elevaciones laterales', type: 'pesas' },
-        { name: 'Tríceps en polea', type: 'pesas' }
+        { id: 'press_banca_barra', name: 'Press banca', type: 'pesas' },
+        { id: 'press_inclinado_barra', name: 'Press inclinado', type: 'pesas' },
+        { id: 'aperturas_mancuernas', name: 'Aperturas mancuernas', type: 'pesas' },
+        { id: 'press_militar_barra', name: 'Press militar', type: 'pesas' },
+        { id: 'elevaciones_laterales_mancuernas', name: 'Elevaciones laterales', type: 'pesas' },
+        { id: 'triceps_polea', name: 'Tríceps en polea', type: 'pesas' }
       ],
       [
-        { name: 'Dominadas', type: 'pesas' },
-        { name: 'Remo con barra', type: 'pesas' },
-        { name: 'Remo con mancuerna', type: 'pesas' },
-        { name: 'Face pull', type: 'pesas' },
-        { name: 'Curl con barra', type: 'pesas' },
-        { name: 'Curl martillo', type: 'pesas' }
+        { id: 'dominadas', name: 'Dominadas', type: 'pesas' },
+        { id: 'remo_barra', name: 'Remo con barra', type: 'pesas' },
+        { id: 'remo_mancuerna', name: 'Remo con mancuerna', type: 'pesas' },
+        { id: 'face_pull', name: 'Face pull', type: 'pesas' },
+        { id: 'curl_barra', name: 'Curl con barra', type: 'pesas' },
+        { id: 'curl_martillo', name: 'Curl martillo', type: 'pesas' }
       ],
       [
-        { name: 'Sentadilla', type: 'pesas' },
-        { name: 'Prensa de pierna', type: 'pesas' },
-        { name: 'Peso muerto rumano', type: 'pesas' },
-        { name: 'Curl femoral sentado', type: 'pesas' },
-        { name: 'Hip thrust', type: 'pesas' },
-        { name: 'Pantorrillas', type: 'pesas' }
+        { id: 'sentadilla_barra', name: 'Sentadilla', type: 'pesas' },
+        { id: 'prensa_pierna', name: 'Prensa de pierna', type: 'pesas' },
+        { id: 'peso_muerto_rumano', name: 'Peso muerto rumano', type: 'pesas' },
+        { id: 'curl_femoral_sentado', name: 'Curl femoral sentado', type: 'pesas' },
+        { id: 'hip_thrust_barra', name: 'Hip thrust', type: 'pesas' },
+        { id: 'pantorrillas_pie', name: 'Pantorrillas', type: 'pesas' }
       ],
       [
-        { name: 'Press inclinado en máquina', type: 'pesas' },
-        { name: 'Contractor de pecho', type: 'pesas' },
-        { name: 'Press de hombro en máquina', type: 'pesas' },
-        { name: 'Elevaciones laterales en máquina', type: 'pesas' },
-        { name: 'Tríceps en máquina', type: 'pesas' },
-        { name: 'Press francés', type: 'pesas' }
+        { id: 'press_inclinado_maquina', name: 'Press inclinado en máquina', type: 'pesas' },
+        { id: 'contractor_pecho', name: 'Contractor de pecho', type: 'pesas' },
+        { id: 'press_hombro_maquina', name: 'Press de hombro en máquina', type: 'pesas' },
+        { id: 'elevaciones_laterales_maquina', name: 'Elevaciones laterales en máquina', type: 'pesas' },
+        { id: 'triceps_maquina', name: 'Tríceps en máquina', type: 'pesas' },
+        { id: 'press_frances', name: 'Press francés', type: 'pesas' }
       ],
       [
-        { name: 'Pulldown en máquina', type: 'pesas' },
-        { name: 'Remo en máquina', type: 'pesas' },
-        { name: 'Remo T-bar', type: 'pesas' },
-        { name: 'Curl en máquina', type: 'pesas' },
-        { name: 'Curl predicador', type: 'pesas' },
-        { name: 'Face pull', type: 'pesas' }
+        { id: 'pulldown_maquina', name: 'Pulldown en máquina', type: 'pesas' },
+        { id: 'remo_maquina', name: 'Remo en máquina', type: 'pesas' },
+        { id: 'remo_tbar', name: 'Remo T-bar', type: 'pesas' },
+        { id: 'curl_maquina', name: 'Curl en máquina', type: 'pesas' },
+        { id: 'curl_predicador', name: 'Curl predicador', type: 'pesas' },
+        { id: 'face_pull', name: 'Face pull', type: 'pesas' }
       ],
       [
-        { name: 'Hack squat', type: 'pesas' },
-        { name: 'Zancadas', type: 'pesas' },
-        { name: 'Extensiones cuádriceps', type: 'pesas' },
-        { name: 'Curl femoral', type: 'pesas' },
-        { name: 'Pantorrillas en prensa', type: 'pesas' },
-        { name: 'Crunch en máquina', type: 'pesas' }
+        { id: 'hack_squat', name: 'Hack squat', type: 'pesas' },
+        { id: 'zancadas', name: 'Zancadas', type: 'pesas' },
+        { id: 'extensiones_cuadriceps', name: 'Extensiones cuádriceps', type: 'pesas' },
+        { id: 'curl_femoral', name: 'Curl femoral', type: 'pesas' },
+        { id: 'pantorrillas_prensa', name: 'Pantorrillas en prensa', type: 'pesas' },
+        { id: 'crunch_maquina', name: 'Crunch en máquina', type: 'pesas' }
       ]
     ],
     labels: ['Push Libre', 'Pull Libre', 'Legs Libre', 'Push Máquinas', 'Pull Máquinas', 'Legs Máquinas']
@@ -212,28 +212,28 @@ export const TEMPLATES_F: TemplateCollection = {
   fullbody_3: {
     exercises: [
       [
-        { name: 'Hip thrust', type: 'pesas' },
-        { name: 'Sentadilla', type: 'pesas' },
-        { name: 'Press con mancuernas', type: 'pesas' },
-        { name: 'Jalón al pecho', type: 'pesas' },
-        { name: 'Abductores en máquina', type: 'pesas' },
-        { name: 'Plancha', type: 'pesas' }
+        { id: 'hip_thrust_barra', name: 'Hip thrust', type: 'pesas' },
+        { id: 'sentadilla_barra', name: 'Sentadilla', type: 'pesas' },
+        { id: 'press_banca_mancuernas', name: 'Press con mancuernas', type: 'pesas' },
+        { id: 'jalon_pecho', name: 'Jalón al pecho', type: 'pesas' },
+        { id: 'abductores_maquina', name: 'Abductores en máquina', type: 'pesas' },
+        { id: 'plancha', name: 'Plancha', type: 'pesas' }
       ],
       [
-        { name: 'Peso muerto rumano', type: 'pesas' },
-        { name: 'Zancadas', type: 'pesas' },
-        { name: 'Remo en máquina', type: 'pesas' },
-        { name: 'Press de hombro en máquina', type: 'pesas' },
-        { name: 'Patada de glúteo en máquina', type: 'pesas' },
-        { name: 'Elevación de piernas', type: 'pesas' }
+        { id: 'peso_muerto_rumano', name: 'Peso muerto rumano', type: 'pesas' },
+        { id: 'zancadas', name: 'Zancadas', type: 'pesas' },
+        { id: 'remo_maquina', name: 'Remo en máquina', type: 'pesas' },
+        { id: 'press_hombro_maquina', name: 'Press de hombro en máquina', type: 'pesas' },
+        { id: 'patada_gluteo_maquina', name: 'Patada de glúteo en máquina', type: 'pesas' },
+        { id: 'elevacion_piernas', name: 'Elevación de piernas', type: 'pesas' }
       ],
       [
-        { name: 'Prensa de pierna', type: 'pesas' },
-        { name: 'Puente de glúteo', type: 'pesas' },
-        { name: 'Press con mancuernas', type: 'pesas' },
-        { name: 'Remo en polea baja', type: 'pesas' },
-        { name: 'Curl femoral sentado', type: 'pesas' },
-        { name: 'Crunch', type: 'pesas' }
+        { id: 'prensa_pierna', name: 'Prensa de pierna', type: 'pesas' },
+        { id: 'puente_gluteo', name: 'Puente de glúteo', type: 'pesas' },
+        { id: 'press_banca_mancuernas', name: 'Press con mancuernas', type: 'pesas' },
+        { id: 'remo_polea_baja', name: 'Remo en polea baja', type: 'pesas' },
+        { id: 'curl_femoral_sentado', name: 'Curl femoral sentado', type: 'pesas' },
+        { id: 'crunch', name: 'Crunch', type: 'pesas' }
       ]
     ],
     labels: ['Full Body A', 'Full Body B', 'Full Body C']
@@ -242,24 +242,24 @@ export const TEMPLATES_F: TemplateCollection = {
   fullbody_cardio_3: {
     exercises: [
       [
-        { name: 'Hip thrust', type: 'pesas' },
-        { name: 'Sentadilla', type: 'pesas' },
-        { name: 'Jalón al pecho', type: 'pesas' },
-        { name: 'Press con mancuernas', type: 'pesas' },
-        { name: 'Abductores en máquina', type: 'pesas' },
-        { name: 'Plancha', type: 'pesas' }
+        { id: 'hip_thrust_barra', name: 'Hip thrust', type: 'pesas' },
+        { id: 'sentadilla_barra', name: 'Sentadilla', type: 'pesas' },
+        { id: 'jalon_pecho', name: 'Jalón al pecho', type: 'pesas' },
+        { id: 'press_banca_mancuernas', name: 'Press con mancuernas', type: 'pesas' },
+        { id: 'abductores_maquina', name: 'Abductores en máquina', type: 'pesas' },
+        { id: 'plancha', name: 'Plancha', type: 'pesas' }
       ],
       [
-        { name: 'Stairmaster', type: 'cardio' },
-        { name: 'Elíptica', type: 'cardio' }
+        { id: 'stairmaster', name: 'Stairmaster', type: 'cardio' },
+        { id: 'eliptica', name: 'Elíptica', type: 'cardio' }
       ],
       [
-        { name: 'Peso muerto rumano', type: 'pesas' },
-        { name: 'Prensa de pierna', type: 'pesas' },
-        { name: 'Remo en máquina', type: 'pesas' },
-        { name: 'Press de hombro en máquina', type: 'pesas' },
-        { name: 'Patada de glúteo en máquina', type: 'pesas' },
-        { name: 'Elevación de piernas', type: 'pesas' }
+        { id: 'peso_muerto_rumano', name: 'Peso muerto rumano', type: 'pesas' },
+        { id: 'prensa_pierna', name: 'Prensa de pierna', type: 'pesas' },
+        { id: 'remo_maquina', name: 'Remo en máquina', type: 'pesas' },
+        { id: 'press_hombro_maquina', name: 'Press de hombro en máquina', type: 'pesas' },
+        { id: 'patada_gluteo_maquina', name: 'Patada de glúteo en máquina', type: 'pesas' },
+        { id: 'elevacion_piernas', name: 'Elevación de piernas', type: 'pesas' }
       ]
     ],
     labels: ['Full Body', 'Cardio', 'Full Body']
@@ -269,36 +269,36 @@ export const TEMPLATES_F: TemplateCollection = {
   upperlower_4: {
     exercises: [
       [
-        { name: 'Hip thrust', type: 'pesas' },
-        { name: 'Sentadilla', type: 'pesas' },
-        { name: 'Curl femoral sentado', type: 'pesas' },
-        { name: 'Abductores en máquina', type: 'pesas' },
-        { name: 'Patada de glúteo en máquina', type: 'pesas' },
-        { name: 'Plancha', type: 'pesas' }
+        { id: 'hip_thrust_barra', name: 'Hip thrust', type: 'pesas' },
+        { id: 'sentadilla_barra', name: 'Sentadilla', type: 'pesas' },
+        { id: 'curl_femoral_sentado', name: 'Curl femoral sentado', type: 'pesas' },
+        { id: 'abductores_maquina', name: 'Abductores en máquina', type: 'pesas' },
+        { id: 'patada_gluteo_maquina', name: 'Patada de glúteo en máquina', type: 'pesas' },
+        { id: 'plancha', name: 'Plancha', type: 'pesas' }
       ],
       [
-        { name: 'Press con mancuernas', type: 'pesas' },
-        { name: 'Jalón al pecho', type: 'pesas' },
-        { name: 'Press de hombro en máquina', type: 'pesas' },
-        { name: 'Remo en máquina', type: 'pesas' },
-        { name: 'Elevaciones laterales', type: 'pesas' },
-        { name: 'Tríceps en polea', type: 'pesas' }
+        { id: 'press_banca_mancuernas', name: 'Press con mancuernas', type: 'pesas' },
+        { id: 'jalon_pecho', name: 'Jalón al pecho', type: 'pesas' },
+        { id: 'press_hombro_maquina', name: 'Press de hombro en máquina', type: 'pesas' },
+        { id: 'remo_maquina', name: 'Remo en máquina', type: 'pesas' },
+        { id: 'elevaciones_laterales_mancuernas', name: 'Elevaciones laterales', type: 'pesas' },
+        { id: 'triceps_polea', name: 'Tríceps en polea', type: 'pesas' }
       ],
       [
-        { name: 'Peso muerto rumano', type: 'pesas' },
-        { name: 'Prensa de pierna', type: 'pesas' },
-        { name: 'Extensiones cuádriceps', type: 'pesas' },
-        { name: 'Puente de glúteo', type: 'pesas' },
-        { name: 'Pantorrillas en prensa', type: 'pesas' },
-        { name: 'Elevación de piernas', type: 'pesas' }
+        { id: 'peso_muerto_rumano', name: 'Peso muerto rumano', type: 'pesas' },
+        { id: 'prensa_pierna', name: 'Prensa de pierna', type: 'pesas' },
+        { id: 'extensiones_cuadriceps', name: 'Extensiones cuádriceps', type: 'pesas' },
+        { id: 'puente_gluteo', name: 'Puente de glúteo', type: 'pesas' },
+        { id: 'pantorrillas_prensa', name: 'Pantorrillas en prensa', type: 'pesas' },
+        { id: 'elevacion_piernas', name: 'Elevación de piernas', type: 'pesas' }
       ],
       [
-        { name: 'Press inclinado', type: 'pesas' },
-        { name: 'Remo en polea baja', type: 'pesas' },
-        { name: 'Face pull', type: 'pesas' },
-        { name: 'Curl con mancuernas', type: 'pesas' },
-        { name: 'Elevaciones laterales en máquina', type: 'pesas' },
-        { name: 'Crunch', type: 'pesas' }
+        { id: 'press_inclinado_barra', name: 'Press inclinado', type: 'pesas' },
+        { id: 'remo_polea_baja', name: 'Remo en polea baja', type: 'pesas' },
+        { id: 'face_pull', name: 'Face pull', type: 'pesas' },
+        { id: 'curl_mancuernas', name: 'Curl con mancuernas', type: 'pesas' },
+        { id: 'elevaciones_laterales_maquina', name: 'Elevaciones laterales en máquina', type: 'pesas' },
+        { id: 'crunch', name: 'Crunch', type: 'pesas' }
       ]
     ],
     labels: ['Glúteos & Piernas A', 'Upper A', 'Glúteos & Piernas B', 'Upper B']
@@ -308,44 +308,44 @@ export const TEMPLATES_F: TemplateCollection = {
   pplul_5: {
     exercises: [
       [
-        { name: 'Hip thrust', type: 'pesas' },
-        { name: 'Sentadilla', type: 'pesas' },
-        { name: 'Curl femoral sentado', type: 'pesas' },
-        { name: 'Abductores en máquina', type: 'pesas' },
-        { name: 'Patada de glúteo en máquina', type: 'pesas' },
-        { name: 'Plancha', type: 'pesas' }
+        { id: 'hip_thrust_barra', name: 'Hip thrust', type: 'pesas' },
+        { id: 'sentadilla_barra', name: 'Sentadilla', type: 'pesas' },
+        { id: 'curl_femoral_sentado', name: 'Curl femoral sentado', type: 'pesas' },
+        { id: 'abductores_maquina', name: 'Abductores en máquina', type: 'pesas' },
+        { id: 'patada_gluteo_maquina', name: 'Patada de glúteo en máquina', type: 'pesas' },
+        { id: 'plancha', name: 'Plancha', type: 'pesas' }
       ],
       [
-        { name: 'Press con mancuernas', type: 'pesas' },
-        { name: 'Jalón al pecho', type: 'pesas' },
-        { name: 'Press de hombro en máquina', type: 'pesas' },
-        { name: 'Remo en máquina', type: 'pesas' },
-        { name: 'Elevaciones laterales', type: 'pesas' },
-        { name: 'Tríceps en polea', type: 'pesas' }
+        { id: 'press_banca_mancuernas', name: 'Press con mancuernas', type: 'pesas' },
+        { id: 'jalon_pecho', name: 'Jalón al pecho', type: 'pesas' },
+        { id: 'press_hombro_maquina', name: 'Press de hombro en máquina', type: 'pesas' },
+        { id: 'remo_maquina', name: 'Remo en máquina', type: 'pesas' },
+        { id: 'elevaciones_laterales_mancuernas', name: 'Elevaciones laterales', type: 'pesas' },
+        { id: 'triceps_polea', name: 'Tríceps en polea', type: 'pesas' }
       ],
       [
-        { name: 'Peso muerto rumano', type: 'pesas' },
-        { name: 'Prensa de pierna', type: 'pesas' },
-        { name: 'Extensiones cuádriceps', type: 'pesas' },
-        { name: 'Puente de glúteo', type: 'pesas' },
-        { name: 'Pantorrillas en prensa', type: 'pesas' },
-        { name: 'Elevación de piernas', type: 'pesas' }
+        { id: 'peso_muerto_rumano', name: 'Peso muerto rumano', type: 'pesas' },
+        { id: 'prensa_pierna', name: 'Prensa de pierna', type: 'pesas' },
+        { id: 'extensiones_cuadriceps', name: 'Extensiones cuádriceps', type: 'pesas' },
+        { id: 'puente_gluteo', name: 'Puente de glúteo', type: 'pesas' },
+        { id: 'pantorrillas_prensa', name: 'Pantorrillas en prensa', type: 'pesas' },
+        { id: 'elevacion_piernas', name: 'Elevación de piernas', type: 'pesas' }
       ],
       [
-        { name: 'Press inclinado', type: 'pesas' },
-        { name: 'Remo en polea baja', type: 'pesas' },
-        { name: 'Face pull', type: 'pesas' },
-        { name: 'Curl con mancuernas', type: 'pesas' },
-        { name: 'Elevaciones laterales en máquina', type: 'pesas' },
-        { name: 'Crunch', type: 'pesas' }
+        { id: 'press_inclinado_barra', name: 'Press inclinado', type: 'pesas' },
+        { id: 'remo_polea_baja', name: 'Remo en polea baja', type: 'pesas' },
+        { id: 'face_pull', name: 'Face pull', type: 'pesas' },
+        { id: 'curl_mancuernas', name: 'Curl con mancuernas', type: 'pesas' },
+        { id: 'elevaciones_laterales_maquina', name: 'Elevaciones laterales en máquina', type: 'pesas' },
+        { id: 'crunch', name: 'Crunch', type: 'pesas' }
       ],
       [
-        { name: 'Hip thrust en máquina', type: 'pesas' },
-        { name: 'Zancadas', type: 'pesas' },
-        { name: 'Peso muerto sumo', type: 'pesas' },
-        { name: 'Curl femoral', type: 'pesas' },
-        { name: 'Abductores en máquina', type: 'pesas' },
-        { name: 'Stairmaster', type: 'cardio' }
+        { id: 'hip_thrust_maquina', name: 'Hip thrust en máquina', type: 'pesas' },
+        { id: 'zancadas', name: 'Zancadas', type: 'pesas' },
+        { id: 'peso_muerto_sumo', name: 'Peso muerto sumo', type: 'pesas' },
+        { id: 'curl_femoral', name: 'Curl femoral', type: 'pesas' },
+        { id: 'abductores_maquina', name: 'Abductores en máquina', type: 'pesas' },
+        { id: 'stairmaster', name: 'Stairmaster', type: 'cardio' }
       ]
     ],
     labels: ['Glúteos Heavy', 'Upper Push', 'Piernas & Core', 'Upper Pull', 'Glúteos & Cardio']
@@ -355,52 +355,52 @@ export const TEMPLATES_F: TemplateCollection = {
   ppl_6: {
     exercises: [
       [
-        { name: 'Hip thrust', type: 'pesas' },
-        { name: 'Sentadilla', type: 'pesas' },
-        { name: 'Curl femoral sentado', type: 'pesas' },
-        { name: 'Abductores en máquina', type: 'pesas' },
-        { name: 'Patada de glúteo', type: 'pesas' },
-        { name: 'Plancha', type: 'pesas' }
+        { id: 'hip_thrust_barra', name: 'Hip thrust', type: 'pesas' },
+        { id: 'sentadilla_barra', name: 'Sentadilla', type: 'pesas' },
+        { id: 'curl_femoral_sentado', name: 'Curl femoral sentado', type: 'pesas' },
+        { id: 'abductores_maquina', name: 'Abductores en máquina', type: 'pesas' },
+        { id: 'patada_gluteo', name: 'Patada de glúteo', type: 'pesas' },
+        { id: 'plancha', name: 'Plancha', type: 'pesas' }
       ],
       [
-        { name: 'Press con mancuernas', type: 'pesas' },
-        { name: 'Jalón al pecho', type: 'pesas' },
-        { name: 'Press de hombro en máquina', type: 'pesas' },
-        { name: 'Remo en máquina', type: 'pesas' },
-        { name: 'Elevaciones laterales', type: 'pesas' },
-        { name: 'Tríceps en polea', type: 'pesas' }
+        { id: 'press_banca_mancuernas', name: 'Press con mancuernas', type: 'pesas' },
+        { id: 'jalon_pecho', name: 'Jalón al pecho', type: 'pesas' },
+        { id: 'press_hombro_maquina', name: 'Press de hombro en máquina', type: 'pesas' },
+        { id: 'remo_maquina', name: 'Remo en máquina', type: 'pesas' },
+        { id: 'elevaciones_laterales_mancuernas', name: 'Elevaciones laterales', type: 'pesas' },
+        { id: 'triceps_polea', name: 'Tríceps en polea', type: 'pesas' }
       ],
       [
-        { name: 'Peso muerto rumano', type: 'pesas' },
-        { name: 'Prensa de pierna', type: 'pesas' },
-        { name: 'Extensiones cuádriceps', type: 'pesas' },
-        { name: 'Puente de glúteo', type: 'pesas' },
-        { name: 'Pantorrillas en prensa', type: 'pesas' },
-        { name: 'Elevación de piernas', type: 'pesas' }
+        { id: 'peso_muerto_rumano', name: 'Peso muerto rumano', type: 'pesas' },
+        { id: 'prensa_pierna', name: 'Prensa de pierna', type: 'pesas' },
+        { id: 'extensiones_cuadriceps', name: 'Extensiones cuádriceps', type: 'pesas' },
+        { id: 'puente_gluteo', name: 'Puente de glúteo', type: 'pesas' },
+        { id: 'pantorrillas_prensa', name: 'Pantorrillas en prensa', type: 'pesas' },
+        { id: 'elevacion_piernas', name: 'Elevación de piernas', type: 'pesas' }
       ],
       [
-        { name: 'Press inclinado en máquina', type: 'pesas' },
-        { name: 'Contractor de pecho', type: 'pesas' },
-        { name: 'Remo en polea baja', type: 'pesas' },
-        { name: 'Face pull', type: 'pesas' },
-        { name: 'Curl en máquina', type: 'pesas' },
-        { name: 'Crunch en máquina', type: 'pesas' }
+        { id: 'press_inclinado_maquina', name: 'Press inclinado en máquina', type: 'pesas' },
+        { id: 'contractor_pecho', name: 'Contractor de pecho', type: 'pesas' },
+        { id: 'remo_polea_baja', name: 'Remo en polea baja', type: 'pesas' },
+        { id: 'face_pull', name: 'Face pull', type: 'pesas' },
+        { id: 'curl_maquina', name: 'Curl en máquina', type: 'pesas' },
+        { id: 'crunch_maquina', name: 'Crunch en máquina', type: 'pesas' }
       ],
       [
-        { name: 'Hip thrust en máquina', type: 'pesas' },
-        { name: 'Zancadas', type: 'pesas' },
-        { name: 'Peso muerto sumo', type: 'pesas' },
-        { name: 'Aductores en máquina', type: 'pesas' },
-        { name: 'Curl femoral', type: 'pesas' },
-        { name: 'Abductores en máquina', type: 'pesas' }
+        { id: 'hip_thrust_maquina', name: 'Hip thrust en máquina', type: 'pesas' },
+        { id: 'zancadas', name: 'Zancadas', type: 'pesas' },
+        { id: 'peso_muerto_sumo', name: 'Peso muerto sumo', type: 'pesas' },
+        { id: 'aductores_maquina', name: 'Aductores en máquina', type: 'pesas' },
+        { id: 'curl_femoral', name: 'Curl femoral', type: 'pesas' },
+        { id: 'abductores_maquina', name: 'Abductores en máquina', type: 'pesas' }
       ],
       [
-        { name: 'Stairmaster', type: 'cardio' },
-        { name: 'Elíptica', type: 'cardio' },
-        { name: 'Crunch', type: 'pesas' },
-        { name: 'Russian twist', type: 'pesas' },
-        { name: 'Elevación de piernas', type: 'pesas' },
-        { name: 'Plancha', type: 'pesas' }
+        { id: 'stairmaster', name: 'Stairmaster', type: 'cardio' },
+        { id: 'eliptica', name: 'Elíptica', type: 'cardio' },
+        { id: 'crunch', name: 'Crunch', type: 'pesas' },
+        { id: 'russian_twist', name: 'Russian twist', type: 'pesas' },
+        { id: 'elevacion_piernas', name: 'Elevación de piernas', type: 'pesas' },
+        { id: 'plancha', name: 'Plancha', type: 'pesas' }
       ]
     ],
     labels: ['Glúteos Libre', 'Upper Libre', 'Piernas Libre', 'Upper Máquinas', 'Glúteos Máquinas', 'Cardio & Core']

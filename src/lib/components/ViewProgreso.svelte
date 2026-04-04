@@ -9,7 +9,7 @@
 		linearRegression,
 		detectPlateau
 	} from '$lib/utils/calculations';
-	import { getExerciseInfo, getExerciseMuscleGroup } from '$lib/data/exercises';
+	import { getExerciseInfo, getExerciseMuscleGroup, resolveExerciseName, getCategoryColor } from '$lib/data/exercises';
 	import type { Entry, WeightEntry, CardioEntry, Session } from '$lib/stores/db';
 
 	// Chart.js loaded dynamically
@@ -126,8 +126,8 @@
 	let exerciseList = $derived.by(() => {
 		const logged = getLoggedExercises();
 		const q = searchQuery.trim().toLowerCase();
-		let exercises = [...logged].filter((name) => {
-			if (q && !name.toLowerCase().includes(q)) return false;
+		let exercises = [...logged].filter((id) => {
+			if (q && !resolveExerciseName(id).toLowerCase().includes(q)) return false;
 			return true;
 		});
 		// Sort by most recent
@@ -160,7 +160,7 @@
 	let isCardio = $derived.by(() => {
 		if (!selectedExercise) return false;
 		const info = getExerciseInfo(selectedExercise);
-		if (info?.type === 'cardio') return true;
+		if (info?.exerciseType === 'cardio') return true;
 		return $db.sessions.some((s: Session) =>
 			s.entries?.find((e: Entry) => e.exercise === selectedExercise && e.type === 'cardio')
 		);
@@ -560,7 +560,7 @@
 		{#each recentPRs as pr, i}
 			<div class="prog-pr-item">
 				<span class="prog-pr-icon" style="color:{prColors[i] || 'var(--muted2)'}">{i + 1}</span>
-				<span class="prog-pr-name">{pr.exercise}</span>
+				<span class="prog-pr-name">{resolveExerciseName(pr.exercise)}</span>
 				<span class="prog-pr-val">{pr.weight}{pr.unit}</span>
 				<span class="prog-pr-date">{fmtD(pr.date)}</span>
 			</div>
@@ -593,13 +593,15 @@
 				{@const unit = lastEntry && 'unit' in lastEntry ? (lastEntry as WeightEntry).unit || 'kg' : 'kg'}
 				{@const trend = getExerciseTrend(name)}
 				{@const mg = getExerciseMuscleGroup(name)}
+				{@const displayName = resolveExerciseName(name)}
 				<button
 					class="prog-ex-item"
 					class:active={selectedExercise === name}
 					onclick={() => selectEx(name)}
+					style="border-left:3px solid {getCategoryColor(mg)}"
 				>
 					<div class="prog-ex-left">
-						<span class="prog-ex-name">{name}</span>
+						<span class="prog-ex-name">{displayName}</span>
 						<span class="prog-ex-mg">{mg}</span>
 					</div>
 					<div class="prog-ex-right">
@@ -616,7 +618,7 @@
 {#if selectedExercise}
 	<div class="prog-detail" bind:this={detailEl}>
 		<!-- Header -->
-		<div class="prog-detail-title">{selectedExercise}</div>
+		<div class="prog-detail-title">{resolveExerciseName(selectedExercise)}</div>
 		<div class="prog-detail-mg">{exerciseMG}</div>
 
 		{#if hasChartData}

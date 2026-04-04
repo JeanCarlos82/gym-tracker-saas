@@ -3,7 +3,7 @@
 	import { db } from '$lib/stores/db';
 	import { signOut } from '$lib/stores/auth';
 	import { supabase } from '$lib/supabase';
-	import { getExerciseInfo, getExerciseMuscleGroup } from '$lib/data/exercises';
+	import { getExerciseInfo, getExerciseMuscleGroup, getCategoryColor } from '$lib/data/exercises';
 	import ExercisePicker from '$lib/components/ExercisePicker.svelte';
 	import { shareRoutine as shareRoutineFn } from '$lib/utils/share';
 	import { get } from 'svelte/store';
@@ -55,12 +55,6 @@
 	};
 	const DK_MAP = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
 
-	const MUSCLE_COLORS: Record<string, string> = {
-		'Pecho': '#f87171', 'Tríceps': '#fb923c', 'Hombros': '#fbbf24',
-		'Espalda': '#60a5fa', 'Bíceps': '#818cf8', 'Cuádriceps': '#4ade80',
-		'Isquiotibiales': '#34d399', 'Glúteos': '#2dd4bf', 'Pantorrillas': '#6ee7b7',
-		'Core': '#f59e0b', 'Cardio': '#38bdf8'
-	};
 
 	const ACT_MULT = [1.2, 1.375, 1.55, 1.725, 1.9];
 	const ACT_LABELS = ['Sedentario', 'Ligero', 'Moderado', 'Activo', 'Muy activo'];
@@ -69,16 +63,16 @@
 		'3-4 días gym', '5-6 días gym', '2x al día, trabajo físico'
 	];
 
-	const IMPORT_PROMPT = `Convierte mi rutina de gym al siguiente formato JSON. Responde SOLO con el JSON, sin explicaciones.
+	const IMPORT_PROMPT = `Convierte mi rutina de gym al siguiente formato JSON. Responde SOLO con el JSON dentro de un bloque de código, sin explicaciones antes ni después. Necesito poder copiar el JSON directamente.
 
 El formato es:
 {
   "routine": {
-    "lunes": { "label": "Nombre del día", "rest": false, "exercises": [{"name": "Nombre ejercicio", "type": "pesas"}] },
-    "martes": { "label": "Descanso", "rest": true, "exercises": [] },
-    "miercoles": { "label": "...", "rest": false, "exercises": [...] },
-    "jueves": { "label": "...", "rest": false, "exercises": [...] },
-    "viernes": { "label": "...", "rest": false, "exercises": [...] },
+    "lunes": { "label": "Push", "rest": false, "exercises": [{"id": "press_banca_barra", "name": "Press banca barra", "type": "pesas"}] },
+    "martes": { "label": "Pull", "rest": false, "exercises": [{"id": "jalon_pecho", "name": "Jalón al pecho", "type": "pesas"}] },
+    "miercoles": { "label": "Descanso", "rest": true, "exercises": [] },
+    "jueves": { "label": "Legs", "rest": false, "exercises": [{"id": "sentadilla_barra", "name": "Sentadilla barra", "type": "pesas"}] },
+    "viernes": { "label": "Upper", "rest": false, "exercises": [...] },
     "sabado": { "label": "Descanso", "rest": true, "exercises": [] },
     "domingo": { "label": "Descanso", "rest": true, "exercises": [] }
   },
@@ -88,14 +82,18 @@ El formato es:
   "bw": []
 }
 
-Reglas:
-- Los días siempre son: lunes, martes, miercoles, jueves, viernes, sabado, domingo (sin tildes)
-- "type" es "pesas" para ejercicios con peso y "cardio" para cardio
+Reglas IMPORTANTES:
+- Cada ejercicio DEBE tener "id" (snake_case sin tildes), "name" (nombre en español) y "type" ("pesas" o "cardio")
+- El "id" se genera así: nombre en minúsculas, sin tildes, espacios = guión bajo. Ej: "Press banca barra" → "press_banca_barra"
+- Los días son: lunes, martes, miercoles, jueves, viernes, sabado, domingo (sin tildes, minúsculas)
 - "rest": true para días de descanso, false para días de entrenamiento
-- "label" es el nombre del tipo de entrenamiento (ej: "Push", "Pull", "Legs", "Full Body")
+- "label" es el nombre del tipo de entrenamiento (ej: "Push", "Pull", "Legs", "Full Body", "Upper", "Lower")
 - "objective" puede ser: "hipertrofia", "fuerza" o "resistencia"
+- "type" es "pesas" para ejercicios con peso y "cardio" para cardio (correr, bicicleta, elíptica, etc.)
 
-Mi rutina es:
+Responde UNICAMENTE con el JSON dentro de un bloque de código. Sin texto antes ni después, solo el JSON.
+
+En mi siguiente mensaje te voy a dar mi rutina. Cuando la recibas, conviertela al formato JSON de arriba.
 `;
 
 	// ── Props ──
@@ -142,6 +140,8 @@ Mi rutina es:
 
 	// File input ref
 	let fileInput: HTMLInputElement;
+	let pasteText = $state('');
+	let importOpen = $state(false);
 
 	// PWA install
 	let deferredPrompt: Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: string }> } | null = null;
@@ -264,8 +264,9 @@ Mi rutina es:
 		if (!exercises || !exercises.length) return '';
 		const counts: Record<string, number> = {};
 		exercises.forEach(ex => {
-			const info = getExerciseInfo(ex.name);
-			const primary = info?.muscleGroup?.[0] || getExerciseMuscleGroup(ex.name);
+			const key = (ex as ExerciseRef & { id?: string }).id || ex.name;
+			const info = getExerciseInfo(key);
+			const primary = info?.category || getExerciseMuscleGroup(key);
 			if (primary && primary !== 'Otro') counts[primary] = (counts[primary] || 0) + 1;
 		});
 		const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
@@ -502,7 +503,7 @@ Mi rutina es:
 		const newRoutine = { ...dbData.routine };
 		const exs = names.map(name => {
 			const info = getExerciseInfo(name);
-			return { name, type: (info?.zone === 'cardio' ? 'cardio' : 'pesas') as 'pesas' | 'cardio' };
+			return { id: info?.id || name, name: info?.name || name, type: (info?.exerciseType === 'cardio' ? 'cardio' : 'pesas') as 'pesas' | 'cardio' };
 		});
 		newRoutine[pickerDayKey] = { ...newRoutine[pickerDayKey], exercises: exs, rest: false };
 		db.saveRoutine(newRoutine);
@@ -581,6 +582,27 @@ Mi rutina es:
 		};
 		reader.readAsText(file);
 		input.value = '';
+	}
+
+	function handlePasteImport() {
+		const text = pasteText.trim();
+		if (!text) { ontoast('Pega el JSON primero'); return; }
+		// Strip markdown code block fences if present
+		const clean = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '');
+		const success = db.importData(clean);
+		if (success) {
+			const p = dbData.profile;
+			pName = p.name || '';
+			pAge = p.age || '';
+			pHeight = p.height || '';
+			pWeight = p.weight || '';
+			pSex = p.sex || 'H';
+			pActivityLevel = p.activityLevel ?? 2;
+			pasteText = '';
+			ontoast('Rutina importada');
+		} else {
+			ontoast('JSON no válido. Verifica que copiaste todo el código.');
+		}
 	}
 
 	function copyImportPrompt() {
@@ -832,8 +854,9 @@ Mi rutina es:
 								<div>
 									<!-- Exercise list -->
 									{#each exList as ex, i}
-										{@const mg = getExerciseInfo(ex.name)?.muscleGroup?.[0] || 'Otro'}
-										{@const color = MUSCLE_COLORS[mg] || '#777'}
+										{@const exKey = (ex as ExerciseRef & { id?: string }).id || ex.name}
+										{@const mg = getExerciseInfo(exKey)?.category || 'Otro'}
+										{@const color = getCategoryColor(mg)}
 										<div class="exrow">
 											<span class="exrow-num">{i + 1}</span>
 											<span class="exrow-name">{ex.name}</span>
@@ -986,38 +1009,68 @@ Mi rutina es:
 					<div style="display:flex;align-items:center;gap:8px">
 						<span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2)">Recordar a las</span>
 						<select style="background:var(--card2);color:var(--text);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:6px 10px;font-family:'DM Mono',monospace;font-size:12px;outline:none" bind:value={notifHour} onchange={() => setReminderHour(notifHour)}>
+							<option value={5}>5:00 AM</option>
+							<option value={6}>6:00 AM</option>
+							<option value={7}>7:00 AM</option>
+							<option value={8}>8:00 AM</option>
+							<option value={9}>9:00 AM</option>
+							<option value={10}>10:00 AM</option>
+							<option value={11}>11:00 AM</option>
+							<option value={12}>12:00 PM</option>
+							<option value={13}>1:00 PM</option>
+							<option value={14}>2:00 PM</option>
+							<option value={15}>3:00 PM</option>
 							<option value={16}>4:00 PM</option>
 							<option value={17}>5:00 PM</option>
 							<option value={18}>6:00 PM</option>
 							<option value={19}>7:00 PM</option>
 							<option value={20}>8:00 PM</option>
 							<option value={21}>9:00 PM</option>
+							<option value={22}>10:00 PM</option>
 						</select>
 					</div>
 				{/if}
 			</div>
 
 			<div style="border-top:1px solid var(--border);padding-top:10px">
-				<!-- Export / Import -->
+				<!-- Export -->
 				<div class="backup-row">
 					<div class="backup-btn exp" onclick={exportData}>
 						<div class="backup-lbl">EXPORTAR</div>
 						<div class="backup-sub">Guardar JSON</div>
 					</div>
-					<label class="backup-btn imp" style="cursor:pointer">
-						<div class="backup-lbl">IMPORTAR</div>
-						<div class="backup-sub">Restaurar JSON</div>
-						<input type="file" accept=".json" style="display:none" bind:this={fileInput} onchange={handleImport}>
-					</label>
 				</div>
 
-				<!-- Import prompt tip -->
+				<!-- ChatGPT import steps + prompt -->
 				<div class="import-tip">
 					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
 					<div>
-						<p>Ya tienes una rutina? Copia el prompt, pegalo en <b>ChatGPT</b> junto con tu rutina y te devolvera un JSON para importar.</p>
-						<button class="wiz-copy-prompt" onclick={copyImportPrompt} style="margin-top:6px">COPIAR PROMPT</button>
+						<p style="margin-bottom:4px"><b>Importar rutina con ChatGPT</b></p>
+						<p>1. Copia el prompt y pegalo en <b>ChatGPT</b></p>
+						<p>2. Escribe tu rutina en el siguiente mensaje</p>
+						<p>3. Toca <b>"Copy code"</b> en la respuesta</p>
+						<p>4. Regresa aquí y toca <b>IMPORTAR</b></p>
 					</div>
+				</div>
+
+				<!-- Copy prompt + Import (note-style expand) -->
+				<div style="display:flex;gap:8px;margin-top:8px">
+					<button class="wiz-copy-prompt" style="flex:1" onclick={copyImportPrompt}>COPIAR PROMPT</button>
+					<button class="import-paste-btn" class:active={importOpen} onclick={() => { importOpen = !importOpen; pasteText = ''; }}>
+						<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+						IMPORTAR
+					</button>
+				</div>
+
+				<!-- Floating paste area (like notes) -->
+				<div class="import-expand" class:open={importOpen}>
+					<textarea
+						class="paste-area"
+						placeholder="Pega el JSON de ChatGPT aquí..."
+						bind:value={pasteText}
+						rows="5"
+					></textarea>
+					<button class="sbtn" style="width:100%;margin-top:6px" onclick={() => { handlePasteImport(); if (pasteText === '') importOpen = false; }}>IMPORTAR RUTINA</button>
 				</div>
 
 				<!-- Install PWA -->
@@ -1124,3 +1177,4 @@ Mi rutina es:
 </div>
 
 <ExercisePicker bind:visible={pickerVisible} selected={pickerDayKey ? (dbData.routine[pickerDayKey]?.exercises || []).map(e => e.name) : []} onselect={onPickerSelect} />
+

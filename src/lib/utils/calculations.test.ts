@@ -147,8 +147,8 @@ describe('detectPlateau', () => {
 
 describe('estimateCalories', () => {
   it('calculates for known exercise and intensity', () => {
-    // Correr, media: MET=8.5, 70kg, 30min -> round(8.5*70*3.5/200*30) = round(312.375) = 312
-    expect(estimateCalories('Correr', 'media', 30, 70)).toBe(312);
+    // correr, media: MET=8.5, 70kg, 30min -> round(8.5*70*3.5/200*30) = round(312.375) = 312
+    expect(estimateCalories('correr', 'media', 30, 70)).toBe(312);
   });
 
   it('uses fallback METs for unknown exercise', () => {
@@ -157,6 +157,6 @@ describe('estimateCalories', () => {
   });
 
   it('returns 0 for zero minutes', () => {
-    expect(estimateCalories('Correr', 'alta', 0, 70)).toBe(0);
+    expect(estimateCalories('correr', 'alta', 0, 70)).toBe(0);
   });
 });

@@ -8,23 +8,23 @@ import type {
   PlateauResult,
   Objective
 } from '$lib/data/types.js';
-import { getExerciseInfo } from '$lib/data/exercises.js';
+import { getExerciseInfo, resolveExerciseId } from '$lib/data/exercises.js';
 
 // ── MET values per exercise and intensity (Compendium of Physical Activities) ──
 // MET = oxygen consumption relative to rest. kcal/min = MET * weight(kg) * 3.5 / 200
 
 export const CARDIO_METS: Record<string, Record<string, number>> = {
-  'Correr': { baja: 6, media: 8.5, alta: 11 },
-  'Caminadora': { baja: 3.5, media: 5, alta: 8 },
-  'Caminar': { baja: 2.5, media: 3.5, alta: 5 },
-  'Elíptica': { baja: 4.5, media: 6, alta: 8 },
-  'Bicicleta estática': { baja: 4, media: 6.5, alta: 10 },
-  'Stairmaster': { baja: 6, media: 8, alta: 10 },
-  'Remo ergómetro': { baja: 5, media: 7, alta: 10 },
-  'Saltar cuerda': { baja: 8, media: 10, alta: 12 },
-  'Natación': { baja: 4.5, media: 7, alta: 10 },
-  'Bicicleta de asalto': { baja: 6, media: 9, alta: 12 },
-  'HIIT': { baja: 6, media: 9, alta: 12 }
+  'correr': { baja: 6, media: 8.5, alta: 11 },
+  'caminadora': { baja: 3.5, media: 5, alta: 8 },
+  'caminar': { baja: 2.5, media: 3.5, alta: 5 },
+  'eliptica': { baja: 4.5, media: 6, alta: 8 },
+  'bicicleta_estatica': { baja: 4, media: 6.5, alta: 10 },
+  'stairmaster': { baja: 6, media: 8, alta: 10 },
+  'remo_ergometro': { baja: 5, media: 7, alta: 10 },
+  'saltar_cuerda': { baja: 8, media: 10, alta: 12 },
+  'natacion': { baja: 4.5, media: 7, alta: 10 },
+  'bicicleta_asalto': { baja: 6, media: 9, alta: 12 },
+  'hiit': { baja: 6, media: 9, alta: 12 }
 };
 
 // ── HTML escaping ──
@@ -210,15 +210,10 @@ export function smartSuggestion(
   const unit = ('unit' in last ? (last as WeightEntry).unit : 'kg') || 'kg';
   const info = getExerciseInfo(name);
 
-  // Determine increment size based on exercise type
-  const isCompoundLower = [
-    'Sentadilla', 'Peso muerto', 'Prensa de pierna',
-    'Peso muerto rumano', 'Peso muerto sumo', 'Hip thrust', 'Hack squat'
-  ].some((c) => name.includes(c));
-  const isIsolation =
-    info?.muscleGroup?.length === 1 &&
-    !['Sentadilla', 'Press banca', 'Press militar', 'Peso muerto', 'Dominadas', 'Remo con barra']
-      .some((c) => name.includes(c));
+  // Determine increment size based on exercise metadata
+  const lowerCategories = ['Cuádriceps', 'Isquiotibiales', 'Glúteos'];
+  const isCompoundLower = !!(info?.is_compound && lowerCategories.includes(info.category));
+  const isIsolation = info ? !info.is_compound : false;
   const increment = isCompoundLower ? 5 : isIsolation ? 1.25 : 2.5;
 
   // Target reps based on objective
@@ -334,7 +329,9 @@ export function estimateCalories(
   minutes: number,
   weightKg: number
 ): number {
-  const mets = CARDIO_METS[exercise] || { baja: 4, media: 6, alta: 8 };
+  // Accept both exercise ID and display name (backward compat)
+  const id = resolveExerciseId(exercise);
+  const mets = CARDIO_METS[id] || CARDIO_METS[exercise] || { baja: 4, media: 6, alta: 8 };
   const met = mets[intensity] || mets.media;
   return Math.round((met * weightKg * 3.5) / 200 * minutes);
 }

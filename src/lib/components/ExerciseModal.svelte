@@ -9,6 +9,7 @@
 		estimateCalories
 	} from '$lib/utils/calculations';
 	import { today } from '$lib/utils/format';
+	import { resolveExerciseName, getCategoryColor, getExerciseById } from '$lib/data/exercises';
 	import type {
 		Entry,
 		WeightEntry,
@@ -72,6 +73,9 @@
 	let todayStr = $derived($todayDate);
 	let dayKey = $derived($todayDayKey);
 	let objective = $derived($db.objective as Objective);
+	let displayName = $derived(resolveExerciseName(exerciseName));
+	let exerciseInfo = $derived(getExerciseById(exerciseName));
+	let catColor = $derived(exerciseInfo ? getCategoryColor(exerciseInfo.category) : '#888');
 
 	// Check if there's an existing entry for today
 	let existingSession = $derived($db.sessions.find((s) => s.date === todayStr) || null);
@@ -483,7 +487,7 @@
 				: undefined}
 	>
 		<div class="mhandle"></div>
-		<div class="mtitle">{exerciseName}</div>
+		<div class="mtitle" style="display:flex;align-items:center;gap:8px"><span class="cat-dot" style="background:{catColor}"></span>{displayName}</div>
 		<div class="msub">
 			{exerciseType === 'cardio' ? 'REGISTRA TU CARDIO' : 'REGISTRA TU ENTRENAMIENTO'}
 		</div>

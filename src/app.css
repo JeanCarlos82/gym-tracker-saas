@@ -3,6 +3,13 @@
   --bg:#0d0d0d; --card:#141414; --card2:#1a1a1a; --card3:#202020;
   --border:#202020; --border2:#2a2a2a;
   --accent:#E8FF3A; --red:#ff4d4d; --blue:#3ab4ff; --green:#3aff8a; --orange:#ffaa3a;
+  /* Category colors */
+  /* Category colors */
+  --cat-pecho:#f87171; --cat-espalda:#60a5fa; --cat-hombros:#fbbf24;
+  --cat-biceps:#a78bfa; --cat-triceps:#fb923c; --cat-antebrazo:#c084fc;
+  --cat-piernas:#4ade80; --cat-gluteos:#f472b6; --cat-gemelos:#2dd4bf;
+  --cat-core:#facc15; --cat-cardio:#22d3ee; --cat-hiit:#ef4444;
+  --cat-fullbody:#8b5cf6; --cat-movilidad:#a3e635;
   --text:#f2f2f2; --muted:#555; --muted2:#777;
   /* Grid: 4 columns, 16px margin, 16px gutter */
   --margin:16px; --gutter:16px;
@@ -108,6 +115,12 @@ input,textarea{-webkit-user-select:text;user-select:text;}
 .chip.r{background:rgba(248,113,113,0.08);color:var(--red,#f87171);}
 .chip.g{background:rgba(58,255,138,0.08);color:var(--green);}
 .chip.o{background:rgba(255,170,58,0.08);color:var(--orange);}
+/* Category dot (small colored circle before exercise name) */
+.cat-dot{display:inline-block;width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+/* Category badge (chip with category color) */
+.cat-badge{font-family:'DM Mono',monospace;font-size:9px;padding:2px 7px;border-radius:4px;letter-spacing:0.3px;}
+/* Equipment chip */
+.eq-chip{font-family:'DM Mono',monospace;font-size:8px;padding:1px 5px;border-radius:3px;background:rgba(255,255,255,0.05);color:var(--muted2);}
 .ex-r{display:flex;align-items:center;gap:8px;flex-shrink:0;margin-left:12px;}
 .ex-num{text-align:right;}
 .ex-weight{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--accent);line-height:1;}
@@ -625,12 +638,7 @@ input,textarea{-webkit-user-select:text;user-select:text;}
 .pk-check{width:20px;height:20px;border-radius:5px;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:11px;color:transparent;flex-shrink:0;transition:all 0.15s;}
 .pk-checked .pk-check{background:var(--accent);border-color:var(--accent);color:#000;}
 .pk-name{font-size:13px;color:var(--text);flex:1;}
-.pick-item{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:8px;border:1px solid var(--border);margin-bottom:4px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all 0.15s;}
-.pick-item:active{opacity:0.7;}
-.pick-item.selected{border-color:var(--accent);background:rgba(232,255,58,0.06);}
-.pick-item.selected span:first-child{color:var(--accent);}
-.pick-item span:first-child{font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);}
-.pick-mg{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted2);}
+/* .pick-item styles moved to ExercisePicker.svelte scoped styles */
 .pk-mg{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted2);padding:2px 6px;background:var(--card2);border-radius:4px;}
 .routine-actions{display:flex;gap:6px;margin-top:8px;}
 .routine-actions .picker-open-btn{flex:1;margin-top:0;}
@@ -705,6 +713,15 @@ input,textarea{-webkit-user-select:text;user-select:text;}
 .import-tip p{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted2);line-height:1.6;margin:0;}
 .import-tip b{color:var(--text);}
 .import-tip i{color:var(--accent);font-style:normal;}
+.paste-area{width:100%;font-family:'DM Mono',monospace;font-size:11px;background:var(--card2);color:var(--text);border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:8px;resize:vertical;outline:none;min-height:80px;}
+.paste-area:focus{border-color:var(--accent);}
+.paste-area::placeholder{color:var(--muted);}
+.import-paste-btn{display:flex;align-items:center;gap:6px;padding:8px 14px;background:var(--card2);border:1px solid var(--border);border-radius:10px;color:var(--muted2);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.5px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all 0.15s;}
+.import-paste-btn:active{transform:scale(0.95);}
+.import-paste-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(232,255,58,0.06);}
+.import-paste-btn svg{width:16px;height:16px;}
+.import-expand{max-height:0;overflow:hidden;transition:max-height 0.25s ease,opacity 0.2s ease;opacity:0;}
+.import-expand.open{max-height:300px;opacity:1;margin-top:8px;}
 
 /* ── CREATOR ── */
 .creator{padding:24px 0 16px;text-align:center;margin-bottom:20px;}
@@ -798,7 +815,6 @@ input,textarea{-webkit-user-select:text;user-select:text;}
 
 /* 5. Active press states (where not already present) */
 .wiz-opt:active{transform:scale(0.97);}
-.pick-item:active{transform:scale(0.97);}
 .sess-card:active{transform:scale(0.97);}
 .guide-card:active{transform:scale(0.97);}
 
@@ -823,7 +839,6 @@ input,textarea{-webkit-user-select:text;user-select:text;}
 .sex-btn:focus-visible,
 .backup-btn:focus-visible,
 .chip:focus-visible,
-.pick-item:focus-visible,
 .ex-card:focus-visible,
 .day-hdr:focus-visible,
 .creator-link:focus-visible,

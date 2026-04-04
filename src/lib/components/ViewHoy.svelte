@@ -9,6 +9,7 @@
 		smartSuggestion
 	} from '$lib/utils/calculations';
 	import { today } from '$lib/utils/format';
+	import { getCategoryColor, getExerciseById } from '$lib/data/exercises';
 	import type { Entry, WeightEntry, CardioEntry, ExerciseRef, Objective } from '$lib/data/types';
 
 	// ── Props ──
@@ -35,26 +36,26 @@
 
 	// ── Helpers ──
 
-	function prevEntry(name: string): Entry | null {
+	function prevEntry(id: string): Entry | null {
 		const t = today();
 		const past = $db.sessions
 			.filter((s) => s.date !== t)
 			.sort((a, b) => b.date.localeCompare(a.date));
 		for (const s of past) {
-			const e = s.entries?.find((e) => e.exercise === name);
+			const e = s.entries?.find((e) => e.exercise === id);
 			if (e) return e;
 		}
 		return null;
 	}
 
-	function getLastEntries(name: string, count = 3): Entry[] {
+	function getLastEntries(id: string, count = 3): Entry[] {
 		const results: Entry[] = [];
 		const t = today();
 		const past = $db.sessions
 			.filter((s) => s.date !== t)
 			.sort((a, b) => b.date.localeCompare(a.date));
 		for (const s of past) {
-			const e = s.entries?.find((e) => e.exercise === name);
+			const e = s.entries?.find((e) => e.exercise === id);
 			if (e) {
 				results.push(e);
 				if (results.length >= count) break;
@@ -63,13 +64,13 @@
 		return results;
 	}
 
-	function getEntry(exerciseName: string): Entry | undefined {
-		return session?.entries?.find((e) => e.exercise === exerciseName);
+	function getEntry(exerciseId: string): Entry | undefined {
+		return session?.entries?.find((e) => e.exercise === exerciseId);
 	}
 
-	function getSuggestion(exerciseName: string) {
-		const lastEntries = getLastEntries(exerciseName);
-		return smartSuggestion(exerciseName, lastEntries, objective);
+	function getSuggestion(exerciseId: string) {
+		const lastEntries = getLastEntries(exerciseId);
+		return smartSuggestion(exerciseId, lastEntries, objective);
 	}
 
 	// ── Intensity display helpers ──
@@ -170,7 +171,7 @@
 {:else}
 	<!-- Exercise list -->
 	<div class="ex-list">
-		{#each exercises as ex, exIdx (ex.name)}
+		{#each exercises as ex, exIdx (ex.id)}
 			{#if reorderMode}
 				<!-- Reorder mode card with touch drag -->
 				{@const isDragging = dragIdx === exIdx}
@@ -199,14 +200,14 @@
 				</div>
 			{:else if ex.type === 'cardio'}
 				<!-- Cardio card -->
-				{@const entry = getEntry(ex.name) as CardioEntry | undefined}
+				{@const entry = getEntry(ex.id) as CardioEntry | undefined}
 				{@const logged = !!entry}
 				<div
 					class="ex-card {logged ? 'logged' : ''}"
 										role="button"
 					tabindex="0"
-					onclick={() => handleCardClick(ex.name, 'cardio')}
-					onkeydown={(e) => { if (e.key === 'Enter') handleCardClick(ex.name, 'cardio'); }}
+					onclick={() => handleCardClick(ex.id, 'cardio')}
+					onkeydown={(e) => { if (e.key === 'Enter') handleCardClick(ex.id, 'cardio'); }}
 				>
 					<div class="ex-l">
 						<div class="ex-name">{ex.name}</div>
@@ -248,20 +249,20 @@
 				</div>
 			{:else}
 				<!-- Weight exercise card -->
-				{@const entry = getEntry(ex.name) as WeightEntry | undefined}
+				{@const entry = getEntry(ex.id) as WeightEntry | undefined}
 				{@const logged = !!entry}
-				{@const prev = prevEntry(ex.name)}
+				{@const prev = prevEntry(ex.id)}
 				{@const mx = entryMaxWeight(entry ?? null)}
 				{@const prevMx = entryMaxWeight(prev)}
 				{@const unit = entry?.unit || (prev && 'unit' in prev ? (prev as WeightEntry).unit : null) || 'kg'}
 				{@const best1rm = logged ? entryBest1RM(entry) : 0}
-				{@const suggestion = !logged ? getSuggestion(ex.name) : null}
+				{@const suggestion = !logged ? getSuggestion(ex.id) : null}
 				<div
 					class="ex-card {logged ? 'logged' : ''}"
 										role="button"
 					tabindex="0"
-					onclick={() => handleCardClick(ex.name, 'pesas')}
-					onkeydown={(e) => { if (e.key === 'Enter') handleCardClick(ex.name, 'pesas'); }}
+					onclick={() => handleCardClick(ex.id, 'pesas')}
+					onkeydown={(e) => { if (e.key === 'Enter') handleCardClick(ex.id, 'pesas'); }}
 				>
 					<div class="ex-l">
 						<div class="ex-name">{ex.name}</div>

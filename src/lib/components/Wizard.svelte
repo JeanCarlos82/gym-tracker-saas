@@ -11,7 +11,7 @@
 		getSuggestedDays,
 		goalToObjective
 	} from '$lib/utils/routine-builder';
-	import { EXERCISE_DB, getExerciseInfo } from '$lib/data/exercises';
+	import { EXERCISE_DB, getExerciseInfo, getExerciseById, getCategoryColor, ZONE_MUSCLES, type Zone } from '$lib/data/exercises';
 
 	// ── Props ──
 	let { visible = $bindable(false), oncomplete }: {
@@ -75,24 +75,11 @@
 		viernes: 'V', sabado: 'S', domingo: 'D'
 	};
 
-	const MUSCLE_COLORS: Record<string, string> = {
-		'Pecho': '#f87171',
-		'Tríceps': '#fb923c',
-		'Hombros': '#fbbf24',
-		'Espalda': '#60a5fa',
-		'Bíceps': '#818cf8',
-		'Cuádriceps': '#4ade80',
-		'Isquiotibiales': '#34d399',
-		'Glúteos': '#2dd4bf',
-		'Pantorrillas': '#6ee7b7',
-		'Core': '#f59e0b',
-		'Cardio': '#38bdf8',
-	};
-
 	function getExColor(e: ExerciseEntry): string | null {
-		if (e.type === 'cardio') return MUSCLE_COLORS['Cardio'];
-		const info = getExerciseInfo(e.name);
-		if (info?.muscleGroup?.length) return MUSCLE_COLORS[info.muscleGroup[0]] || null;
+		if (e.type === 'cardio') return getCategoryColor('Cardio');
+		const key = (e as ExerciseEntry & { id?: string }).id || e.name;
+		const info = getExerciseById(key) || getExerciseInfo(key);
+		if (info?.category) return getCategoryColor(info.category);
 		return null;
 	}
 
@@ -160,7 +147,7 @@
 		if (!q) return EXERCISE_DB;
 		return EXERCISE_DB.filter(e =>
 			e.name.toLowerCase().includes(q) ||
-			e.muscleGroup.some(m => m.toLowerCase().includes(q))
+			e.category.toLowerCase().includes(q)
 		);
 	});
 
@@ -401,7 +388,7 @@
 			...updated[pickerDay],
 			exercises: pickerSelected.map(name => {
 				const info = getExerciseInfo(name);
-				return { name, type: info?.type || 'pesas' } as ExerciseEntry;
+				return { id: info?.id || name, name: info?.name || name, type: info?.type || 'pesas' } as ExerciseEntry;
 			})
 		};
 		manualRoutine = updated;
@@ -947,7 +934,8 @@ Mi rutina es:
 			>
 			<div style="max-height:50dvh;overflow-y:auto;margin:8px 0 12px;scrollbar-width:none">
 				{#each PICKER_ZONES as zone}
-					{@const zoneExs = pickerFiltered.filter(e => e.zone === zone.key)}
+					{@const zoneCats = ZONE_MUSCLES[zone.key as Zone] || []}
+					{@const zoneExs = pickerFiltered.filter(e => zoneCats.includes(e.category))}
 					{#if zoneExs.length > 0}
 						<div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--accent);letter-spacing:1.5px;padding:8px 0 4px">{zone.label}</div>
 						{#each zoneExs as ex}
@@ -957,7 +945,7 @@ Mi rutina es:
 								onclick={() => togglePickerEx(ex.name)}
 							>
 								<span>{ex.name}</span>
-								<span class="pick-mg">{ex.muscleGroup[0]}</span>
+								<span class="pick-mg">{ex.category}</span>
 							</div>
 						{/each}
 					{/if}

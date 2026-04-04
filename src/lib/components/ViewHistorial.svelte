@@ -9,6 +9,7 @@
 		escapeHtml
 	} from '$lib/utils/calculations';
 	import type { Session, Entry, WeightEntry, CardioEntry } from '$lib/data/types';
+	import { resolveExerciseName } from '$lib/data/exercises';
 
 	// ── Reactive state from store ──
 	let dbVal = $derived($db);
@@ -230,7 +231,7 @@
 												{#each sess.entries as entry}
 													<div class="sess-row">
 														<div class="sess-row-top">
-															<div class="sess-exname">{entry.exercise}</div>
+															<div class="sess-exname">{resolveExerciseName(entry.exercise)}</div>
 															<div class="sess-maxval">
 																{#if entry.type === 'cardio'}
 																	{@const ce = entry as CardioEntry}

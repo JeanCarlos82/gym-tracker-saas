@@ -2,6 +2,7 @@ import { writable, derived, get } from 'svelte/store';
 import { supabase } from '$lib/supabase';
 import { user } from './auth';
 import type { GymSet, WeightEntry, CardioEntry, Entry, Session, ExerciseRef, DayRoutine, Routine, Profile, BodyWeightRecord, Database } from '$lib/data/types';
+import { NAME_TO_ID, resolveExerciseId } from '$lib/data/exercises';
 export type { GymSet, WeightEntry, CardioEntry, Entry, Session, ExerciseRef, DayRoutine, Routine, Profile, BodyWeightRecord, Database };
 
 // ── Defaults ──
@@ -14,17 +15,51 @@ const DEFAULT_ROUTINE: Routine = {
 const DEFAULT_PROFILE: Profile = { name: '', age: '', sex: 'H', height: '', weight: '', weightUnit: 'kg', heightUnit: 'cm', restTimerSeconds: 90, activityLevel: 2 };
 const DEFAULT_DB: Database = { routine: DEFAULT_ROUTINE, sessions: [], profile: DEFAULT_PROFILE, objective: 'hipertrofia', bw: [] };
 
+// ── Exercise ID migration ──
+function migrateExerciseIds(data: Database): Database {
+	const routine: Routine = {};
+	for (const [day, dr] of Object.entries(data.routine)) {
+		routine[day] = {
+			...dr,
+			exercises: dr.exercises.map((ref: ExerciseRef) => {
+				if (ref.name && !ref.id && NAME_TO_ID[ref.name]) {
+					return { ...ref, id: NAME_TO_ID[ref.name] };
+				}
+				return ref;
+			}),
+		};
+	}
+
+	const sessions: Session[] = data.sessions.map(sess => ({
+		...sess,
+		entries: sess.entries.map(entry => {
+			if (entry.exercise && NAME_TO_ID[entry.exercise]) {
+				return { ...entry, exercise: NAME_TO_ID[entry.exercise] };
+			}
+			return entry;
+		}),
+	}));
+
+	return { ...data, routine, sessions };
+}
+
 // ── Local storage helpers ──
 function loadLocal(): Database {
 	if (typeof localStorage === 'undefined') return { ...DEFAULT_DB };
 	try {
-		return {
+		const data: Database = {
 			routine: JSON.parse(localStorage.getItem('gym_routine') || 'null') || DEFAULT_ROUTINE,
 			sessions: JSON.parse(localStorage.getItem('gym_sessions') || '[]') || [],
 			profile: JSON.parse(localStorage.getItem('gym_profile') || 'null') || DEFAULT_PROFILE,
 			objective: localStorage.getItem('gym_objective') || 'hipertrofia',
 			bw: JSON.parse(localStorage.getItem('gym_bw') || '[]') || [],
 		};
+		if (localStorage.getItem('gym_migrated_v2')) return data;
+		const migrated = migrateExerciseIds(data);
+		persistLocal('gym_routine', migrated.routine);
+		persistLocal('gym_sessions', migrated.sessions);
+		localStorage.setItem('gym_migrated_v2', '1');
+		return migrated;
 	} catch (e) {
 		console.warn('Failed to load from localStorage:', e);
 		return { ...DEFAULT_DB };
@@ -73,7 +108,7 @@ async function loadFromSupabase(userId: string): Promise<Database> {
 
 		const bw: BodyWeightRecord[] = (bwRes.data || []).map((b: { date: string; value: number }) => ({ date: b.date, v: b.value }));
 
-		return { routine, sessions, profile, objective: p?.objective || 'hipertrofia', bw };
+		return migrateExerciseIds({ routine, sessions, profile, objective: p?.objective || 'hipertrofia', bw });
 	} catch (e) {
 		console.error('Failed to load from Supabase:', e);
 		return loadLocal();
