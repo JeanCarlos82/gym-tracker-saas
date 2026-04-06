@@ -24,6 +24,9 @@ export type Difficulty = 'Principiante' | 'Intermedio' | 'Avanzado';
 /** Exercise type (kept for backward compat with entries) */
 export type ExerciseType = 'pesas' | 'cardio';
 
+/** Input mode hint — determines which fields ExerciseModal shows per set */
+export type InputMode = 'weight_reps' | 'bodyweight_reps' | 'timed' | 'bodyweight_timed';
+
 /** Full exercise definition */
 export interface Exercise {
   id: string;
@@ -38,6 +41,7 @@ export interface Exercise {
   difficulty: Difficulty;
   is_compound: boolean;
   unilateral: boolean;
+  inputMode?: InputMode; // UI hint for set logging — defaults to 'weight_reps'
 }
 
 // ── Backward compat aliases ──
@@ -113,20 +117,22 @@ export const EXERCISE_DB: Exercise[] = [
   { id: 'cruces_polea_alta', name: 'Cruces polea alta', category: 'Pecho', muscle_primary: 'Pecho inferior', muscle_secondary: ['Deltoide anterior'], equipment: 'Polea', type: 'Polea', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Principiante', is_compound: false, unilateral: false },
   { id: 'cruces_polea_media', name: 'Cruces polea media', category: 'Pecho', muscle_primary: 'Pecho mayor', muscle_secondary: ['Deltoide anterior'], equipment: 'Polea', type: 'Polea', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Principiante', is_compound: false, unilateral: false },
   { id: 'cruces_polea_baja', name: 'Cruces polea baja', category: 'Pecho', muscle_primary: 'Pecho superior', muscle_secondary: ['Deltoide anterior'], equipment: 'Polea', type: 'Polea', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Principiante', is_compound: false, unilateral: false },
-  { id: 'fondos_paralelas', name: 'Fondos paralelas', category: 'Pecho', muscle_primary: 'Pecho inferior', muscle_secondary: ['Tríceps', 'Deltoide anterior'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Empuje vertical', difficulty: 'Avanzado', is_compound: true, unilateral: false },
-  { id: 'flexiones', name: 'Flexiones', category: 'Pecho', muscle_primary: 'Pecho mayor', muscle_secondary: ['Tríceps', 'Deltoide anterior'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Empuje horizontal', difficulty: 'Principiante', is_compound: true, unilateral: false },
-  { id: 'flexiones_inclinadas', name: 'Flexiones inclinadas', category: 'Pecho', muscle_primary: 'Pecho inferior', muscle_secondary: ['Tríceps'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Empuje horizontal', difficulty: 'Principiante', is_compound: true, unilateral: false },
-  { id: 'flexiones_declinadas', name: 'Flexiones declinadas', category: 'Pecho', muscle_primary: 'Pecho superior', muscle_secondary: ['Tríceps', 'Deltoide anterior'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Empuje horizontal', difficulty: 'Intermedio', is_compound: true, unilateral: false },
-  { id: 'flexiones_diamante', name: 'Flexiones diamante', category: 'Pecho', muscle_primary: 'Triceps', muscle_secondary: ['Pecho mayor'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Empuje horizontal', difficulty: 'Intermedio', is_compound: true, unilateral: false },
+  { id: 'fondos_paralelas', name: 'Fondos paralelas', category: 'Pecho', muscle_primary: 'Pecho inferior', muscle_secondary: ['Tríceps', 'Deltoide anterior'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Empuje vertical', difficulty: 'Avanzado', is_compound: true, unilateral: false, inputMode: 'bodyweight_reps' },
+  { id: 'flexiones', name: 'Flexiones', category: 'Pecho', muscle_primary: 'Pecho mayor', muscle_secondary: ['Tríceps', 'Deltoide anterior'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Empuje horizontal', difficulty: 'Principiante', is_compound: true, unilateral: false, inputMode: 'bodyweight_reps' },
+  { id: 'flexiones_inclinadas', name: 'Flexiones inclinadas', category: 'Pecho', muscle_primary: 'Pecho inferior', muscle_secondary: ['Tríceps'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Empuje horizontal', difficulty: 'Principiante', is_compound: true, unilateral: false, inputMode: 'bodyweight_reps' },
+  { id: 'flexiones_declinadas', name: 'Flexiones declinadas', category: 'Pecho', muscle_primary: 'Pecho superior', muscle_secondary: ['Tríceps', 'Deltoide anterior'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Empuje horizontal', difficulty: 'Intermedio', is_compound: true, unilateral: false, inputMode: 'bodyweight_reps' },
+  { id: 'flexiones_diamante', name: 'Flexiones diamante', category: 'Pecho', muscle_primary: 'Triceps', muscle_secondary: ['Pecho mayor'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Empuje horizontal', difficulty: 'Intermedio', is_compound: true, unilateral: false, inputMode: 'bodyweight_reps' },
   { id: 'press_convergente', name: 'Press convergente', category: 'Pecho', muscle_primary: 'Pecho mayor', muscle_secondary: ['Tríceps'], equipment: 'Máquina', type: 'Máquina', exerciseType: 'pesas', movement: 'Empuje horizontal', difficulty: 'Principiante', is_compound: true, unilateral: false },
   { id: 'squeeze_press', name: 'Squeeze press', category: 'Pecho', muscle_primary: 'Pecho interno', muscle_secondary: ['Tríceps'], equipment: 'Mancuernas', type: 'Libre', exerciseType: 'pesas', movement: 'Empuje horizontal', difficulty: 'Intermedio', is_compound: true, unilateral: false },
+  { id: 'press_banca_smith', name: 'Press banca Smith', category: 'Pecho', muscle_primary: 'Pecho mayor', muscle_secondary: ['Tríceps', 'Deltoide anterior'], equipment: 'Máquina', type: 'Máquina', exerciseType: 'pesas', movement: 'Empuje horizontal', difficulty: 'Principiante', is_compound: true, unilateral: false },
+  { id: 'crossover_polea', name: 'Crossover polea', category: 'Pecho', muscle_primary: 'Pecho mayor', muscle_secondary: ['Deltoide anterior'], equipment: 'Polea', type: 'Polea', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Intermedio', is_compound: false, unilateral: false },
 
   // ══════════════════════════════════════════
   // ESPALDA
   // ══════════════════════════════════════════
-  { id: 'dominadas_pronadas', name: 'Dominadas pronadas', category: 'Espalda', muscle_primary: 'Dorsal ancho', muscle_secondary: ['Bíceps', 'Romboides'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Tirón vertical', difficulty: 'Avanzado', is_compound: true, unilateral: false },
-  { id: 'dominadas_supinas', name: 'Dominadas supinas', category: 'Espalda', muscle_primary: 'Dorsal ancho', muscle_secondary: ['Bíceps'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Tirón vertical', difficulty: 'Avanzado', is_compound: true, unilateral: false },
-  { id: 'dominadas_neutras', name: 'Dominadas neutras', category: 'Espalda', muscle_primary: 'Dorsal ancho', muscle_secondary: ['Bíceps', 'Braquial'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Tirón vertical', difficulty: 'Avanzado', is_compound: true, unilateral: false },
+  { id: 'dominadas_pronadas', name: 'Dominadas pronadas', category: 'Espalda', muscle_primary: 'Dorsal ancho', muscle_secondary: ['Bíceps', 'Romboides'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Tirón vertical', difficulty: 'Avanzado', is_compound: true, unilateral: false, inputMode: 'bodyweight_reps' },
+  { id: 'dominadas_supinas', name: 'Dominadas supinas', category: 'Espalda', muscle_primary: 'Dorsal ancho', muscle_secondary: ['Bíceps'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Tirón vertical', difficulty: 'Avanzado', is_compound: true, unilateral: false, inputMode: 'bodyweight_reps' },
+  { id: 'dominadas_neutras', name: 'Dominadas neutras', category: 'Espalda', muscle_primary: 'Dorsal ancho', muscle_secondary: ['Bíceps', 'Braquial'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Tirón vertical', difficulty: 'Avanzado', is_compound: true, unilateral: false, inputMode: 'bodyweight_reps' },
   { id: 'dominadas_asistidas', name: 'Dominadas asistidas', category: 'Espalda', muscle_primary: 'Dorsal ancho', muscle_secondary: ['Bíceps'], equipment: 'Máquina', type: 'Máquina', exerciseType: 'pesas', movement: 'Tirón vertical', difficulty: 'Principiante', is_compound: true, unilateral: false },
   { id: 'jalon_al_pecho', name: 'Jalon al pecho', category: 'Espalda', muscle_primary: 'Dorsal ancho', muscle_secondary: ['Bíceps', 'Romboides'], equipment: 'Polea', type: 'Polea', exerciseType: 'pesas', movement: 'Tirón vertical', difficulty: 'Principiante', is_compound: true, unilateral: false },
   { id: 'jalon_agarre_estrecho', name: 'Jalon agarre estrecho', category: 'Espalda', muscle_primary: 'Dorsal ancho', muscle_secondary: ['Bíceps'], equipment: 'Polea', type: 'Polea', exerciseType: 'pesas', movement: 'Tirón vertical', difficulty: 'Principiante', is_compound: true, unilateral: false },
@@ -148,7 +154,12 @@ export const EXERCISE_DB: Exercise[] = [
   { id: 'encogimientos_hombros', name: 'Encogimientos hombros', category: 'Espalda', muscle_primary: 'Trapecio', muscle_secondary: [], equipment: 'Mancuernas', type: 'Libre', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Principiante', is_compound: false, unilateral: false },
   { id: 'remo_alto_polea', name: 'Remo alto polea', category: 'Espalda', muscle_primary: 'Trapecio', muscle_secondary: ['Romboides'], equipment: 'Polea', type: 'Polea', exerciseType: 'pesas', movement: 'Tirón horizontal', difficulty: 'Principiante', is_compound: false, unilateral: false },
   { id: 'buenos_dias', name: 'Buenos dias', category: 'Espalda', muscle_primary: 'Espalda baja', muscle_secondary: ['Isquiotibiales', 'Glúteos'], equipment: 'Barra', type: 'Libre', exerciseType: 'pesas', movement: 'Bisagra', difficulty: 'Avanzado', is_compound: true, unilateral: false },
-  { id: 'dominadas_chin_up', name: 'Dominadas chin up', category: 'Espalda', muscle_primary: 'Dorsal ancho', muscle_secondary: ['Bíceps'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Tirón vertical', difficulty: 'Avanzado', is_compound: true, unilateral: false },
+  { id: 'dominadas_chin_up', name: 'Dominadas chin up', category: 'Espalda', muscle_primary: 'Dorsal ancho', muscle_secondary: ['Bíceps'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Tirón vertical', difficulty: 'Avanzado', is_compound: true, unilateral: false, inputMode: 'bodyweight_reps' },
+  { id: 'pulldown_recto', name: 'Pulldown brazos rectos', category: 'Espalda', muscle_primary: 'Dorsal ancho', muscle_secondary: ['Tríceps'], equipment: 'Polea', type: 'Polea', exerciseType: 'pesas', movement: 'Tirón vertical', difficulty: 'Intermedio', is_compound: false, unilateral: false },
+  { id: 'seal_row', name: 'Seal row', category: 'Espalda', muscle_primary: 'Dorsal ancho', muscle_secondary: ['Romboides', 'Bíceps'], equipment: 'Mancuernas', type: 'Libre', exerciseType: 'pesas', movement: 'Tirón horizontal', difficulty: 'Intermedio', is_compound: true, unilateral: false },
+  { id: 'meadows_row', name: 'Meadows row', category: 'Espalda', muscle_primary: 'Dorsal ancho', muscle_secondary: ['Romboides'], equipment: 'Barra', type: 'Libre', exerciseType: 'pesas', movement: 'Tirón horizontal', difficulty: 'Avanzado', is_compound: true, unilateral: true },
+  { id: 'rack_pull', name: 'Rack pull', category: 'Espalda', muscle_primary: 'Dorsal ancho', muscle_secondary: ['Trapecio', 'Erector espinal'], equipment: 'Barra', type: 'Libre', exerciseType: 'pesas', movement: 'Bisagra', difficulty: 'Intermedio', is_compound: true, unilateral: false },
+  { id: 'remo_gironda', name: 'Remo Gironda', category: 'Espalda', muscle_primary: 'Dorsal ancho', muscle_secondary: ['Bíceps', 'Romboides'], equipment: 'Polea', type: 'Polea', exerciseType: 'pesas', movement: 'Tirón horizontal', difficulty: 'Intermedio', is_compound: true, unilateral: false },
 
   // ══════════════════════════════════════════
   // HOMBROS
@@ -168,6 +179,8 @@ export const EXERCISE_DB: Exercise[] = [
   { id: 'remo_al_menton', name: 'Remo al menton', category: 'Hombros', muscle_primary: 'Deltoide medio', muscle_secondary: ['Trapecio'], equipment: 'Barra', type: 'Libre', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Intermedio', is_compound: true, unilateral: false },
   { id: 'y_raise', name: 'Y raise', category: 'Hombros', muscle_primary: 'Deltoide posterior', muscle_secondary: ['Trapecio'], equipment: 'Mancuernas', type: 'Libre', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Intermedio', is_compound: false, unilateral: false },
   { id: 'handstand_push_up', name: 'Handstand push up', category: 'Hombros', muscle_primary: 'Hombros', muscle_secondary: ['Tríceps', 'Core'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Empuje vertical', difficulty: 'Avanzado', is_compound: true, unilateral: false },
+  { id: 'press_landmine', name: 'Press landmine', category: 'Hombros', muscle_primary: 'Deltoide anterior', muscle_secondary: ['Tríceps', 'Core'], equipment: 'Barra', type: 'Libre', exerciseType: 'pesas', movement: 'Empuje vertical', difficulty: 'Intermedio', is_compound: true, unilateral: true },
+  { id: 'rear_delt_fly', name: 'Rear delt fly', category: 'Hombros', muscle_primary: 'Deltoide posterior', muscle_secondary: ['Romboides'], equipment: 'Mancuernas', type: 'Libre', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Principiante', is_compound: false, unilateral: false },
 
   // ══════════════════════════════════════════
   // BÍCEPS
@@ -186,11 +199,13 @@ export const EXERCISE_DB: Exercise[] = [
   { id: 'curl_spider', name: 'Curl spider', category: 'Bíceps', muscle_primary: 'Biceps', muscle_secondary: [], equipment: 'Mancuernas', type: 'Libre', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Intermedio', is_compound: false, unilateral: false },
   { id: 'curl_21', name: 'Curl 21', category: 'Bíceps', muscle_primary: 'Biceps', muscle_secondary: ['Braquial'], equipment: 'Barra', type: 'Libre', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Intermedio', is_compound: false, unilateral: false },
   { id: 'curl_inverso', name: 'Curl inverso', category: 'Bíceps', muscle_primary: 'Antebrazo', muscle_secondary: ['Bíceps'], equipment: 'Barra', type: 'Libre', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Intermedio', is_compound: false, unilateral: false },
+  { id: 'curl_cable_overhead', name: 'Curl cable overhead', category: 'Bíceps', muscle_primary: 'Bíceps', muscle_secondary: [], equipment: 'Polea', type: 'Polea', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Intermedio', is_compound: false, unilateral: false },
+  { id: 'curl_drag', name: 'Curl drag', category: 'Bíceps', muscle_primary: 'Bíceps', muscle_secondary: ['Braquial'], equipment: 'Barra', type: 'Libre', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Intermedio', is_compound: false, unilateral: false },
 
   // ══════════════════════════════════════════
   // TRÍCEPS
   // ══════════════════════════════════════════
-  { id: 'fondos_banco', name: 'Fondos banco', category: 'Tríceps', muscle_primary: 'Triceps', muscle_secondary: ['Pecho mayor', 'Deltoide anterior'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Empuje vertical', difficulty: 'Principiante', is_compound: true, unilateral: false },
+  { id: 'fondos_banco', name: 'Fondos banco', category: 'Tríceps', muscle_primary: 'Triceps', muscle_secondary: ['Pecho mayor', 'Deltoide anterior'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Empuje vertical', difficulty: 'Principiante', is_compound: true, unilateral: false, inputMode: 'bodyweight_reps' },
   { id: 'press_cerrado', name: 'Press cerrado', category: 'Tríceps', muscle_primary: 'Triceps', muscle_secondary: ['Pecho mayor'], equipment: 'Barra', type: 'Libre', exerciseType: 'pesas', movement: 'Empuje horizontal', difficulty: 'Intermedio', is_compound: true, unilateral: false },
   { id: 'extension_polea_barra', name: 'Extension polea barra', category: 'Tríceps', muscle_primary: 'Triceps', muscle_secondary: [], equipment: 'Polea', type: 'Polea', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Principiante', is_compound: false, unilateral: false },
   { id: 'pushdown_cuerda', name: 'Pushdown cuerda', category: 'Tríceps', muscle_primary: 'Triceps', muscle_secondary: [], equipment: 'Polea', type: 'Polea', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Principiante', is_compound: false, unilateral: false },
@@ -201,6 +216,8 @@ export const EXERCISE_DB: Exercise[] = [
   { id: 'extension_maquina', name: 'Extension maquina', category: 'Tríceps', muscle_primary: 'Triceps', muscle_secondary: [], equipment: 'Máquina', type: 'Máquina', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Principiante', is_compound: false, unilateral: false },
   { id: 'skull_crushers', name: 'Skull crushers', category: 'Tríceps', muscle_primary: 'Triceps', muscle_secondary: [], equipment: 'Barra', type: 'Libre', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Intermedio', is_compound: false, unilateral: false },
   { id: 'press_frances', name: 'Press frances', category: 'Tríceps', muscle_primary: 'Triceps', muscle_secondary: [], equipment: 'Barra', type: 'Libre', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Intermedio', is_compound: false, unilateral: false },
+  { id: 'dip_machine', name: 'Fondos maquina', category: 'Tríceps', muscle_primary: 'Triceps', muscle_secondary: ['Pecho mayor'], equipment: 'Máquina', type: 'Máquina', exerciseType: 'pesas', movement: 'Empuje vertical', difficulty: 'Principiante', is_compound: true, unilateral: false },
+  { id: 'pushdown_barra_v', name: 'Pushdown barra V', category: 'Tríceps', muscle_primary: 'Triceps', muscle_secondary: [], equipment: 'Polea', type: 'Polea', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Principiante', is_compound: false, unilateral: false },
 
   // ══════════════════════════════════════════
   // ANTEBRAZO
@@ -208,7 +225,7 @@ export const EXERCISE_DB: Exercise[] = [
   { id: 'curl_muneca', name: 'Curl muñeca', category: 'Antebrazo', muscle_primary: 'Antebrazo', muscle_secondary: [], equipment: 'Mancuernas', type: 'Libre', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Principiante', is_compound: false, unilateral: false },
   { id: 'curl_inverso_muneca', name: 'Curl inverso muñeca', category: 'Antebrazo', muscle_primary: 'Antebrazo', muscle_secondary: [], equipment: 'Mancuernas', type: 'Libre', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Principiante', is_compound: false, unilateral: false },
   { id: 'farmer_walk', name: 'Farmer walk', category: 'Antebrazo', muscle_primary: 'Antebrazo', muscle_secondary: ['Trapecio', 'Core'], equipment: 'Peso corporal', type: 'Funcional', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Intermedio', is_compound: true, unilateral: false },
-  { id: 'dead_hang', name: 'Dead hang', category: 'Antebrazo', muscle_primary: 'Antebrazo', muscle_secondary: [], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Principiante', is_compound: false, unilateral: false },
+  { id: 'dead_hang', name: 'Dead hang', category: 'Antebrazo', muscle_primary: 'Antebrazo', muscle_secondary: [], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Principiante', is_compound: false, unilateral: false, inputMode: 'timed' },
   { id: 'pinch_grip', name: 'Pinch grip', category: 'Antebrazo', muscle_primary: 'Antebrazo', muscle_secondary: [], equipment: 'Peso corporal', type: 'Funcional', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Intermedio', is_compound: false, unilateral: false },
 
   // ══════════════════════════════════════════
@@ -226,28 +243,34 @@ export const EXERCISE_DB: Exercise[] = [
   { id: 'hack_squat', name: 'Hack squat', category: 'Piernas', muscle_primary: 'Cuadriceps', muscle_secondary: ['Glúteos'], equipment: 'Máquina', type: 'Máquina', exerciseType: 'pesas', movement: 'Sentadilla', difficulty: 'Intermedio', is_compound: true, unilateral: false },
   { id: 'sentadilla_smith', name: 'Sentadilla smith', category: 'Piernas', muscle_primary: 'Cuadriceps', muscle_secondary: ['Glúteos'], equipment: 'Máquina', type: 'Máquina', exerciseType: 'pesas', movement: 'Sentadilla', difficulty: 'Principiante', is_compound: true, unilateral: false },
   { id: 'step_up', name: 'Step up', category: 'Piernas', muscle_primary: 'Cuadriceps', muscle_secondary: ['Glúteos'], equipment: 'Mancuernas', type: 'Libre', exerciseType: 'pesas', movement: 'Sentadilla', difficulty: 'Principiante', is_compound: true, unilateral: true },
-  { id: 'pistol_squat', name: 'Pistol squat', category: 'Piernas', muscle_primary: 'Cuadriceps', muscle_secondary: ['Glúteos', 'Core'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Sentadilla', difficulty: 'Avanzado', is_compound: true, unilateral: true },
-  { id: 'wall_sit', name: 'Wall sit', category: 'Piernas', muscle_primary: 'Cuadriceps', muscle_secondary: [], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Principiante', is_compound: false, unilateral: false },
+  { id: 'pistol_squat', name: 'Pistol squat', category: 'Piernas', muscle_primary: 'Cuadriceps', muscle_secondary: ['Glúteos', 'Core'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Sentadilla', difficulty: 'Avanzado', is_compound: true, unilateral: true, inputMode: 'bodyweight_reps' },
+  { id: 'wall_sit', name: 'Wall sit', category: 'Piernas', muscle_primary: 'Cuadriceps', muscle_secondary: [], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Principiante', is_compound: false, unilateral: false, inputMode: 'timed' },
   { id: 'curl_femoral_tumbado', name: 'Curl femoral tumbado', category: 'Piernas', muscle_primary: 'Isquiotibiales', muscle_secondary: [], equipment: 'Máquina', type: 'Máquina', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Principiante', is_compound: false, unilateral: false },
   { id: 'curl_femoral_sentado', name: 'Curl femoral sentado', category: 'Piernas', muscle_primary: 'Isquiotibiales', muscle_secondary: [], equipment: 'Máquina', type: 'Máquina', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Principiante', is_compound: false, unilateral: false },
   { id: 'curl_femoral_de_pie', name: 'Curl femoral de pie', category: 'Piernas', muscle_primary: 'Isquiotibiales', muscle_secondary: [], equipment: 'Máquina', type: 'Máquina', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Principiante', is_compound: false, unilateral: true },
-  { id: 'nordic_curl', name: 'Nordic curl', category: 'Piernas', muscle_primary: 'Isquiotibiales', muscle_secondary: [], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Avanzado', is_compound: false, unilateral: false },
+  { id: 'nordic_curl', name: 'Nordic curl', category: 'Piernas', muscle_primary: 'Isquiotibiales', muscle_secondary: [], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Avanzado', is_compound: false, unilateral: false, inputMode: 'bodyweight_reps' },
   { id: 'aductores_maquina', name: 'Aductores maquina', category: 'Piernas', muscle_primary: 'Aductores', muscle_secondary: [], equipment: 'Máquina', type: 'Máquina', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Principiante', is_compound: false, unilateral: false },
   { id: 'abductores_maquina', name: 'Abductores maquina', category: 'Piernas', muscle_primary: 'Abductores', muscle_secondary: [], equipment: 'Máquina', type: 'Máquina', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Principiante', is_compound: false, unilateral: false },
   { id: 'cossack_squat', name: 'Cossack squat', category: 'Piernas', muscle_primary: 'Aductores', muscle_secondary: ['Cuadriceps', 'Glúteos'], equipment: 'Mancuernas', type: 'Libre', exerciseType: 'pesas', movement: 'Sentadilla', difficulty: 'Intermedio', is_compound: true, unilateral: true },
   { id: 'lateral_lunge', name: 'Lateral lunge', category: 'Piernas', muscle_primary: 'Aductores', muscle_secondary: ['Cuadriceps', 'Glúteos'], equipment: 'Mancuernas', type: 'Libre', exerciseType: 'pesas', movement: 'Sentadilla', difficulty: 'Intermedio', is_compound: true, unilateral: true },
+  { id: 'sissy_squat', name: 'Sissy squat', category: 'Piernas', muscle_primary: 'Cuadriceps', muscle_secondary: ['Core'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Avanzado', is_compound: false, unilateral: false, inputMode: 'bodyweight_reps' },
+  { id: 'sentadilla_hack_inversa', name: 'Sentadilla hack inversa', category: 'Piernas', muscle_primary: 'Cuadriceps', muscle_secondary: ['Glúteos'], equipment: 'Máquina', type: 'Máquina', exerciseType: 'pesas', movement: 'Sentadilla', difficulty: 'Intermedio', is_compound: true, unilateral: false },
+  { id: 'sentadilla_pendulum', name: 'Sentadilla pendulum', category: 'Piernas', muscle_primary: 'Cuadriceps', muscle_secondary: ['Glúteos'], equipment: 'Máquina', type: 'Máquina', exerciseType: 'pesas', movement: 'Sentadilla', difficulty: 'Intermedio', is_compound: true, unilateral: false },
+  { id: 'prensa_horizontal', name: 'Prensa horizontal', category: 'Piernas', muscle_primary: 'Cuadriceps', muscle_secondary: ['Glúteos'], equipment: 'Máquina', type: 'Máquina', exerciseType: 'pesas', movement: 'Sentadilla', difficulty: 'Principiante', is_compound: true, unilateral: false },
 
   // ══════════════════════════════════════════
   // GLÚTEOS
   // ══════════════════════════════════════════
   { id: 'hip_thrust', name: 'Hip thrust', category: 'Glúteos', muscle_primary: 'Gluteos', muscle_secondary: ['Isquiotibiales'], equipment: 'Barra', type: 'Libre', exerciseType: 'pesas', movement: 'Bisagra', difficulty: 'Intermedio', is_compound: true, unilateral: false },
   { id: 'hip_thrust_maquina', name: 'Hip thrust maquina', category: 'Glúteos', muscle_primary: 'Gluteos', muscle_secondary: ['Isquiotibiales'], equipment: 'Máquina', type: 'Máquina', exerciseType: 'pesas', movement: 'Bisagra', difficulty: 'Principiante', is_compound: true, unilateral: false },
-  { id: 'puente_gluteo', name: 'Puente gluteo', category: 'Glúteos', muscle_primary: 'Gluteos', muscle_secondary: ['Isquiotibiales'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Bisagra', difficulty: 'Principiante', is_compound: false, unilateral: false },
+  { id: 'puente_gluteo', name: 'Puente gluteo', category: 'Glúteos', muscle_primary: 'Gluteos', muscle_secondary: ['Isquiotibiales'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Bisagra', difficulty: 'Principiante', is_compound: false, unilateral: false, inputMode: 'bodyweight_reps' },
   { id: 'patada_gluteo_polea', name: 'Patada gluteo polea', category: 'Glúteos', muscle_primary: 'Gluteos', muscle_secondary: [], equipment: 'Polea', type: 'Polea', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Principiante', is_compound: false, unilateral: true },
   { id: 'abduccion_maquina', name: 'Abduccion maquina', category: 'Glúteos', muscle_primary: 'Gluteo medio', muscle_secondary: [], equipment: 'Máquina', type: 'Máquina', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Principiante', is_compound: false, unilateral: false },
   { id: 'abduccion_banda', name: 'Abduccion banda', category: 'Glúteos', muscle_primary: 'Gluteo medio', muscle_secondary: [], equipment: 'Banda', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Principiante', is_compound: false, unilateral: false },
   { id: 'pull_through', name: 'Pull through', category: 'Glúteos', muscle_primary: 'Gluteos', muscle_secondary: ['Isquiotibiales'], equipment: 'Polea', type: 'Polea', exerciseType: 'pesas', movement: 'Bisagra', difficulty: 'Principiante', is_compound: true, unilateral: false },
-  { id: 'frog_pumps', name: 'Frog pumps', category: 'Glúteos', muscle_primary: 'Gluteos', muscle_secondary: [], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Principiante', is_compound: false, unilateral: false },
+  { id: 'frog_pumps', name: 'Frog pumps', category: 'Glúteos', muscle_primary: 'Gluteos', muscle_secondary: [], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Principiante', is_compound: false, unilateral: false, inputMode: 'bodyweight_reps' },
+  { id: 'hip_abduction_maquina', name: 'Hip abduction maquina', category: 'Glúteos', muscle_primary: 'Gluteos', muscle_secondary: ['Abductores'], equipment: 'Máquina', type: 'Máquina', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Principiante', is_compound: false, unilateral: false },
+  { id: 'kickback_polea', name: 'Kickback polea', category: 'Glúteos', muscle_primary: 'Gluteos', muscle_secondary: ['Isquiotibiales'], equipment: 'Polea', type: 'Polea', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Principiante', is_compound: false, unilateral: true },
 
   // ══════════════════════════════════════════
   // GEMELOS
@@ -260,17 +283,22 @@ export const EXERCISE_DB: Exercise[] = [
   // ══════════════════════════════════════════
   // CORE
   // ══════════════════════════════════════════
-  { id: 'crunch', name: 'Crunch', category: 'Core', muscle_primary: 'Abdomen', muscle_secondary: ['Oblicuos'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Principiante', is_compound: false, unilateral: false },
+  { id: 'crunch', name: 'Crunch', category: 'Core', muscle_primary: 'Abdomen', muscle_secondary: ['Oblicuos'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Principiante', is_compound: false, unilateral: false, inputMode: 'bodyweight_reps' },
   { id: 'crunch_maquina', name: 'Crunch maquina', category: 'Core', muscle_primary: 'Abdomen', muscle_secondary: [], equipment: 'Máquina', type: 'Máquina', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Principiante', is_compound: false, unilateral: false },
   { id: 'crunch_polea', name: 'Crunch polea', category: 'Core', muscle_primary: 'Abdomen', muscle_secondary: ['Oblicuos'], equipment: 'Polea', type: 'Polea', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Intermedio', is_compound: false, unilateral: false },
-  { id: 'elevacion_piernas', name: 'Elevacion piernas', category: 'Core', muscle_primary: 'Abdomen inferior', muscle_secondary: ['Flexores de cadera'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Intermedio', is_compound: false, unilateral: false },
-  { id: 'elevacion_piernas_colgado', name: 'Elevacion piernas colgado', category: 'Core', muscle_primary: 'Abdomen', muscle_secondary: ['Flexores de cadera'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Avanzado', is_compound: false, unilateral: false },
-  { id: 'plancha', name: 'Plancha', category: 'Core', muscle_primary: 'Core', muscle_secondary: ['Abdomen', 'Oblicuos'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Principiante', is_compound: false, unilateral: false },
-  { id: 'plancha_lateral', name: 'Plancha lateral', category: 'Core', muscle_primary: 'Oblicuos', muscle_secondary: ['Core'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Intermedio', is_compound: false, unilateral: true },
+  { id: 'elevacion_piernas', name: 'Elevacion piernas', category: 'Core', muscle_primary: 'Abdomen inferior', muscle_secondary: ['Flexores de cadera'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Intermedio', is_compound: false, unilateral: false, inputMode: 'bodyweight_reps' },
+  { id: 'elevacion_piernas_colgado', name: 'Elevacion piernas colgado', category: 'Core', muscle_primary: 'Abdomen', muscle_secondary: ['Flexores de cadera'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Avanzado', is_compound: false, unilateral: false, inputMode: 'bodyweight_reps' },
+  { id: 'plancha', name: 'Plancha', category: 'Core', muscle_primary: 'Core', muscle_secondary: ['Abdomen', 'Oblicuos'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Principiante', is_compound: false, unilateral: false, inputMode: 'timed' },
+  { id: 'plancha_lateral', name: 'Plancha lateral', category: 'Core', muscle_primary: 'Oblicuos', muscle_secondary: ['Core'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Intermedio', is_compound: false, unilateral: true, inputMode: 'timed' },
   { id: 'russian_twist', name: 'Russian twist', category: 'Core', muscle_primary: 'Oblicuos', muscle_secondary: ['Abdomen'], equipment: 'Mancuernas', type: 'Libre', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Intermedio', is_compound: false, unilateral: false },
   { id: 'woodchopper', name: 'Woodchopper', category: 'Core', muscle_primary: 'Oblicuos', muscle_secondary: ['Abdomen'], equipment: 'Polea', type: 'Polea', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Intermedio', is_compound: false, unilateral: true },
-  { id: 'bicycle_crunch', name: 'Bicycle crunch', category: 'Core', muscle_primary: 'Oblicuos', muscle_secondary: ['Abdomen'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Principiante', is_compound: false, unilateral: false },
-  { id: 'dead_bug', name: 'Dead bug', category: 'Core', muscle_primary: 'Core', muscle_secondary: ['Abdomen'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Principiante', is_compound: false, unilateral: false },
+  { id: 'bicycle_crunch', name: 'Bicycle crunch', category: 'Core', muscle_primary: 'Oblicuos', muscle_secondary: ['Abdomen'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Principiante', is_compound: false, unilateral: false, inputMode: 'bodyweight_reps' },
+  { id: 'dead_bug', name: 'Dead bug', category: 'Core', muscle_primary: 'Core', muscle_secondary: ['Abdomen'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Principiante', is_compound: false, unilateral: false, inputMode: 'bodyweight_reps' },
+  { id: 'ab_wheel_rollout', name: 'Ab wheel', category: 'Core', muscle_primary: 'Core', muscle_secondary: ['Abdomen', 'Hombros'], equipment: 'Funcional', type: 'Funcional', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Intermedio', is_compound: false, unilateral: false, inputMode: 'bodyweight_reps' },
+  { id: 'hollow_hold', name: 'Hollow hold', category: 'Core', muscle_primary: 'Abdomen', muscle_secondary: ['Core'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Intermedio', is_compound: false, unilateral: false, inputMode: 'timed' },
+  { id: 'pallof_press', name: 'Pallof press', category: 'Core', muscle_primary: 'Oblicuos', muscle_secondary: ['Core'], equipment: 'Polea', type: 'Polea', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Intermedio', is_compound: false, unilateral: false },
+  { id: 'v_ups', name: 'V-ups', category: 'Core', muscle_primary: 'Abdomen', muscle_secondary: ['Flexores de cadera'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Intermedio', is_compound: false, unilateral: false, inputMode: 'bodyweight_reps' },
+  { id: 'hanging_knee_raise', name: 'Elevacion rodillas colgado', category: 'Core', muscle_primary: 'Abdomen inferior', muscle_secondary: ['Flexores de cadera'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Intermedio', is_compound: false, unilateral: false, inputMode: 'bodyweight_reps' },
 
   // ══════════════════════════════════════════
   // CARDIO
@@ -282,6 +310,11 @@ export const EXERCISE_DB: Exercise[] = [
   { id: 'remo_maquina_cardio', name: 'Remo maquina cardio', category: 'Cardio', muscle_primary: 'Cuerpo completo', muscle_secondary: ['Dorsal ancho', 'Bíceps'], equipment: 'Máquina', type: 'Máquina', exerciseType: 'cardio', movement: 'Cardio', difficulty: 'Intermedio', is_compound: false, unilateral: false },
   { id: 'escaladora', name: 'Escaladora', category: 'Cardio', muscle_primary: 'Piernas', muscle_secondary: ['Glúteos'], equipment: 'Máquina', type: 'Máquina', exerciseType: 'cardio', movement: 'Cardio', difficulty: 'Intermedio', is_compound: false, unilateral: false },
   { id: 'saltar_cuerda', name: 'Saltar cuerda', category: 'Cardio', muscle_primary: 'Cardio', muscle_secondary: ['Gemelos'], equipment: 'Peso corporal', type: 'Funcional', exerciseType: 'cardio', movement: 'Cardio', difficulty: 'Intermedio', is_compound: false, unilateral: false },
+  { id: 'caminata_inclinada', name: 'Caminata inclinada', category: 'Cardio', muscle_primary: 'Piernas', muscle_secondary: ['Glúteos', 'Cardio'], equipment: 'Máquina', type: 'Máquina', exerciseType: 'cardio', movement: 'Cardio', difficulty: 'Principiante', is_compound: false, unilateral: false },
+  { id: 'natacion', name: 'Natacion', category: 'Cardio', muscle_primary: 'Cardio', muscle_secondary: ['Espalda', 'Hombros'], equipment: 'Funcional', type: 'Funcional', exerciseType: 'cardio', movement: 'Cardio', difficulty: 'Intermedio', is_compound: true, unilateral: false },
+  { id: 'bicicleta_asalto', name: 'Bicicleta de asalto', category: 'Cardio', muscle_primary: 'Cardio', muscle_secondary: ['Piernas', 'Core'], equipment: 'Máquina', type: 'Máquina', exerciseType: 'cardio', movement: 'Cardio', difficulty: 'Intermedio', is_compound: false, unilateral: false },
+  { id: 'sled_push', name: 'Sled push', category: 'Cardio', muscle_primary: 'Piernas', muscle_secondary: ['Glúteos', 'Core'], equipment: 'Funcional', type: 'Funcional', exerciseType: 'cardio', movement: 'Cardio', difficulty: 'Intermedio', is_compound: true, unilateral: false },
+  { id: 'air_bike', name: 'Air bike', category: 'Cardio', muscle_primary: 'Cardio', muscle_secondary: ['Piernas', 'Brazos'], equipment: 'Máquina', type: 'Máquina', exerciseType: 'cardio', movement: 'Cardio', difficulty: 'Intermedio', is_compound: false, unilateral: false },
 
   // ══════════════════════════════════════════
   // HIIT
@@ -300,15 +333,19 @@ export const EXERCISE_DB: Exercise[] = [
   { id: 'kettlebell_swing', name: 'Kettlebell swing', category: 'Full body', muscle_primary: 'Gluteos', muscle_secondary: ['Isquiotibiales', 'Core'], equipment: 'Kettlebell', type: 'Libre', exerciseType: 'pesas', movement: 'Bisagra', difficulty: 'Intermedio', is_compound: true, unilateral: false },
   { id: 'turkish_get_up', name: 'Turkish get up', category: 'Full body', muscle_primary: 'Core', muscle_secondary: ['Hombros', 'Piernas'], equipment: 'Peso corporal', type: 'Funcional', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Avanzado', is_compound: true, unilateral: true },
   { id: 'battle_ropes', name: 'Battle ropes', category: 'Full body', muscle_primary: 'Cardio', muscle_secondary: ['Hombros', 'Core'], equipment: 'Máquina', type: 'Máquina', exerciseType: 'pesas', movement: 'Cardio', difficulty: 'Intermedio', is_compound: true, unilateral: false },
+  { id: 'snatch', name: 'Snatch', category: 'Full body', muscle_primary: 'Full body', muscle_secondary: ['Hombros', 'Piernas'], equipment: 'Barra', type: 'Libre', exerciseType: 'pesas', movement: 'Empuje vertical', difficulty: 'Avanzado', is_compound: true, unilateral: false },
+  { id: 'power_clean', name: 'Power clean', category: 'Full body', muscle_primary: 'Full body', muscle_secondary: ['Piernas', 'Espalda'], equipment: 'Barra', type: 'Libre', exerciseType: 'pesas', movement: 'Bisagra', difficulty: 'Avanzado', is_compound: true, unilateral: false },
+  { id: 'muscle_up', name: 'Muscle up', category: 'Full body', muscle_primary: 'Dorsal ancho', muscle_secondary: ['Pecho mayor', 'Tríceps'], equipment: 'Peso corporal', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Tirón vertical', difficulty: 'Avanzado', is_compound: true, unilateral: false, inputMode: 'bodyweight_reps' },
+  { id: 'rope_climb', name: 'Rope climb', category: 'Full body', muscle_primary: 'Dorsal ancho', muscle_secondary: ['Bíceps', 'Core'], equipment: 'Funcional', type: 'Funcional', exerciseType: 'pesas', movement: 'Tirón vertical', difficulty: 'Avanzado', is_compound: true, unilateral: false, inputMode: 'timed' },
 
   // ══════════════════════════════════════════
   // MOVILIDAD
   // ══════════════════════════════════════════
   { id: 'band_pull_apart', name: 'Band pull apart', category: 'Movilidad', muscle_primary: 'Espalda alta', muscle_secondary: ['Deltoide posterior'], equipment: 'Banda', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Principiante', is_compound: false, unilateral: false },
   { id: 'rotacion_hombro', name: 'Rotacion hombro', category: 'Movilidad', muscle_primary: 'Hombros', muscle_secondary: [], equipment: 'Banda', type: 'Cuerpo', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Principiante', is_compound: false, unilateral: false },
-  { id: 'estiramiento_cadera', name: 'Estiramiento cadera', category: 'Movilidad', muscle_primary: 'Cadera', muscle_secondary: [], equipment: 'Peso corporal', type: 'Funcional', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Principiante', is_compound: false, unilateral: false },
-  { id: 'cat_cow', name: 'Cat cow', category: 'Movilidad', muscle_primary: 'Columna', muscle_secondary: ['Core'], equipment: 'Peso corporal', type: 'Funcional', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Principiante', is_compound: false, unilateral: false },
-  { id: 'sentadilla_profunda', name: 'Sentadilla profunda', category: 'Movilidad', muscle_primary: 'Cadera', muscle_secondary: ['Cuadriceps'], equipment: 'Peso corporal', type: 'Funcional', exerciseType: 'pesas', movement: 'Sentadilla', difficulty: 'Principiante', is_compound: false, unilateral: false },
+  { id: 'estiramiento_cadera', name: 'Estiramiento cadera', category: 'Movilidad', muscle_primary: 'Cadera', muscle_secondary: [], equipment: 'Peso corporal', type: 'Funcional', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Principiante', is_compound: false, unilateral: false, inputMode: 'bodyweight_timed' },
+  { id: 'cat_cow', name: 'Cat cow', category: 'Movilidad', muscle_primary: 'Columna', muscle_secondary: ['Core'], equipment: 'Peso corporal', type: 'Funcional', exerciseType: 'pesas', movement: 'Aislamiento', difficulty: 'Principiante', is_compound: false, unilateral: false, inputMode: 'bodyweight_timed' },
+  { id: 'sentadilla_profunda', name: 'Sentadilla profunda', category: 'Movilidad', muscle_primary: 'Cadera', muscle_secondary: ['Cuadriceps'], equipment: 'Peso corporal', type: 'Funcional', exerciseType: 'pesas', movement: 'Sentadilla', difficulty: 'Principiante', is_compound: false, unilateral: false, inputMode: 'bodyweight_timed' },
 ];
 
 // ══════════════════════════════════════════
@@ -395,7 +432,7 @@ export const NAME_TO_ID: Record<string, string> = {
   'Extensiones cuádriceps': 'extension_piernas',
   'Zancadas': 'zancadas',
   'Hack squat': 'hack_squat',
-  'Sissy squat': 'wall_sit',
+  'Sissy squat': 'sissy_squat',
   'Step up': 'step_up',
   // ── Old Isquiotibiales names ──
   'Curl femoral': 'curl_femoral_tumbado',
@@ -429,7 +466,7 @@ export const NAME_TO_ID: Record<string, string> = {
   'Elevación de piernas': 'elevacion_piernas',
   'Elevación de piernas en banco': 'elevacion_piernas',
   'Russian twist': 'russian_twist',
-  'Ab wheel': 'plancha',
+  'Ab wheel': 'ab_wheel_rollout',
   'Mountain climbers': 'mountain_climbers',
   'Dead bug': 'dead_bug',
   'Leñador en polea': 'woodchopper',
@@ -441,10 +478,144 @@ export const NAME_TO_ID: Record<string, string> = {
   'Saltar cuerda': 'saltar_cuerda',
   'Caminadora': 'cinta_correr',
   'Stairmaster': 'escaladora',
-  'Bicicleta de asalto': 'bicicleta_estatica',
-  'Natación': 'correr',
+  'Bicicleta de asalto': 'bicicleta_asalto',
+  'Natación': 'natacion',
   'Caminar': 'cinta_correr',
+  'Caminata inclinada': 'caminata_inclinada',
+  'Incline walk': 'caminata_inclinada',
+  'Treadmill incline': 'caminata_inclinada',
+  'Incline walking': 'caminata_inclinada',
+  'Swimming': 'natacion',
+  'Assault bike': 'air_bike',
+  'Sled push': 'sled_push',
+  'Air bike': 'air_bike',
   'HIIT': 'burpees',
+  // ── English aliases (for ChatGPT imports) ──
+  'Bench press': 'press_banca_barra',
+  'Flat bench press': 'press_banca_barra',
+  'Incline bench press': 'press_inclinado_barra',
+  'Incline bench': 'press_inclinado_barra',
+  'Decline bench press': 'press_declinado_barra',
+  'Chest press': 'press_banca_maquina',
+  'Chest fly': 'aperturas_mancuernas',
+  'Cable fly': 'cruces_polea_media',
+  'Cable crossover': 'crossover_polea',
+  'Pec deck': 'aperturas_maquina',
+  'Push ups': 'flexiones',
+  'Push-ups': 'flexiones',
+  'Pushups': 'flexiones',
+  'Dips': 'fondos_paralelas',
+  'Lat pulldown': 'jalon_al_pecho',
+  'Seated row': 'remo_maquina',
+  'Seated cable row': 'remo_polea_baja',
+  'Barbell row': 'remo_barra',
+  'Dumbbell row': 'remo_mancuerna',
+  'T-bar row': 'remo_t_bar',
+  'Pendlay row': 'remo_pendlay',
+  'Pull up': 'dominadas_pronadas',
+  'Pull-up': 'dominadas_pronadas',
+  'Pull ups': 'dominadas_pronadas',
+  'Pullups': 'dominadas_pronadas',
+  'Chin up': 'dominadas_chin_up',
+  'Chin-up': 'dominadas_chin_up',
+  'Chin ups': 'dominadas_chin_up',
+  'Overhead press': 'press_militar_barra',
+  'Military press': 'press_militar_barra',
+  'Shoulder press': 'press_militar_barra',
+  'Lateral raise': 'elevaciones_laterales',
+  'Lateral raises': 'elevaciones_laterales',
+  'Side lateral raise': 'elevaciones_laterales',
+  'Front raise': 'elevaciones_frontales',
+  'Reverse fly': 'pajaros_mancuernas',
+  'Rear delt fly': 'rear_delt_fly',
+  'Shrugs': 'encogimientos_hombros',
+  'Barbell shrug': 'encogimientos_hombros',
+  'Bicep curl': 'curl_barra',
+  'Barbell curl': 'curl_barra',
+  'Dumbbell curl': 'curl_mancuernas',
+  'Hammer curl': 'curl_martillo',
+  'Preacher curl': 'curl_predicador',
+  'Spider curl': 'curl_spider',
+  'EZ bar curl': 'curl_barra_z',
+  'EZ curl': 'curl_barra_z',
+  'Concentration curl': 'curl_concentrado',
+  'Cable curl': 'curl_polea',
+  'Reverse grip curl': 'curl_inverso',
+  'Drag curl': 'curl_drag',
+  'Tricep pushdown': 'extension_polea_barra',
+  'Triceps pushdown': 'extension_polea_barra',
+  'Rope pushdown': 'pushdown_cuerda',
+  'Skull crusher': 'skull_crushers',
+  'Skull crushers': 'skull_crushers',
+  'Overhead tricep extension': 'extension_overhead_mancuerna',
+  'Tricep kickback': 'patada_triceps',
+  'Close grip bench press': 'press_cerrado',
+  'Squat': 'sentadilla_barra',
+  'Squats': 'sentadilla_barra',
+  'Back squat': 'sentadilla_barra',
+  'Front squat': 'sentadilla_frontal',
+  'Goblet squat': 'sentadilla_goblet',
+  'Bulgarian split squat': 'sentadilla_bulgara',
+  'Smith machine squat': 'sentadilla_smith',
+  'Box squat': 'sentadilla_barra',
+  'Leg press': 'prensa_piernas',
+  'Leg extension': 'extension_piernas',
+  'Leg curl': 'curl_femoral_tumbado',
+  'Seated leg curl': 'curl_femoral_sentado',
+  'Lying leg curl': 'curl_femoral_tumbado',
+  'Standing leg curl': 'curl_femoral_de_pie',
+  'Lunge': 'zancadas',
+  'Lunges': 'zancadas',
+  'Walking lunge': 'zancadas_caminando',
+  'Walking lunges': 'zancadas_caminando',
+  'Step ups': 'step_up',
+  'Deadlift': 'peso_muerto_convencional',
+  'Conventional deadlift': 'peso_muerto_convencional',
+  'Romanian deadlift': 'peso_muerto_rumano',
+  'RDL': 'peso_muerto_rumano',
+  'Sumo deadlift': 'peso_muerto_sumo',
+  'Good morning': 'buenos_dias',
+  'Good mornings': 'buenos_dias',
+  'Barbell hip thrust': 'hip_thrust',
+  'Glute bridge': 'puente_gluteo',
+  'Cable kickback': 'kickback_polea',
+  'Glute kickback': 'kickback_polea',
+  'Calf raise': 'elevacion_talones',
+  'Calf raises': 'elevacion_talones',
+  'Standing calf raise': 'elevacion_talones_maquina',
+  'Seated calf raise': 'elevacion_talones_sentado',
+  'Plank': 'plancha',
+  'Side plank': 'plancha_lateral',
+  'Crunches': 'crunch',
+  'Hanging leg raise': 'elevacion_piernas_colgado',
+  'Hanging knee raise': 'hanging_knee_raise',
+  'Leg raise': 'elevacion_piernas',
+  'Ab rollout': 'ab_wheel_rollout',
+  'V-ups': 'v_ups',
+  'V ups': 'v_ups',
+  'Farmer walk': 'farmer_walk',
+  'Farmer carry': 'farmer_walk',
+  'Kettlebell swing': 'kettlebell_swing',
+  'Turkish get up': 'turkish_get_up',
+  'Clean and press': 'clean_and_press',
+  'Power clean': 'power_clean',
+  'Snatch': 'snatch',
+  'Muscle up': 'muscle_up',
+  'Muscle-up': 'muscle_up',
+  'Thruster': 'thruster',
+  'Thrusters': 'thruster',
+  'Burpee': 'burpees',
+  'Battle ropes': 'battle_ropes',
+  'Jump rope': 'saltar_cuerda',
+  'Jumping rope': 'saltar_cuerda',
+  'Treadmill': 'cinta_correr',
+  'Elliptical': 'eliptica',
+  'Stair climber': 'escaladora',
+  'Stationary bike': 'bicicleta_estatica',
+  'Exercise bike': 'bicicleta_estatica',
+  'Rowing machine': 'remo_maquina_cardio',
+  'Running': 'correr',
+  'Jogging': 'correr',
   // ── Old IDs from previous DB version (for migration of stored sessions) ──
   'aperturas_polea': 'cruces_polea_media',
   'elevaciones_laterales_mancuernas': 'elevaciones_laterales',
@@ -478,14 +649,12 @@ export const NAME_TO_ID: Record<string, string> = {
   'aductores_maquina': 'aductores_maquina',
   'lenador_polea': 'woodchopper',
   'elevacion_piernas_banco': 'elevacion_piernas',
-  'ab_wheel': 'plancha',
+  'ab_wheel': 'ab_wheel_rollout',
   'crunch_polea': 'crunch_polea',
-  'sissy_squat': 'wall_sit',
   'sentadilla_smith': 'sentadilla_smith',
   'sentadilla_multipower': 'sentadilla_smith',
   'remo_ergometro': 'remo_maquina_cardio',
-  'bicicleta_asalto': 'bicicleta_estatica',
-  'natacion': 'correr',
+  'natacion': 'natacion',
   'caminar': 'cinta_correr',
   'caminadora': 'cinta_correr',
   'stairmaster': 'escaladora',
@@ -509,6 +678,12 @@ for (const ex of EXERCISE_DB) {
 /** Primary lookup by id */
 export function getExerciseById(id: string): Exercise | null {
   return EXERCISE_MAP.get(id) || null;
+}
+
+/** Get the input mode for an exercise (defaults to weight_reps) */
+export function getInputMode(id: string): InputMode {
+  const ex = EXERCISE_MAP.get(id);
+  return ex?.inputMode ?? 'weight_reps';
 }
 
 /** Backward-compatible lookup: tries id first, then old name, then current name */
